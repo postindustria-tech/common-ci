@@ -16,6 +16,7 @@ Common-CI project contains a guideline for creation of continuous integration sc
     - [Microsoft Azure DevOps Pipelines](#microsoft-azure-devops-pipelines)
     - [YML file](#yml-file)
     - [Build and test platforms](#build-and-test-platforms)
+    - [Testing principles](#testing-principles)
     - [Additional documentation](#additional-documentation)
 - [Continuous deployment](#continuous-deployment)
   - [Configuration](#configuration)
@@ -153,7 +154,13 @@ Although relatively self descriptive, could be extended by comments:
 ```
 
 ### Build and test platforms
-51Degrees provides information about supported platforms and language/API versions. The full table is available on [51Degrees documentation website](https://51degrees.com/documentation/index.html) on [Information/Version support page](https://51degrees.com/documentation/_info__version_support.html). Azure DevOps Pipelines should be configured to at least mirror the requirements setup by the documentation. If platform architecture is not specified in the support version matrix, it is assumed that both 32 and 64 bit platforms are supported and relevant continuous jobs should be provided. If any changes are applied, support removed or added, either the documentation table or CI configuration must be updated to assure full synchronization between the two.
+51Degrees provides information about supported platforms and language/API versions. The full table is available on [51Degrees documentation website](https://51degrees.com/documentation/index.html) on [Information/Version support page](https://51degrees.com/documentation/_info__version_support.html). Azure DevOps Pipelines should be configured to at least mirror the requirements setup by the documentation. If platform architecture is not specified in the support version matrix, it is assumed that both 32 and 64 bit platforms are supported and relevant continuous integration jobs should be provided (please ignore 32bit architecture for the operating systems not supporting x86 platforms). If any changes are applied, support removed or added, either the documentation table or CI configuration must be updated to assure full synchronization between the two.
+### Testing principles
+Whenever testing environment is set up for a project, continuous integration scripts should be configured to perform full set of tests for:
+- All platforms supported by the software project
+- All architectures supported by the operating system (Linux 32/64bit; Windows 32/64bit; MacOS 64bit)
+- All variants of configuration (e.g. for APIs all performance profiles)
+- Both debug and release build configurations
 ### Additional documentation
 This guideline covers high-level overview and basic principles for continuous integration configuration in 51Degrees. Due to the nature of software products supported and provided by the company, different approaches may be required for various types of platforms, languages, APIs and their versions. Therefore, this document should be treated as the guideline and any project specific configuration that alters the information provided by this document should be explained in the `readme.md` file stored under the `ci` folder of the given project. Repository containing this document should be added as a submodule to any project that contains Continuous Integration pipeline configured within 51Degrees Azure DevOps environment. Example directory tree expected in the project:
 ```
