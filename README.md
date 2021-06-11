@@ -170,8 +170,8 @@ This guideline covers high-level overview and basic principles for continuous in
     \common-ci
       \readme.md
     \readme.md
-    \build_and_test.yml
-    \build_and_publish.yml
+    \build-and-test.yml
+    \build-and-publish.yml
 ```
 ### APIs common templates
 When tasks are replicated across APIs, they should be made as templates and kept in the `common-ci` repository. Templates that are shared across languages are kept at the root directory of `common-ci` and templates which are only shared within a language APIs should be kept in its distinct folder, named with the language name. Below is an illustration of the of `common-ci` directory structure:
