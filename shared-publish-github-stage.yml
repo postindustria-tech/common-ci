@@ -5,7 +5,7 @@ parameters:
 stages:
 - stage: publish_github
   displayName: Publish to GitHub
-  condition: eq(variables['build.sourceBranch'], ${{ parameters.branchName }})
+  condition: eq(variables['build.sourceBranch'], '${{ parameters.branchName }}')
   jobs:
   - deployment: deploy_github
     displayName: Deploy to GitHub
