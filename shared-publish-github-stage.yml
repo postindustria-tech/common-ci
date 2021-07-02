@@ -1,6 +1,9 @@
 parameters:
 - name: imageName # Name of the platform to run on
 - name: branchName # Name of the branch which is allowed to be published to GitHub
+- name: skipTagging # True if tagging should be skipped for the repository
+  type: boolean
+  default: false
 
 stages:
 - stage: publish_github
@@ -86,13 +89,16 @@ stages:
                echo "Failed to push branch '$(Build.SourceBranchName)' to GitHub."
                exit 1
              fi
-             
-             echo "Pushing tag '$(Build.BuildNumber)' to GitHub"
-             git push github $(Build.BuildNumber)
-             if [ $? != 0 ]; then
-               echo "Failed to push tag '$(Build.BuildNumber)' to GitHub."
-               exit 1
-             fi
-             
-            displayName: 'Push to GitHub'
-            failOnStderr: true
+
+          - ${{ if eq(parameters.skipTagging, false) }}:
+            - bash: |
+                export tagName="`git tag --points-at $(Build.SourceBranchName)`"
+                
+                echo "Pushing tag '$tagName' to GitHub"
+                git push github $tagName
+                if [ $? != 0 ]; then
+                  echo "Failed to push tag '$tagName' to GitHub."
+                  exit 1
+                fi
+              displayName: 'Push tags to GitHub'
+              failOnStderr: true

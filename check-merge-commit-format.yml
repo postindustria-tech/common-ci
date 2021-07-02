@@ -1,0 +1,50 @@
+trigger: none
+
+# Don't trigger for a pull request
+pr: none
+
+stages:
+
+- stage: Merge_Message
+  jobs:
+  - job: Merge_Message
+
+    variables:
+    # Access token for the git repository. Used by the git tag task.
+    - name: system_accesstoken
+      value: $(System.AccessToken)
+    
+    pool:
+      vmImage: 'windows-latest'
+    
+    steps:
+    # The lines below are needed to allow the pipeline access to the
+    # OAuth access token that controls write access to the git repository.
+    # (Required for GitTag task)
+    - checkout: self
+      persistCredentials: true
+        
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Get the name of the repo from the PR.
+          $repoUrl = "$(System.PullRequest.SourceRepositoryURI)"
+          $repoUrlParts = $repoUrl.Split("/")
+          $repoName = $repoUrlParts[$repoUrlParts.Length - 1]
+          $url = "https://dev.azure.com/51degrees/pipeline/_apis/git/repositories/$repoName/pullrequests/$(System.PullRequest.PullRequestId)?api-version=6.0"
+          # Get the PR.
+          $pr = Invoke-RestMethod -Uri $url `
+          -Headers @{
+           Authorization = "Bearer $(System.AccessToken)"
+          }
+          # Get the title of the PR and check that it matches the expected format.
+          $title = $pr.title
+          $found = $title -match "Merge branch '.*'"
+          if ( $found -eq $false) {
+            # The format does not match, so fail the build.
+            $errMsg = "`"$title`" does not match the format `"Merge branch '[branchname]' ...`""
+            Write-Error $errMsg
+            exit 1
+          }
+        failOnStderr: true

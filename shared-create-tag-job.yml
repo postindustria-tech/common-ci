@@ -19,12 +19,35 @@ jobs:
   - checkout: self
     persistCredentials: true
   
+  # Checkout the common-ci repo so the GitVersion config file can
+  # be used.
+  - checkout: git://pipeline/common-ci
+
+  - powershell: |
+      Write-Host "Check if $($Env:BUILD_REPOSITORY_NAME)\GitVersion.yml exists."
+      if ($(Test-Path $Env:BUILD_REPOSITORY_NAME\GitVersion.yml)) {
+          Write-Host "GitVersion.yml exists in current location."
+          $gitVersionPath = "$($(Get-Location).Path)\$Env:BUILD_REPOSITORY_NAME\GitVersion.yml"
+      } else {
+          Write-Host "Use GitVersion.yml in common-ci."
+          $gitVersionPath = "$($(Get-Location).Path)\common-ci\GitVersion.yml"
+      }
+      Write-Host "# Using GitVersion.yml at $gitVersionPath"
+      Write-Host "##vso[task.setvariable variable=GitVersionPath]$gitVersionPath"
+    name: SetGitVersionPath
+    displayName: 'Determine GitVersion.yml file to use.'
+
   - task: gittools.gitversion.gitversion-task.GitVersion@5
     displayName: 'Determine Version Number'
     # Give this task a name so we can use the variables it sets later.
     name: GitVersion
     inputs:
       preferBundledVersion: false
+      # As two repos have been checked out, the default path will not
+      # work. So it is specified here.
+      targetPath: '$(Build.Repository.Name)'
+      configFilePath: '$(GitVersionPath)'
+      
   
   # Add a tag to the git repository with the version number.
   - task: ATP.ATP-GitTag.GitTag.GitTag@5
@@ -32,3 +55,4 @@ jobs:
     inputs:
       tagUser: 'Azure DevOps'
       tagEmail: 'CIUser@51Degrees.com'
+      workingdir: '$(Build.Repository.Name)'

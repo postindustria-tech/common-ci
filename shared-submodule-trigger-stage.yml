@@ -1,0 +1,55 @@
+stages:
+- stage: UpdateReference
+  displayName: 'Update Reference'
+  
+  pool:
+    vmImage: windows-2019
+  
+  variables:
+  - group: CIAutomation # Required to access CI variables
+  - name: SYSTEM_ACCESSTOKEN
+    value: $(System.AccessToken)
+  
+  jobs:
+  - job:
+    
+    steps:
+    - checkout: self
+      submodules: recursive
+      persistCredentials: true
+      # Checkout the common-ci to access the latest release configuration.
+    - checkout: git://pipeline/common-ci
+      
+    - powershell: |
+        # Install all modules
+        $Env:PSModulePath += ";$($(Get-Location).Path)\common-ci\scripts\modules"
+        Write-Host "Module Path: $($Env:PsModulePath)"
+        
+        # Get release-config.json path
+        $configFile = "$($(Get-Location).Path)\common-ci\release-config.json"
+        
+        # Cancel any previous builds
+        Write-Host ""
+        Write-Host "# Cancel the previous builds"
+        Write-Host "============================"
+        Write-Host "Pipeline: " + $Env:BUILD_DEFINITIONNAME
+        Write-Host "Branch: " + $Env:BUILD_SOURCEBRANCH
+        Write-Host "Current Build ID: " + $Env:BUILD_BUILDID
+        if (!$(Stop-PreviousBuilds `
+            -PipelineName $Env:BUILD_DEFINITIONNAME `
+            -Branch $Env:BUILD_SOURCEBRANCH `
+            -CurrentBuildId $Env:BUILD_BUILDID)) {
+            Write-Host "# ERROR: Failed to cancel the previous builds."
+            exit 1
+        }
+        
+        # Update all submodule.
+        cd $Env:BUILD_REPOSITORY_NAME
+        Write-Host "# Try to update repository $Env:BUILD_REPOSITORY_NAME."
+        if (!$(Update-CommitPushPull -ConfigFile $configFile)) {
+            Write-Host "# ERROR: Failed to update submodule references and package dependencies."
+            exit 1
+        }
+      displayName: 'Submodule trigger'
+      workingDirectory: $(build.sourcesDirectory)
+      condition: and(succeeded(), eq(variables['AutomatedRelease'], 'On'))

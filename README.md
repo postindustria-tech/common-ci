@@ -9,7 +9,7 @@ Common-CI project contains a guideline for creation of continuous integration sc
   - [Approach](#approach)
     - [Overview](#overview)
     - [Build and test](#build-and-test)
-    - [Build, test and publish](#build-test-and-publish)
+    - [Create packages](#create-packages)
   - [Naming convention](#naming-convention)
     - [Azure DevOps Pipelines](#azure-devops-pipelines)
   - [Development guideline](#development-guideline)
@@ -25,6 +25,9 @@ Common-CI project contains a guideline for creation of continuous integration sc
   - [Release process](#release-process)
     - [Packages release](#packages-release)
     - [External package managers and public repositories](#external-package-managers-and-public-repositories)
+  - [Automation](#automation)
+  - [Naming convention](#naming-convention-1)
+    - [Azure DevOps Pipelines](#azure-devops-pipelines-1)
 - [License](#license)
 
 # Reasoning
@@ -47,7 +50,7 @@ As an internal repository management system 51Degrees is using the Azure DevOps 
 
 At least two main continuous integration jobs should be provided for each software project/repository:
 - “[Build and test](#build-and-test)”, and
-- “[Build, test and publish](#build,-test-and-publish)”
+- “[Create packages](#create-packages)”
 
 Binaries built by continuous integration should be configured to perform a release built by default. If debug build configuration is required, additional, explicit jobs should be created to clearly indicate that pipeline output will be in debug mode.
 
@@ -80,14 +83,12 @@ General guideline for selecting the approach is to keep the `yml` file in a cons
 
 <i>Note: Build and test job should be configured in a separate `yml` file to allow performing the set of tasks defined in this job as a part of "Build, test and publish" job.</i>
 
-### Build, test and publish
-Build, test and publish job should be used for creation of packages or tagging the repository and continuous integration system should be configured to automatically execute this job whenever pull request from `release` or `hotfix` branch is merged to `main` branch (as described in  [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)).
+### Create packages
+Create packages job should be used for creation of packages or tagging the repository and continuous integration system should be configured to automatically execute this job whenever pull request from `release` or `hotfix` branch is merged to `main` branch (as described in  [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)).
 
-Build, test and publish job uses tasks created for [Build and test](#build-and-test) job and extends them by any tasks required for creation of packages and/or repository version tag. This job usually runs a sequence of tasks which differ for creating the packages and tagging the repository. <br />
+Create packages job performs any tasks required for creation of packages and/or repository version tag. This job usually runs a sequence of tasks which differ for creating the packages and tagging the repository. <br />
 
 Typical tasks for packages creation:<br />
-- Build and test<br />
-As described in [Build and test](#build-and-test) section.
 - Package creation<br />
 Language and project specific task generating the packages for given language and/or platform. This task should be documented in project specific `ci/readme.md` file.
 - Digital signing<br />
@@ -96,26 +97,23 @@ This task should digitally sign the generated binaries or packages to assure a h
 Packages or binaries produced by [Build, test and publish](#build,-test-and-publish) job should be published as artifacts of the Azure DevOps Pipeline execution. This task is important to support a smooth release process where the product of this step is used as the final release package.
 
 Typical tasks for creating a repository tag:<br />
-- Build and test<br />
-As described in [Build and test](#build-and-test) section.
 - Determine repository version number<br />
 This step should determine the version number to be used for repository tagging. 51Degrees is using [GitVersion](https://gitversion.readthedocs.io/en/latest/input/docs/build-server-support/build-server/azure-devops/) Azure DevOps plugin to identify the repository version based on the [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 - Tag the repository<br />
 Perform `git tag` operation on the repository using the version number determined in the previous step and `push` the newly created tag to remote.
 
 Job <b>must</b> indicate a <b>fail state</b> if any of the following occurs:
-- Build and test step fails as described in [build and test](#build-and-test) section.
 - Package creation fails
 - Digital signature process fails
 - Artifacts cannot be found or published
 
 ## Naming convention
 ### Azure DevOps Pipelines
-There are two main jobs per pipeline: `build and test`, and `build, test and publish` the common naming convention is as follows:
+There are two main jobs per pipeline: `build and test`, and `create packages` the common naming convention is as follows:
 - For “build and test” job:<br />
 `<package-name>-test` where `<package-name>` represents dash-separated repository name; for example for repository `pipeline-python`, “build and test” job name should be configured as `pipeline-python-test`.
-- For “build, test and publish” job when packages are created:<br /> `<package-name>-create-packages`, where `<package-name>` represents dash-separated repository name; for example for repository `pipeline-python`, “build, test and publish” job name should be configured as `pipeline-python-create-packages`.
-- For “build, test and publish” job when repository is only tagged:<br />
+- For “create packages” job when packages are created:<br /> `<package-name>-create-packages`, where `<package-name>` represents dash-separated repository name; for example for repository `pipeline-python`, “build, test and publish” job name should be configured as `pipeline-python-create-packages`.
+- For “create packages” job when repository is only tagged:<br />
 `<package-name>-tag-repository`, where `<package-name>` represents dash-separated repository name; for example for repository `location-php`, “build, test and publish” job name should be configured as `location-php-tag-repository`.
 - For jobs in debug configuration:<br />
 `<package-name>-<job>-debug`, where `<package-name>` represents dash-separated repository name, `<job>` represents job suffix selected above; for example for repository `device-detection-dotnet`, “build, test and publish” job in `debug` the name should be configured as `device-detection-dotnet-create-packages-debug`.
@@ -202,7 +200,7 @@ Deployment to internal package managers is performed daily (overnightly) based o
 
 ## Release process
 ### Packages release
-Packages release process in 51Degrees is handled through Azure DevOps and the deployment to the public repositories is performed manually using packages generated by [Build, test and publish](#build,-test-and-publish) continuous integration job. As explained in “[build, test and publish](#build,-test-and-publish)” section, process of creating the packages is automatically triggered by completion of pull request to the `main` branch of the repository. Created packages are stored as artifacts in Azure DevOps Artifacts and are used in internal release pipelines in order to upload them to the public package managers/repositories.
+Packages release process in 51Degrees is handled through Azure DevOps and the deployment to the public repositories is performed manually using packages generated by [Create packages](#create-packages) continuous integration job. As explained in “[Create packages](#create-packages)” section, process of creating the packages is automatically triggered by completion of pull request to the `main` branch of the repository. Created packages are stored as artifacts in Azure DevOps Artifacts and are used in internal release pipelines in order to upload them to the public package managers/repositories.
 
 API release process steps:
 - PR completed to the `main` branch.
@@ -220,8 +218,48 @@ API release process steps:
 - [PyPi](https://pypi.org/search/?q=51degrees) (and [TestPyPi](https://test.pypi.org/search/?q=51degrees))
 - Source code on [Github](https://github.com/51Degrees/)
 
+## Automation
+Fully automated release process use the following flow:
+1. Changes are prepared in `release|hotfix` branches.
+2. `Trigger release` job starts.
+3. All `leaf submodules` `release|hotfix` branches are merged to `main`.
+   1. NOTE: `leaf submodules` are modules which do not have any dependencies.
+4. Completion of submodule merging trigger merging of the `release|hotfix` branches of the modules which depend on these submodules.
+5. Completion of merging `release|hotfix` branches to `main` will also trigger `deployment` of packages both internally and externally.
+6. At the end of the `release` process, packages are available to be collected internally; and `deployment` to external reposition are left to be approved by `release engineer`.
+
+The fully automated release process is controlled by a `release-config.json` file, located in the `common-ci` repository. The automated release process can also be enabled or disabled by a global variable `AutomatedRelease` as part of the Azure Devops variable group `CIAutomation`. To support automating the deployment process, powershell scripts and additional pipelines are required. These scripts are located under `common-ci` repository, and are grouped into modules. The additional pipelines are required per API, but shared templated can be reused from `common-ci`.
+
+Additional pipelines:
+- The `submodule trigger` pipeline is required for each API to pick up the package deployment from each of its submodules. Since a module can have multiple submodules, multiple triggers might happen at the same time. Thus, this pipeline should cancel all previous builds and only one at a single time.
+  - This must be triggered only by a submodule deployment that happened on the 'main' branch.
+  - This pipeline, will then perform update of all submodule references and package dependencies, using the versions specified in the `release-config.json`.
+- The `pull request completion` job is required to be done at the end of each `build and test` pipeline.
+  - This will check if the current build is triggered by a pull request from `release|hotfix` branch to the `main` branch. If it is and the following conditions have been met, it then proceed to complete the corresponding pull request.
+    - The `AutomatedRelease` variable has been enabled.
+    - All submodule references and package dependencies have been updated.
+    - The pull request has been approved and comments have been left unresolved; or approval is not required.
+
+Fully automated deployment trigger procedure:
+1. At the start, `release engineer` will need to update the `release-config.json` to specify all release packages and their target release version. Any additional details should also be specified.
+   1. NOTE: There is a `release-config-template.json` available for references.
+2. Once the `release-config.json` is ready in one of the `release|hotfix` branch of `common-ci`, either the following should trigger the release process:
+   1. Complete the pull request that contains the updated `release-config.json` changes to the `main` branch. This will only work based on the assumption that the `common-ci` is specified as submodule of all release APIs.
+   2. Trigger the `trigger-release` pipeline of the `common-ci`.
+
+## Naming convention
+### Azure DevOps Pipelines
+There are two main jobs per pipeline: `deploy internally`, and `deploy externally`. The common naming convention is as follows:
+- For “deploy internally” job:<br />
+`<package-name>-deploy-internal` where `<package-name>` represents dash-separated repository name; for example for repository `pipeline-python`, “deploy internally” job name should be configured as `pipeline-python-deploy-internal`.
+- For “deploy externally” job:<br />
+`<package-name>-deploy-external`, where `<package-name>` represents dash-separated repository name; for example for repository `pipeline-python`, “deploy externally” job name should be configured as `pipeline-python-create-packages`.
+- For “deploy” job there is no internal or external package repository:<br />
+`<package-name>-deploy`, where `<package-name>` represents dash-separated repository name; for example for repository `location-php`, “deploy” job name should be configured as `location-php-deploy`. This normally happens when there is no package management for a target language; or the only package management supported for a language is via publishing the source code to a public Git repository.
+
+There are other jobs required to support the automated deployment process: `submodule trigger`, and `pull request completion`. The `pull request completion` is required as part of the `build and test` pipeline. Thus, the only required common naming convention is for `submodule trigger` pipeline.
+- For “submodule trigger” job:<br />
+`<package-name>-submodule-trigger` where `<package-name>` represents dash-separated repository name; for example for repository `pipeline-python`, “submodule trigger” job name should be configured as `pipeline-python-submodule-trigger`.
+
 # License
 License information can be found in the `LICENSE` file available in this repository.
-
-
-

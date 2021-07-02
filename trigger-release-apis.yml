@@ -1,0 +1,38 @@
+trigger:
+  - main
+
+pr: none
+
+variables:
+- group: CIAutomation # Required to access CI variables
+
+stages:
+- stage: Trigger_Release
+
+  jobs:
+  - job: Trigger_Release
+  
+    pool:
+      vmImage: 'windows-2019'
+  
+    steps:
+    - checkout: self
+      submodules: recursive
+      persistCredentials: true
+    
+    # This step should only be triggered if 'AutomatedRelease'
+    # variable is set to 'On'.
+    - powershell: |
+        # Install all modules
+        $Env:PSModulePath += ";$($(Get-Location).Path)\scripts\modules"
+        Write-Host "Module Path: $($Env:PsModulePath)"
+      
+        # Trigger the release
+        if (!$(Start-Release -ConfigFile "$($(Get-Location).Path)\release-config.json") {
+            Write-Host "# Failed to trigger release of all apis."
+            exit 1
+        }
+      displayName: 'Trigger release'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      condition: and(succeeded(), eq(variables['AutomatedRelease'], 'On'))

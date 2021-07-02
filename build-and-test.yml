@@ -1,0 +1,10 @@
+# Common-ci only contains document, build script and yaml templates
+# so no tests is run. However, it is depended by other apis so
+# make it complete pull request and trigger modules like other.
+
+trigger: none
+
+stages:
+# Try to complete the corresponding pull request if
+# this is triggered by one.    
+- template: shared-auto-complete-pr-stage.yml

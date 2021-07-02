@@ -1,0 +1,42 @@
+stages:
+# This stage check if current branch runs on a pull request merge branch,
+# then try to complete the pull request if it is true.
+# WARNINGS: This stage should be run at the end of a pipeline, because upon
+# completing a pull request the pipeline will be canceled and no stage
+# or tasks will be run after this.
+- stage: Complete_PR
+  displayName: "Check and complete corresponding pull request"
+
+  variables:
+  - group: CIAutomation # Required to access CI variables
+  - name: SYSTEM_ACCESSTOKEN
+    value: $(System.AccessToken)
+
+  pool:
+    vmImage: 'windows-2019'
+    
+  jobs:
+  - job: Complete_PR
+    
+    steps:
+    - checkout: self
+      submodules: recursive
+      persistCredentials: true
+      # Check out to access the latest release info.
+    - checkout: git://pipeline/common-ci
+      
+
+    - powershell: |
+        # Install all modules
+        $Env:PSModulePath += ";$($(Get-Location).Path)\common-ci\scripts\modules"
+        Write-Host "Module Path: $($Env:PsModulePath)"
+        
+        # Complete the corresponding pull request
+        cd $Env:BUILD_REPOSITORY_NAME
+        Write-Host "# Try to complete pull request for repository $Env:BUILD_REPOSITORY_NAME."
+        if (!$(Complete-CorrespondingPullRequest -ConfigFile "$($(Get-Location).Path)\..\common-ci\release-config.json")) {
+            Write-Host "# FAILED"
+            exit 1
+        }
+      displayName: 'Complete Pull Request'
+      condition: and(succeeded(), eq(variables['AutomatedRelease'], 'On'))

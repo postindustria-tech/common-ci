@@ -1,0 +1,21 @@
+trigger: 
+  - main
+  - develop
+  - release/*
+
+# Don't trigger for a pull request
+pr: none
+
+# Include shared variables
+variables:
+- template: shared-variables.yml
+
+stages:
+
+- stage: Tagging
+
+  jobs:
+  - template: shared-create-tag-job.yml
+    parameters:
+      imageName: $(linuxImage)
+

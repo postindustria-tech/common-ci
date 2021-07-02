@@ -1,0 +1,7 @@
+next-version: 0.1.0
+branches: {}
+ignore:
+  sha: []
+merge-message-formats:
+    # Allow the prefix which is automatically added by DevOps.
+    devops: ^Merged (?:PR (?<PullRequestNumber>\d+))(:) Merge branch '(?<SourceBranch>.+)'
