@@ -1,0 +1,36 @@
+# Type labels
+- name: "type: feature-request"
+  description: New feature
+  color: 0eced4
+- name: "type: bug"
+  description: Something isn't working
+  color: d73a4a
+- name: "type: documentation"
+  description: Improvements or additions to documentation
+  color: 0075ca
+- name: "type: question"
+  description: Further information is requested
+  color: d876e3
+
+# Status Labels
+- name: "status: to be scheduled"
+  description: This item has not been scheduled for a particular release
+  color: c2e0c6
+- name: "status: duplicate"
+  description: This issue or pull request already exists
+  color: cfd3d7
+- name: "status: released/4.3.0"
+  description: This change was released in the specified version
+  color: a8d131
+- name: "status: released/4.3.1"
+  description: This change was released in the specified version
+  color: 6dcc16
+- name: "status: released/4.3.2"
+  description: This change was released in the specified version
+  color: 87a457
+- name: "status: released/4.3.3"
+  description: This change was released in the specified version
+  color: 006b75
+- name: "status: released/4.4.0"
+  description: This change was released in the specified version
+  color: 376842
