@@ -15,8 +15,6 @@ stages:
 
   variables:
   - group: CIAutomation # Required to access CI variables
-  - name: SYSTEM_ACCESSTOKEN
-    value: $(System.AccessToken)
 
   pool:
     vmImage: 'windows-2019'
@@ -29,7 +27,7 @@ stages:
       submodules: recursive
       persistCredentials: true
       # Check out to access the latest release info.
-    - checkout: git://pipeline/common-ci
+    - checkout: 'git://$(System.TeamProject)/common-ci'
       
 
     - powershell: |
@@ -45,4 +43,6 @@ stages:
             exit 1
         }
       displayName: 'Complete Pull Request'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       condition: and(succeeded(), eq(variables['AutomatedRelease'], 'On'))

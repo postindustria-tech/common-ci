@@ -1,5 +1,4 @@
-trigger:
-  - main
+trigger: none
 
 pr: none
 
@@ -28,7 +27,9 @@ stages:
         Write-Host "Module Path: $($Env:PsModulePath)"
       
         # Trigger the release
-        if (!$(Start-Release -ConfigFile "$($(Get-Location).Path)\release-config.json") {
+        if (!$(Start-Release `
+            -ConfigFile "$($(Get-Location).Path)\release-config.json" `
+            -TeamProjectName $Env:SYSTEM_TEAMPROJECTID)) {
             Write-Host "# Failed to trigger release of all apis."
             exit 1
         }

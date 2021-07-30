@@ -7,4 +7,54 @@ trigger: none
 stages:
 # Try to complete the corresponding pull request if
 # this is triggered by one.    
-- template: shared-auto-complete-pr-stage.yml
+- stage: Test
+  displayName: "Test, Check and complete corresponding pull request"
+
+  variables:
+  - group: CIAutomation # Required to access CI variables
+
+  pool:
+    vmImage: 'windows-2019'
+    
+  jobs:
+  - job: Test
+    
+    steps:
+    - checkout: self
+      submodules: recursive
+      persistCredentials: true
+      
+    - powershell: |
+        # Install all modules
+        $Env:PSModulePath += ";$($(Get-Location).Path)\scripts\modules"
+        Write-Host "Module Path: $($Env:PsModulePath)"
+        
+        # Make sure all modules are loaded
+        cd scripts\modules
+        Get-ChildItem -Directory | Foreach { Import-Module $_.Name -Force }
+        
+        # Run all tests
+        # Enable test environment so that production environment is not impacted
+        $Env:51D_ENVIRONMENT = "Test"
+
+        Write-Host "# Run all Pester tests."
+        Invoke-Pester
+      displayName: 'Run tests'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+    - powershell: |
+        # Install all modules
+        $Env:PSModulePath += ";$($(Get-Location).Path)\scripts\modules"
+        Write-Host "Module Path: $($Env:PsModulePath)"
+        
+        # Complete the corresponding pull request
+        Write-Host "# Try to complete pull request for repository $Env:BUILD_REPOSITORY_NAME."
+        if (!$(Complete-CorrespondingPullRequest -ConfigFile "$($(Get-Location).Path)\release-config.json")) {
+            Write-Host "# FAILED"
+            exit 1
+        }
+      displayName: 'Complete Pull Request'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      condition: and(succeeded(), eq(variables['AutomatedRelease'], 'On'))

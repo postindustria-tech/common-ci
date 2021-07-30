@@ -7,8 +7,6 @@ stages:
   
   variables:
   - group: CIAutomation # Required to access CI variables
-  - name: SYSTEM_ACCESSTOKEN
-    value: $(System.AccessToken)
   
   jobs:
   - job:
@@ -18,7 +16,7 @@ stages:
       submodules: recursive
       persistCredentials: true
       # Checkout the common-ci to access the latest release configuration.
-    - checkout: git://pipeline/common-ci
+    - checkout: 'git://$(System.TeamProject)/common-ci'
       
     - powershell: |
         # Install all modules
@@ -38,7 +36,8 @@ stages:
         if (!$(Stop-PreviousBuilds `
             -PipelineName $Env:BUILD_DEFINITIONNAME `
             -Branch $Env:BUILD_SOURCEBRANCH `
-            -CurrentBuildId $Env:BUILD_BUILDID)) {
+            -CurrentBuildId $Env:BUILD_BUILDID `
+            -TeamProjectName $Env:SYSTEM_TEAMPROJECTID)) {
             Write-Host "# ERROR: Failed to cancel the previous builds."
             exit 1
         }
@@ -46,10 +45,14 @@ stages:
         # Update all submodule.
         cd $Env:BUILD_REPOSITORY_NAME
         Write-Host "# Try to update repository $Env:BUILD_REPOSITORY_NAME."
-        if (!$(Update-CommitPushPull -ConfigFile $configFile)) {
+        if (!$(Update-CommitPushPull `
+            -ConfigFile $configFile `
+            -TeamProjectName $Env:SYSTEM_TEAMPROJECTID)) {
             Write-Host "# ERROR: Failed to update submodule references and package dependencies."
             exit 1
         }
       displayName: 'Submodule trigger'
       workingDirectory: $(build.sourcesDirectory)
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       condition: and(succeeded(), eq(variables['AutomatedRelease'], 'On'))
