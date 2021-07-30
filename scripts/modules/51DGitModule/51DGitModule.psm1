@@ -7,28 +7,112 @@
   each function.
 #>
 
+Using module 51DAuthorizationModule
+Using module 51DEnvironmentModule
+
+# This to redirect all stderr to stdout for git.
+$env:GIT_REDIRECT_STDERR = '2>&1'
+
 # For testing purpose only
-$global:releaseConfig = $null
-$global:projects = $null
+$script:releaseConfig = $null
+$script:repositories = $null
+
+class GitHandler {
+	static [boolean]Checkout ([string]$branchName) {
+		Write-Host "# Checkout $branchName"
+		git checkout "$branchName"
+		return $?
+	}
+	
+	static [boolean]CheckoutTrack ([string]$branchName) {
+		Write-Host "# Checkout track $branchName"
+		git checkout --track "$branchName"
+		return $?
+	}
+	
+	static [boolean]CheckoutNew ([string]$branchName) {
+		Write-Host "# Checkout New $branchName"
+		git checkout -b "$branchName"
+		return $?
+	}
+	
+	static [boolean]Pull () {
+		Write-Host "# Git pull"
+		git pull
+		return $?
+	}
+	
+	static [boolean]FetchAllTags () {
+		Write-Host "# Fetch all tags"
+		# git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" fetch --all --tags
+		git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" fetch --all --tags
+		return $?
+	}
+	
+	static [boolean]Push ([string]$branchName) {
+		if ([string]::IsNullOrEmpty($branchName)) {
+			Write-Host "# Git Push $branchName to origin"
+			git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" push
+		} else {
+			Write-Host "# Git Push"
+			git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" push origin "$branchName"
+		}
+		return $?
+	}
+	
+	static [boolean]Commit ([string]$message) {
+		Write-Host "# Git commit"
+		git commit -m "$message"
+		return $?
+	}
+	
+	static [boolean]Config ([string]$email, [string]$name) {
+		Write-Host "# Git config email '$email' and name '$name'"
+		git config user.email "$email"
+		[boolean]$returnCode = $?
+		git config user.name "$name"
+		return $returnCode -and $?
+	}
+	
+	static [boolean]Add ([string]$path) {
+		Write-Host "# Git stage '$path'"
+		git add "$path"
+		return $?
+	}
+	
+	static [boolean]CheckoutWithAuthorization ([string]$branchName) {
+		Write-Host "# Checkout with authorization $branchName"
+		# git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" checkout "$branchName"
+		git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" checkout "$branchName"
+		return $?
+	}
+	
+	static [boolean]Clone ([string]$url) {
+		Write-Host "# Clone $url"
+		# git -c http.extraheader="AUTHORIZATION: Bearer $env:SYSTEM_ACCESSTOKEN" clone "$url"
+		git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" clone "$url"
+		return $?
+	}
+}
 
 <#
   .Description
-  Initialise the global variables
+  Initialise the script variables
   
-  .Parameter ConfigFile
-  Path to the configration file
+  .Parameter Configuration
+  A configuration object
 #>
 function Initialize-GlobalVariables {
 	param (
-		[string]$ConfigFile
+		[Parameter(Mandatory)]
+		[object]$Configuration
 	)
 	
-	# Obtain the config file content. Initialise the global variables
-	Write-Host "# Initialise form configuration file: " + $ConfigFile
-	$global:releaseConfig = Get-Content $ConfigFile | Out-String | ConvertFrom-Json
-	$global:projects = $global:releaseConfig.projects
-	Write-Host "# Init config: " + $global:releaseConfig
-	Write-Host "# Init projects: " + $global:projects
+	# Obtain the config file content. Initialise the script variables
+	$script:releaseConfig = $Configuration
+	$script:repositories = $script:releaseConfig.repositories
+	Write-Host "# Init config: " + $script:releaseConfig
+	Write-Host "# Init repositories: " + $script:repositories
 }
 
 <#
@@ -36,7 +120,7 @@ function Initialize-GlobalVariables {
   Determine whether a release is a major release or a hotfix.
   
   .Parameter Version
-  Version of a project
+  Version of a repository
   
   .Outputs
   Type of release
@@ -61,32 +145,42 @@ function Get-ReleaseType {
 <#
   .Description
   Determine if a tag has been created
-  for a version of a project.
+  for a version of a repository.
 
-  .Parameter ProjectName
-  Name of the project
+  .Parameter RepositoryName
+  Name of the repository
   
   .Parameter Version
-  Release version of the project
+  Release version of the repository
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
+  
+  .Outputs
+  true or false
 #>
-function Get-Tag {
+function Test-TagExist {
 	param (
-		[string]$ProjectName,
-		[string]$Version
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[Parameter(Mandatory)]
+		[string]$Version,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
 	)
 	
-	$url = "$($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI)$env:SYSTEM_TEAMPROJECTID/_apis/git/repositories/$ProjectName/refs?api-version=6.0&filter=tags/$Version"
+	$url = "$([EnvironmentHandler]::GetEnvironmentVariable($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI))$($TeamProjectName)/_apis/git/repositories/$RepositoryName/refs?api-version=6.0&filter=tags/$Version"
 	
 	$response = Invoke-WebRequest `
 	-URI $url `
 	-Headers @{
-		Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
+		Authorization = "$([Authorization]::AuthorizationString)"
 	} `
 	-Method GET
 	
 	if ($(Test-RestResponse `
 		-Response $response `
-		-ErrorMessage "Failed to get all tags which started with $Version for $ProjectName.")){
+		-ErrorMessage "Failed to get all tags which started with $Version for $RepositoryName.")){
 		$content = $response.content | Out-String | ConvertFrom-Json
 		for ($i = 0; $i -le $content.value.count; $i++) {
 			if ($content.value[$i].name -match "$Version(\+\d+)?$") {
@@ -101,35 +195,42 @@ function Get-Tag {
   .Description
   Get the existing release branch.
   
-  .Parameter ProjectName
-  Name of the project
+  .Parameter RepositoryName
+  Name of the repository
   
   .Parameter Version
-  Target release version of the project.
+  Target release version of the repository.
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
   
   .Outputs
   Full name of the release branch, prefixed with 'refs/heads' or $null if not found.
 #>
 function Get-ReleaseBranchRef {
 	param (
-		[string]$ProjectName,
-		[string]$Version
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[Parameter(Mandatory)]
+		[string]$Version,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
 	)
 	
 	$releaseType = Get-ReleaseType -Version $Version
 	
-	$url = "$($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI)$env:SYSTEM_TEAMPROJECTID/_apis/git/repositories/$ProjectName/refs?api-version=6.0&filter=heads/$releaseType/"
+	$url = "$([EnvironmentHandler]::GetEnvironmentVariable($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI))$($TeamProjectName)/_apis/git/repositories/$RepositoryName/refs?api-version=6.0&filter=heads/$releaseType/"
 	
 	$response = Invoke-WebRequest `
 	-URI $url `
 	-Headers @{
-		Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
+		Authorization = "$([Authorization]::AuthorizationString)"
 	} `
 	-Method GET
 	
 	if ($(Test-RestResponse `
 		-Response $response `
-		-ErrorMessage "Failed to get the list of existing branches for $ProjectName.")){
+		-ErrorMessage "Failed to get the list of existing branches for $RepositoryName.")){
 		$content = $response.content | Out-String | ConvertFrom-Json
 		for ($i = 0; $i -lt $content.value.count; $i++) {
 			if ($content.value[$i].name -match "refs/heads/$releaseType/(v)?$Version$") {
@@ -159,27 +260,86 @@ function Get-MergeBranchName {
 
 <#
   .Description
-  Get the existing 'main' branch reference. It should be 'main'
-  but can also be 'master' for older projects.
+  Get the existing 'main' branch object based on Azure Devops Response.
+  It should be 'main' but can also be 'master' for older repositories.
   
-  .Parameter ProjectName
-  Name of a project
+  .Parameter TeamProjectName
+  Name of a team project
+  
+  .Parameter RepositoryName
+  Name of a repository
+  
+  .Parameter AuthorizationHeader
+  Authorization Header that contain access token to the Azure Devops repositories
+  
+  .Outputs
+  Branch object or $null.
+#>
+function Get-MainBranch {
+	param (
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName,
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[string]$AuthorizationHeader
+	)
+	
+	if ([string]::IsNullOrEmpty($AuthorizationHeader)) {
+		$AuthorizationHeader = "$([Authorization]::AuthorizationString)"
+	}
+	
+	$potentialNames = $("master", "main")
+	foreach ($name in $potentialNames) {
+		$url = "$([EnvironmentHandler]::GetEnvironmentVariable($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI))$($TeamProjectName)/_apis/git/repositories/$RepositoryName/refs?filter=heads/$($name)&api-version=6.0-preview.1"
+		
+		$response = Invoke-WebRequest `
+		-URI $url `
+		-Headers @{
+			Authorization = "$AuthorizationHeader"
+		} `
+		-Method GET
+		
+		if ($(Test-RestResponse `
+			-Response $response `
+			-ErrorMessage "Failed to query the existence of the 'main' branch.")){
+			$content = $response.content | Out-String | ConvertFrom-Json
+			if ($content.value.count -eq 1) {
+				return $content.value[0]
+			}
+		}
+	}
+	return $null
+}
+
+<#
+  .Description
+  Get the existing 'main' branch reference. It should be 'main'
+  but can also be 'master' for older repositories.
+  
+  .Parameter RepositoryName
+  Name of a repository
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
   
   .Outputs
   Full reference to the 'main' branch.
 #>
 function Get-MainBranchRef {
 	param (
-		$ProjectName
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
 	)
 	
 	$masterBranch = "master"
-	$url = "$($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI)$env:SYSTEM_TEAMPROJECTID/_apis/git/repositories/$ProjectName/refs?filter=heads/$masterBranch&api-version=6.0-preview.1"
+	$url = "$([EnvironmentHandler]::GetEnvironmentVariable($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI))$($TeamProjectName)/_apis/git/repositories/$RepositoryName/refs?filter=heads/$masterBranch&api-version=6.0-preview.1"
 	
 	$response = Invoke-WebRequest `
 	-URI $url `
 	-Headers @{
-		Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
+		Authorization = "$([Authorization]::AuthorizationString)"
 	} `
 	-Method GET
 	
@@ -196,31 +356,37 @@ function Get-MainBranchRef {
 
 <#
   .Description
-  Get the remote Url to clone the project.
+  Get the remote Url to clone the repository.
   
-  .Parameter ProjectName
-  Name of the project
+  .Parameter RepositoryName
+  Name of the repository
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
   
   .Outputs
   Remote Url or $null if not found.
 #>
 function Get-RepositoryRemoteUrl {
 	param (
-		[string]$ProjectName
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
 	)
 	
-	$url = "$($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI)$env:SYSTEM_TEAMPROJECTID/_apis/git/repositories/$($ProjectName)?api-version=6.0"
+	$url = "$([EnvironmentHandler]::GetEnvironmentVariable($env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI))$($TeamProjectName)/_apis/git/repositories/$($RepositoryName)?api-version=6.0"
 	
 	$response = Invoke-WebRequest `
 	-URI $url `
 	-Headers @{
-		Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
+		Authorization = "$([Authorization]::AuthorizationString)"
 	} `
 	-Method GET
 	
 	if ($(Test-RestResponse `
 		-Response $response `
-		-ErrorMessage "Failed to query repository $ProjectName.")){
+		-ErrorMessage "Failed to query repository $RepositoryName.")){
 		$content = $response.content | Out-String | ConvertFrom-Json
 		return $content.remoteUrl
 	}
@@ -254,7 +420,7 @@ function Find-SubmodulePath {
   Determine the target branch to be assessed.
   
   .Parameter Version
-  The version of a project
+  The version of a repository
   
   .Outputs
   Target branch without 'refs/heads'.
@@ -320,12 +486,18 @@ function Test-BranchExistRemotely {
   .Parameter Version
   Version to release
   
+  .Parameter TeamProjectName
+  Name ofthe repository team project
+  
   .Outputs
   true or false
 #>
 function Get-ReleaseBranch {
 	param (
-		[string]$Version
+		[Parameter(Mandatory)]
+		[string]$Version,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
 	)
 	
 	# Check if the release/hotfix branch exist. Create if it doesn't.
@@ -337,7 +509,9 @@ function Get-ReleaseBranch {
 	if ($(git ls-remote $remoteRepo "refs/heads/$targetBranch") -eq $null) {
 		Write-Host "# No $targetBranch exists. Create one."
 		$repoName = Get-RepositoryName
-		$mainBranchRef = Get-MainBranchRef -ProjectName $repoName
+		$mainBranchRef = Get-MainBranchRef `
+			-RepositoryName $repoName `
+			-TeamProjectName $TeamProjectName
 		if ($mainBranchRef -eq $null) {
 			Write-Host "ERROR: No main branch found."
 			return $false
@@ -345,39 +519,30 @@ function Get-ReleaseBranch {
 		$mainBranchRef -match "refs/heads/(?<name>(master|main))"
 		$mainBranchName = $Matches['name']
 
-		git checkout $mainBranchName
-		if (!$?) {
-			git checkout --track "origin/$mainBranchName"
-			if (!$?) {
+		if (![GitHandler]::Checkout($mainBranchName)) {
+			if (![GitHandler]::CheckoutTrack("origin/$mainBranchName")) {
 				Write-Host "# ERROR: Failed to checkout $mainBranchRef"
 				return $false
 			}
 		}
-		git pull
-		if (!$?) {
+		if (![GitHandler]::Pull()) {
 			Write-Host "# ERROR: Failed to get the latest version of the main branch $mainBranchRef"
 			return $false
 		}
-		
-		git checkout -b $targetBranch
-		if (!$?) {
+
+		if (![GitHandler]::CheckoutNew($targetBranch)) {
 			Write-Host "# ERROR: Failed to create target release branch $targetBranch"
 			$false
 		}
 	} else {
-		# NOTE: This might cause some issue as common-ci has been updated.
-		# Might want to use 'git stash' to keep the changes."
 		Write-Host "# $targetBranch exists. Checkout."
-		git checkout --track "refs/heads/$targetBranch"
-		if (!$?) {
-			git checkout $targetBranch
-			if (!$?) {
+		if (![GitHandler]::CheckoutTrack("origin/$targetBranch")) {
+			if (![GitHandler]::Checkout($targetBranch)) {
 				Write-Host "# ERROR: Failed to checkout target release branch $targetBranch"
 				return $false
 			}
 		}
-		git pull
-		if (!$?) {
+		if (![GitHandler]::Pull()) {
 			Write-Host "# ERROR: Failed to get the latest version of target release branch $targetBranch"
 			return $false
 		}
@@ -391,19 +556,20 @@ function Get-ReleaseBranch {
   Update all submodule references of a current git directory.
   This will run on the current directory.
   
-  .Parameter ConfigFile
-  Path to the release configuration file.
+  .Parameter Configuration
+  A Configuration object
   
   .Outputs
   true or false.
 #>
 function Update-SubmoduleReferences {
 	param (
-		[string]$ConfigFile
+		[Parameter(Mandatory)]
+		[object]$Configuration
 	)
 
-	# Load the configuration into global variables.
-	Initialize-GlobalVariables -ConfigFile $ConfigFile
+	# Load the configuration into script variables.
+	Initialize-GlobalVariables -Configuration $Configuration
 	
 	# Check if all submodules have been deployed
 	Write-Host ""
@@ -422,11 +588,12 @@ function Update-SubmoduleReferences {
 			Write-Host "# Processing module $subRepoName."
 			
 			# Check and update the submodule to the correct tag.
-			$targetTag = $global:projects."$subRepoName".version
+			$targetTag = $script:repositories."$subRepoName".version
+			Write-Host "# Checking tag $targetTag"
 			
 			# Get all tag
-			git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" fetch --all --tags
-			if (!$?) {
+			Write-Host "# Fetch all tags"
+			if (![GitHandler]::FetchAllTags()) {
 				Write-Host "# ERROR: Failed to fetch tags. Cannot reliably check submodule deployment."
 				Pop-Location
 				return $false
@@ -434,16 +601,17 @@ function Update-SubmoduleReferences {
 			
 			$tagUpdated = $false
 			if ($targetTag -ne $null) {
-				$remoteRepo = git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" config --get remote.origin.url
+				$remoteRepo = git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" config --get remote.origin.url
+				Write-Host "# Remote repository found '$remoteRepo'"
 				# Make sure to sort the tag, so only pick up the biggest tag.
 				# e.g. If 4.3.0 and 4.3.0+1 then pick the later.
-				foreach ($tag in $(git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" ls-remote --tags --sort=-v:refname $remoteRepo "$($targetTag)*")) {
+				foreach ($tag in $(git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" ls-remote --tags --sort=-v:refname $remoteRepo "$($targetTag)*")) {
+					Write-Host "# Check tag '$tag' against target tag '$targetTag'"
 					# By presorted the tags, the first only that match the tag format will be the latest one.
 					if ($tag -match ".*/(?<content>$targetTag(\+(\d)+)?)$") {
 						Write-Host "# Tag $targetTag found with value $($Matches['content']). The submodule has been been deployed."
 	
-						git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" checkout "tags/$($Matches['content'])"
-						if (!$?) {
+						if (![GitHandler]::CheckoutWithAuthorization("tags/$($Matches['content'])")) {
 							Write-Host "# ERROR: Failed to checkout the tag $($Matches['content'])."
 							break
 						}
@@ -469,8 +637,7 @@ function Update-SubmoduleReferences {
 			
 			# Stage the submodule update
 			Write-Host "# Stage the submodule $submodulePath"
-			git add $submodulePath
-			if (!$?) {
+			if (![GitHandler]::Add($submodulePath)) {
 				Write-Host "# ERROR: Failed to stage the submodule $subRepoName."
 				return $false
 			}
@@ -498,26 +665,29 @@ function Start-CommitAndPush {
 	Write-Host "================"
 	$branchName = git rev-parse --abbrev-ref HEAD
 	$existingBranch = Test-BranchExistRemotely -Branch $branchName
-	git status
-	git config user.email "ciuser@51degrees.com"
-	git config user.name "CIUser"
+	if (![GitHandler]::Config("ciuser@51degrees.com", "CIUser")) {
+		Write-Host "# ERROR: Failed to configure email and user name"
+		return $false
+	}
+	
 	if ($(git diff --cached --name-only).count -gt 0 ) {
 		Write-Host "# There are changes. Commit now."
-		git commit -m "REF: Update submodules references."
-		if (!$?) {
+		if (![GitHandler]::Commit("REF: Update submodules references.")) {
 			Write-Host "# ERROR: Failed to commit the submodules updates."
 			return $false
 		}
 		
 		# Push changes
 		Write-Host "# Push the changes."
+		[boolean]$rc = $false
 		if (!$existingBranch) {
-			git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" push origin "$branchName"
+			git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" push origin "$branchName"
+			$rc = [GitHandler]::Push("$branchName")
 		} else {
-			git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" push
+			$rc = [GitHandler]::Push($null)
 		}
 		
-		if (!$?) {
+		if (!$rc) {
 			Write-Host "# ERROR: Failed to push changes."
 			return $false
 		}

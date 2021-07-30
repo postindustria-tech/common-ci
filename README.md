@@ -26,6 +26,8 @@ Common-CI project contains a guideline for creation of continuous integration sc
     - [Packages release](#packages-release)
     - [External package managers and public repositories](#external-package-managers-and-public-repositories)
   - [Automation](#automation)
+    - [Automated Release Scripts](#automated-release-scripts)
+    - [Flow Chart](#flow-chart)
   - [Naming convention](#naming-convention-1)
     - [Azure DevOps Pipelines](#azure-devops-pipelines-1)
 - [License](#license)
@@ -171,6 +173,17 @@ This guideline covers high-level overview and basic principles for continuous in
     \build-and-test.yml
     \build-and-publish.yml
 ```
+Language specific configuration should be documented in a `readme.md` file stored under the corresponding folder of the repository `common-ci`. Example directory tree of `common-ci` for `readme.md` files:
+```
+\common-ci
+  \readme.md
+  \java
+    \readme.md
+  \dotnet
+    \readme.md
+    ...
+  ...
+```
 ### APIs common templates
 When tasks are replicated across APIs, they should be made as templates and kept in the `common-ci` repository. Templates that are shared across languages are kept at the root directory of `common-ci` and templates which are only shared within a language APIs should be kept in its distinct folder, named with the language name. Below is an illustration of the of `common-ci` directory structure:
 ```
@@ -221,12 +234,13 @@ API release process steps:
 ## Automation
 Fully automated release process use the following flow:
 1. Changes are prepared in `release|hotfix` branches.
-2. `Trigger release` job starts.
+2. `Trigger release` job starts; or all `leaf submodules` are manually or automatically merged to `main|master`.
 3. All `leaf submodules` `release|hotfix` branches are merged to `main`.
    1. NOTE: `leaf submodules` are modules which do not have any dependencies.
-4. Completion of submodule merging trigger merging of the `release|hotfix` branches of the modules which depend on these submodules.
-5. Completion of merging `release|hotfix` branches to `main` will also trigger `deployment` of packages both internally and externally.
-6. At the end of the `release` process, packages are available to be collected internally; and `deployment` to external reposition are left to be approved by `release engineer`.
+4. Completion of submodule merging triggers tag and packages deployment of the submodules. If module does not generate packages, then it will be the tag creation step.
+5. Tag and package deployment (or creation) completion triggers merging of the `release|hotfix` branches of the modules which depend on these submodules.
+6. Completion of merging `release|hotfix` branches to `main` will also trigger `deployment` of packages both internally and externally in the same way that the submodules were done.
+7. At the end of the `release` process, packages are available to be collected internally; and `deployment` to external reposition are left to be approved by `release engineer`.
 
 The fully automated release process is controlled by a `release-config.json` file, located in the `common-ci` repository. The automated release process can also be enabled or disabled by a global variable `AutomatedRelease` as part of the Azure Devops variable group `CIAutomation`. To support automating the deployment process, powershell scripts and additional pipelines are required. These scripts are located under `common-ci` repository, and are grouped into modules. The additional pipelines are required per API, but shared templated can be reused from `common-ci`.
 
@@ -245,7 +259,32 @@ Fully automated deployment trigger procedure:
    1. NOTE: There is a `release-config-template.json` available for references.
 2. Once the `release-config.json` is ready in one of the `release|hotfix` branch of `common-ci`, either the following should trigger the release process:
    1. Complete the pull request that contains the updated `release-config.json` changes to the `main` branch. This will only work based on the assumption that the `common-ci` is specified as submodule of all release APIs.
+      1. This pull request can be completed manually or automatically by the `build-and-test.yml` auto completion pull request task. The automatic completion is only enabled if the global variable `AutomatedRelease` specified in the variables group `CIAutomation` is set to `On`.
    2. Trigger the `trigger-release` pipeline of the `common-ci`.
+
+### Automated Release Scripts
+As briefly mentioned, the automated release process requires powershell scripts to support tasks that have been done manually. These scripts are located in the directory `scripts/modules` of the `common-ci` repository.
+
+Testing of the release process is done using both script tests and manual testing.
+1. Each module has a set of tests. Since it is the nature of the powershell script to contain many call to utility tools which make it difficult to mock and test effectively. Therefore, where it is not possible to test, the `test` file is left empty as a place holder for the future usage.
+   1. To run the tests, firstly `Pester` module is required. `Pester` is included in powershell environment by default. However it is recommended to install the latest version.
+   2. Updated the environment variables and authorization string as mentioned in the `Manual testing` section below.
+   3. Set the environment `$Env:51D_ENVIRONMENT` to `Test` to ensure that no tests is writing or changing the production environment.
+   4. Load the modules by setting `$Env:PSModulePath` ( and using `Import-Module` command if it is needed) in a powershell terminal.
+   5. Navigate to `scripts/modules` path and run the following command:
+      1. ``` Invoke-Pester ```
+      2. To run each module test, run the above command in each module folder.
+2. Manual testing involves creation of test environment so that the release process can be completed and examined without effecting the production environment.
+   1. To create a test environment, use the `New-TestEnvironment` function provided in the `51DReleaseTestEnvModule` with an input configuration file. There are many example of how a configuration file looks like in the `51DReleaseTestEnvModule` `config` folder.
+      1. The module is mainly used locally but can also be integrated as part of the `Azure Devops` pipelines yaml. However, since the configuration file might be adjusted often to provide a test environment that is suitable for certain scenarios, it is the best to use the script locally.
+      2. To use the module locally, the `$env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI` and `$env:SYSTEM_TEAMPROJECTID` as guided in the `SharedVariables.psm1` of `51DReleaseTestEnvModule` should be updated accordingly. The `AuthorizationString` of the `51DAuthorizationModule` is also required to be updated. More details can be found in each module file.
+      3. The test environment also requires a separate `artifact` feed. Creation of test `artifact` feed is done manually. Once it is created, the `InternalFeedName` and `InternalFeedId` of the variables group `CIAutomation` should be updated accordingly.
+      4. Once the release process has completed in a test environment, the `release-config.json` used for the release process can be fed into the `Test-Release` function to verify if the output has successfully completed correctly.
+      5. To delete the test environment, use the `Clear-TestEnvironment` function of the `51DReleaseTestEnvModule`. The test artifact feed should be deleted manually. As deletion is a dangerous task, be cautious when performing them. The `Clear-TestEnvironment` will prompt to ask for your confirmation together with the target environment before proceed.
+
+### Flow Chart
+The following Flow Chart can be edited and updated by changing the `release-process.drawio` file.
+![Release Process Flow Chart](release-process.png)
 
 ## Naming convention
 ### Azure DevOps Pipelines

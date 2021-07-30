@@ -1,18 +1,18 @@
 {
-	"projects": {
+	"repositories": {
 		"common-ci": {
-			"version": "4.3.1",
+			"version": "4.3.2",
 			"isLeaf": true
 		},
 		"common-cxx": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
 		"device-detection-cxx": {
-			"version": "4.3.0",
+			"version": "4.3.2",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
@@ -28,7 +28,7 @@
 			]
 		},
 		"device-detection-nginx": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
@@ -57,7 +57,7 @@
 		},
 		"location-onpremise-java": {
 		    "version": "4.3.0",
-			"packageName": "pipeline.device-detection",
+			"packageName": "geo-location.digitalelement",
 			"versionVariableName": "geolocation.digitalelement.version",
 			"isLeaf": false,
 			"dependencies": [
@@ -68,7 +68,7 @@
 		},
 		"device-detection-java": {
 			"version": "4.3.0",
-			"packageName": "devicedetection",
+			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
 			"dependencies": [
@@ -78,7 +78,7 @@
 			]
 		},
 		"common-dotnet": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "FiftyOne.Common",
 			"isLeaf": false,
 			"dependencies": [
@@ -86,7 +86,7 @@
 			]
 		},
 		"caching-dotnet": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "FiftyOne.Caching",
 			"isLeaf": false,
 			"dependencies": [
@@ -94,7 +94,7 @@
 			]
 		},
 		"pipeline-dotnet": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "FiftyOne.Pipeline",
 			"isLeaf": false,
 			"dependencies": [
@@ -104,7 +104,7 @@
 			]
 		},
 		"location-dotnet": {
-		    "version": "4.3.0",
+		    "version": "4.3.2",
 			"packageName": "FiftyOne.Geolocation",
 			"isLeaf": false,
 			"dependencies": [
@@ -115,7 +115,7 @@
 			]
 		},
 		"device-detection-dotnet": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "FiftyOne.DeviceDetection",
 			"isLeaf": false,
 			"dependencies": [
@@ -127,7 +127,8 @@
 		},
 		"internal-engines-dotnet": {
 			"version": "4.3.0",
-			"isLeaf": false,
+			"packageName": "FiftyOne.GeoLocation.OnPremise",
+			"isLeaf": false,			
 			"dependencies": [
 				"common-ci",
 				"common-dotnet",
@@ -137,7 +138,7 @@
 			]
 		},
 		"pipeline-node": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.pipeline",
 			"isLeaf": false,
 			"dependencies": [
@@ -145,7 +146,7 @@
 			]
 		},
 		"location-node": {
-		    "version": "4.3.0",
+		    "version": "4.3.1",
 			"packageName": "fiftyone.geolocation",
 			"isLeaf": false,
 			"dependencies": [
@@ -155,7 +156,7 @@
 			]
 		},
 		"device-detection-node": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
@@ -165,7 +166,7 @@
 			]
 		},
 		"pipeline-python": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone_pipeline",
 			"versionVariableName": "pipelineVersion",
 			"isLeaf": false,
@@ -195,7 +196,7 @@
 			]
 		},
 		"pipeline-php-core": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.pipeline.core",
 			"isLeaf": false,
 			"dependencies": [
@@ -203,7 +204,7 @@
 			]
 		},
 		"pipeline-php-engines": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.pipeline.engines",
 			"isLeaf": false,
 			"dependencies": [
@@ -212,7 +213,7 @@
 			]
 		},
 		"pipeline-php-cloudrequestengine": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.pipeline.cloudrequestengine",
 			"isLeaf": false,
 			"dependencies": [
@@ -222,7 +223,7 @@
 			]
 		},
 		"location-php": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.geolocation",
 			"isLeaf": false,
 			"dependencies": [
@@ -234,7 +235,7 @@
 			]
 		},
 		"device-detection-php-onpremise": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
@@ -245,7 +246,7 @@
 			]
 		},
 		"device-detection-php": {
-			"version": "4.3.0",
+			"version": "4.3.1",
 			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [

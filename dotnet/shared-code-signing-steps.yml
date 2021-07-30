@@ -1,0 +1,20 @@
+parameters:
+- name: codeSigningPassword
+
+steps:
+# The secure file to download will be stored in the 
+# Pipelines/Library/SecureFiles section in Azure DevOps.
+- task: DownloadSecureFile@1
+  displayName: 'Download Code Signing Certificate'
+  name: CodeSigningCert
+  inputs:
+    secureFile: '51Degrees Private Code Signing Certificate.pfx'
+    
+# Sign the Nuget package with the file downloaded previously.
+# The password is stored in the Pipelines/Library/VariableGroups
+# section in Azure DevOps.
+- task: NuGetCommand@2
+  displayName: 'Sign NuGet Package'
+  inputs:
+    command: custom
+    arguments: 'sign $(System.ArtifactsDirectory)\*.nupkg -CertificatePath "$(CodeSigningCert.secureFilePath)" -CertificatePassword ${{ parameters.codeSigningPassword }} -Timestamper http://timestamp.digicert.com'

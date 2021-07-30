@@ -9,9 +9,9 @@
 
 # Global constants for Rest APIs.
 # Maximum retry count if rest api call fail with code between 400 and 599
-$global:maximumRetryCount = 3
+$script:maximumRetryCount = 3
 # Interval in seconds between retry if rest api call fail with code between 400 and 599
-$global:retryIntervalSec = 1
+$script:retryIntervalSec = 1
 
 <#
   .Description
@@ -21,7 +21,7 @@ $global:retryIntervalSec = 1
   Number of retrys.
 #>
 function Get-MaxRetrys {
-	return $global:maximumRetryCount
+	return $script:maximumRetryCount
 }
 
 <#
@@ -32,7 +32,7 @@ function Get-MaxRetrys {
   Retry interval in seconds.
 #>
 function Get-RetryInterval {
-	return $global:retryIntervalSec
+	return $script:retryIntervalSec
 }
 
 Export-ModuleMember -Function *

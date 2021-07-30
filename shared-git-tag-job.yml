@@ -1,0 +1,38 @@
+parameters:
+- name: imageName # Name of the image to run the job on
+- name: jobDependencies
+  type: object
+  default: []
+- name: publishConfig # This indicates where a 'Release' or 'Debug' publish is being used.
+  type: string
+  default: 'Release'
+
+jobs:
+- job: Tagging
+  dependsOn: ${{ parameters.jobDependencies }}
+  condition: and(not(failed()), not(canceled()), eq('${{ parameters.publishConfig }}', 'Release'))
+
+  variables:
+  # Access token for the git repository. Used by the git tag task.
+  - name: SYSTEM_ACCESSTOKEN
+    value: $(System.AccessToken)
+  - name: GitVersionSemVer
+    value: $[ dependencies.Versioning.outputs['SetGitVersionVars.GitVersionSemVer'] ]
+  
+  pool:
+    vmImage: ${{ parameters.imageName }}
+  
+  steps:
+  # The lines below are needed to allow the pipeline access to the
+  # OAuth access token that controls write access to the git repository.
+  # (Required for GitTag task)
+  - checkout: self
+    persistCredentials: true
+  
+  # Add a tag to the git repository with the version number.
+  - task: ATP.ATP-GitTag.GitTag.GitTag@5
+    displayName: 'Tag Repo With Version Number'
+    inputs:
+      tagUser: 'Azure DevOps'
+      tagEmail: 'CIUser@51Degrees.com'
+      tag: '$(GitVersionSemVer)'

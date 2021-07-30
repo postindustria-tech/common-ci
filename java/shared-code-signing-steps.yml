@@ -1,0 +1,17 @@
+parameters:
+- name: gpgPassPhrase
+
+steps:
+# Download Code Signing Certificate from SecureFile Library
+- task: DownloadSecureFile@1
+  name: CodeSigningCert
+  displayName: 'Download Code Signing Certificate'
+  inputs:
+    secureFile: '51Degrees Code Signing Certificate.asc'
+    retryCount: 5
+
+- task: Bash@3
+  displayName: 'Import Code Signing Certificate'
+  inputs:
+    targetType: 'inline'
+    script: 'echo ${{ parameters.gpgPassPhrase }} | gpg --import --batch --yes --passphrase-fd 0 "$(CodeSigningCert.secureFilePath)"'

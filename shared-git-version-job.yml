@@ -1,0 +1,56 @@
+parameters:
+- name: imageName # Name of the image to run the job on
+
+jobs:
+- job: Versioning
+  
+  pool:
+    vmImage: ${{ parameters.imageName }}
+  
+  steps:
+  # The lines below are needed to allow the pipeline access to the
+  # OAuth access token that controls write access to the git repository.
+  # (Required for GitTag task)
+  - checkout: self
+    persistCredentials: true
+  
+  # Checkout the common-ci repo so the GitVersion config file can
+  # be used.
+  - checkout: 'git://$(System.TeamProject)/common-ci'
+
+  # NOTE: This task can be used on both Windows and Linux machine so make sure to use
+  # '\' instead '/', and everything is case sensitive.
+  - powershell: |
+      Write-Host "Check if $($Env:BUILD_REPOSITORY_NAME)/GitVersion.yml exists."
+      if ($(Test-Path $Env:BUILD_REPOSITORY_NAME/GitVersion.yml)) {
+          Write-Host "GitVersion.yml exists in current location."
+          $gitVersionPath = "$($(Get-Location).Path)/$Env:BUILD_REPOSITORY_NAME/GitVersion.yml"
+      } else {
+          Write-Host "Use GitVersion.yml in common-ci."
+          $gitVersionPath = "$($(Get-Location).Path)/common-ci/GitVersion.yml"
+      }
+      Write-Host "# Using GitVersion.yml at $gitVersionPath"
+      Write-Host "##vso[task.setvariable variable=GitVersionPath]$gitVersionPath"
+    name: SetGitVersionPath
+    displayName: 'Determine GitVersion.yml file to use.'
+
+  # GitVersion needs to be 5.6. The standard 5.0 breaks on Ubuntu 20.
+  - task: gitversion/setup@0
+    inputs:
+      versionSpec: '5.6.0'
+
+  - task: gitversion/execute@0
+    inputs:
+      preferBundledVersion: true
+      # As two repos have been checked out, the default path will not
+      # work. So it is specified here.
+      targetPath: '$(Build.Repository.LocalPath)/$(Build.Repository.Name)'
+      useConfigFile: true
+      configFilePath: '$(GitVersionPath)'
+      failOnStderr: true
+
+  - powershell: |
+      Write-Host "##vso[task.setvariable variable=GitVersionSemVer;isOutput=true]$(GitVersion.SemVer)"
+      Write-Host "##vso[task.setvariable variable=GitVersionNuGetVer;isOutput=true]$(GitVersion.NuGetVersion)"
+    name: SetGitVersionVars
+    displayName: 'Export GitVersion variables'
