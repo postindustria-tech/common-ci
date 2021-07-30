@@ -1,3 +1,8 @@
+parameters:
+- name: stageDependencies
+  type: object
+  default: []
+
 stages:
 # This stage check if current branch runs on a pull request merge branch,
 # then try to complete the pull request if it is true.
@@ -6,6 +11,7 @@ stages:
 # or tasks will be run after this.
 - stage: Complete_PR
   displayName: "Check and complete corresponding pull request"
+  dependsOn: ${{ parameters.stageDependencies }}
 
   variables:
   - group: CIAutomation # Required to access CI variables
