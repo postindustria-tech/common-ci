@@ -363,7 +363,8 @@ InModuleScope '51DPackageModule' {
 				$updatedContent = Update-DotnetPackageFileContent `
 					-Dependencies $repoConfig.dependencies `
 					-ProjectFileContent $content `
-					-TeamProjectName "testproject"
+					-TeamProjectName "testproject" `
+					-IsPackagesConfig $false
 				
 				$updatedContent | Should -BeExactly '<PackageReference Include="dep.dotnet" Version="4.3.0" />'
 			}
@@ -414,9 +415,114 @@ InModuleScope '51DPackageModule' {
 				$updatedContent = Update-DotnetPackageFileContent `
 					-Dependencies $repoConfig.dependencies `
 					-ProjectFileContent $content `
-					-TeamProjectName "testproject"
+					-TeamProjectName "testproject" `
+					-IsPackagesConfig $false
 				
 				$updatedContent | Should -BeExactly "<PackageReference Include=`"dep.dotnet`">`r`n<Version>4.3.0</Version>`r`n</PackageReference>"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkProject {
+				param (
+					[string]$SourceVersion
+				)
+				
+				$depRepo = "dependent-dotnet"
+				$repoName = "test-dotnet"
+				$repoConfigStr = @"
+				{
+					"version": "4.3.0",
+					"packageName": "test.dotnet",
+					"dependencies": [
+						"$depRepo"
+					]
+				}
+"@
+				$repoConfig = $repoConfigStr | ConvertFrom-Json
+				$reposStr = @"
+				{
+					"$repoName": $repoConfigStr,
+					"$depRepo": {
+						"version": "4.3.0",
+						"packageName": "dep.dotnet"
+					}
+				}
+"@
+				$repos = $reposStr | ConvertFrom-Json
+				
+				$configStr = @"
+				{
+					"repositories": $reposStr
+				}
+"@
+				$config = $configStr | ConvertFrom-Json
+				
+				Mock Test-TagExist { return $true } `
+					-ModuleName 51DPackageModule
+	
+				# Initialize script scope variable
+				Initialize-GlobalVariables -Configuration $config
+				
+				$content = "<HintPath>..\..\..\..\..\packages\dep.dotnet.test.$SourceVersion\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>"
+				
+				$updatedContent = Update-DotnetPackageFileContent `
+					-Dependencies $repoConfig.dependencies `
+					-ProjectFileContent $content `
+					-TeamProjectName "testproject" `
+					-IsPackagesConfig $false
+				
+				$updatedContent | Should -BeExactly "<HintPath>..\..\..\..\..\packages\dep.dotnet.test.4.3.0\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig {
+				param (
+					[string]$SourceVersion
+				)
+				
+				$depRepo = "dependent-dotnet"
+				$repoName = "test-dotnet"
+				$repoConfigStr = @"
+				{
+					"version": "4.3.0",
+					"packageName": "test.dotnet",
+					"dependencies": [
+						"$depRepo"
+					]
+				}
+"@
+				$repoConfig = $repoConfigStr | ConvertFrom-Json
+				$reposStr = @"
+				{
+					"$repoName": $repoConfigStr,
+					"$depRepo": {
+						"version": "4.3.0",
+						"packageName": "dep.dotnet"
+					}
+				}
+"@
+				$repos = $reposStr | ConvertFrom-Json
+				
+				$configStr = @"
+				{
+					"repositories": $reposStr
+				}
+"@
+				$config = $configStr | ConvertFrom-Json
+				
+				Mock Test-TagExist { return $true } `
+					-ModuleName 51DPackageModule
+	
+				# Initialize script scope variable
+				Initialize-GlobalVariables -Configuration $config
+				
+				$content = "<package id=`"dep.dotnet.test`" version=`"$SourceVersion`" targetFramework=`"net472`" />"
+				
+				$updatedContent = Update-DotnetPackageFileContent `
+					-Dependencies $repoConfig.dependencies `
+					-ProjectFileContent $content `
+					-TeamProjectName "testproject" `
+					-IsPackagesConfig $true
+				
+				$updatedContent | Should -BeExactly "<package id=`"dep.dotnet.test`" version=`"4.3.0`" targetFramework=`"net472`" />"
 			}
 		}
 		It 'successfully update the well formed package version xml syntax `<PackageReference `/`>' {
@@ -433,6 +539,22 @@ InModuleScope '51DPackageModule' {
 		
 		It 'successfully update the non well formed package version xml syntax `<PackageReference`>`<`/PackageReference`>' {
 			Test-DotnetSuccessfulVersionUpdateMultiLines -SourceVersion "0.0.0-beta.18+1"
+		}
+		
+		It 'successfully update the well formed package version xml dotnet framework syntax' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkProject -SourceVersion "0.0.0"
+		}
+		
+		It 'successfully update the non well formed package version xml dotnet framework syntax' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkProject -SourceVersion "0.0.0-beta.18+1"
+		}
+		
+		It 'successfully update the well formed package version xml dotnet framework packages config file' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig -SourceVersion "0.0.0"
+		}
+		
+		It 'successfully update the non well formed package version xml dotnet framework packages config file' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig -SourceVersion "0.0.0-beta.18+1"
 		}
 	}
 }

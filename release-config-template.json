@@ -125,6 +125,15 @@
 				"pipeline-dotnet"
 			]
 		},
+		"entitlement-dotnet": {
+			"version": "4.1.9",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet"
+			]
+		},
 		"internal-engines-dotnet": {
 			"version": "4.3.0",
 			"packageName": "FiftyOne.GeoLocation.OnPremise",
