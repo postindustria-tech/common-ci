@@ -25,9 +25,5 @@ steps:
     command: push
     packagesToPush: '$(PIPELINE.WORKSPACE)/build-pipeline/drop/**/*.nupkg;!$(PIPELINE.WORKSPACE)/build-pipeline/drop/**/*.symbols.nupkg'
     nuGetFeedType: external
-    ${{ if eq(variables['System.TeamProjectId'], 'Pipeline') }}:
-      publishFeedCredentials: 'NuGet.org - Release'
-    ${{ if ne(variables['System.TeamProjectId'], 'Pipeline') }}:
-      # If not 'Pipeline' project, publish to internal instead.
-      publishVstsFeed: '${{ parameters.feed }}'
+    publishFeedCredentials: 'NuGet.org - Release'
   condition: and(succeeded(), eq('${{ parameters.nugetFeedType }}', 'external'))
