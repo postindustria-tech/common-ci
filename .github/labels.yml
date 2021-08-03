@@ -31,6 +31,12 @@
 - name: "status: released/4.3.3"
   description: This change was released in the specified version
   color: 006b75
+- name: "status: released/4.3.4"
+  description: This change was released in the specified version
+  color: 99ccff
+- name: "status: released/4.3.5"
+  description: This change was released in the specified version
+  color: ccccff
 - name: "status: released/4.4.0"
   description: This change was released in the specified version
   color: 376842

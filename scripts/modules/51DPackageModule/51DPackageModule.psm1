@@ -171,6 +171,9 @@ function Update-MavenPackageDependencies {
   .Parameter TeamProjectName
   Name ofthe repository team project
   
+  .Parameter IsPackagesConfig
+  If the current package is packages.config which requires different treatment.
+  
   .Outputs
   Updated file content or $null of error occured
 #>
@@ -181,7 +184,9 @@ function Update-DotnetPackageFileContent {
 		[Parameter(Mandatory)]
 		[string]$ProjectFileContent,
 		[Parameter(Mandatory)]
-		[string]$TeamProjectName
+		[string]$TeamProjectName,
+		[Parameter(Mandatory)]
+		[boolean]$IsPackagesConfig
 	)
 	# Update each .csproj file with dependency versions.
 	foreach ($dependency in $Dependencies) {
@@ -192,44 +197,143 @@ function Update-DotnetPackageFileContent {
 		# That will be used to preserv the remaining of the markup,
 		# apart from the version which will be updated.
 		$dependencyVersion = $script:repositories."$dependency".version
-		$matchPattern = "(?<prefix>\<PackageReference \s*Include=\`"$packageName.*\`" \s*Version=\`").*(?<suffix>\`"\s*/\>)"
-		if ($ProjectFileContent -match "$matchPattern") {
-			Write-Host "# Version variable matches dependency $packageName. Update."
-			
-			# Make sure that the version exists for the dependency. Else bail out.
-			if (!$(Test-TagExist `
-				-RepositoryName $dependency `
-				-Version $dependencyVersion `
-				-TeamProjectName $TeamProjectName)) {
-				Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
-				return $null
-			}
-			
-			# This reuse the matched group so make sure we don't lose the original package name.
-			$replaceString = '${prefix}' + "$dependencyVersion" + '${suffix}'
-			$ProjectFileContent = $ProjectFileContent -replace "$matchPattern",$replaceString
-		}
 		
-		# Version 2 of xml markup for <PackageReference></PackageReference>
-		$matchPattern = "(?<prefix>\<PackageReference \s*Include=\`"$packageName.*\`"\s*\>.*\r\n.*\<Version\>)(?<version>.*)(?<suffix>\</Version\>.*\r\n.*\</PackageReference\>)"
-		if ($ProjectFileContent -match "$matchPattern") {
-			Write-Host "# Version variable matches dependency $packageName. Update."
-			
-			# Make sure that the version exists for the dependency. Else bail out.
-			if (!$(Test-TagExist `
-				-RepositoryName $dependency `
-				-Version $dependencyVersion `
-				-TeamProjectName $TeamProjectName)) {
-				Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
-				return $null
+		if ($IsPackagesConfig) {
+			$matchPattern = "(?<prefix>\<package \s*id=\`"$packageName.*\`" \s*version=\`").*(?<suffix>\`"\s*targetFramework=\`".*\`"\s*/\>)"
+			if ($ProjectFileContent -match "$matchPattern") {
+				Write-Host "# Version variable matches dependency $packageName. Update."
+				
+				# Make sure that the version exists for the dependency. Else bail out.
+				if (!$(Test-TagExist `
+					-RepositoryName $dependency `
+					-Version $dependencyVersion `
+					-TeamProjectName $TeamProjectName)) {
+					Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
+					return $null
+				}
+				
+				# This reuse the matched group so make sure we don't lose the original package name.
+				$replaceString = '${prefix}' + "$dependencyVersion" + '${suffix}'
+				$ProjectFileContent = $ProjectFileContent -replace "$matchPattern",$replaceString
+			}
+		} else {
+			$matchPattern = "(?<prefix>\<PackageReference \s*Include=\`"$packageName.*\`" \s*Version=\`").*(?<suffix>\`"\s*/\>)"
+			if ($ProjectFileContent -match "$matchPattern") {
+				Write-Host "# Version variable matches dependency $packageName. Update."
+				
+				# Make sure that the version exists for the dependency. Else bail out.
+				if (!$(Test-TagExist `
+					-RepositoryName $dependency `
+					-Version $dependencyVersion `
+					-TeamProjectName $TeamProjectName)) {
+					Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
+					return $null
+				}
+				
+				# This reuse the matched group so make sure we don't lose the original package name.
+				$replaceString = '${prefix}' + "$dependencyVersion" + '${suffix}'
+				$ProjectFileContent = $ProjectFileContent -replace "$matchPattern",$replaceString
 			}
 			
-			# This reuse the matched group so make sure we don't lose the original package name.
-			$replaceString = '${prefix}' + "$dependencyVersion" + '${suffix}'
-			$ProjectFileContent = $ProjectFileContent -replace "$matchPattern",$replaceString
+			# Version 2 of xml markup for <PackageReference></PackageReference>
+			$matchPattern = "(?<prefix>\<PackageReference \s*Include=\`"$packageName.*\`"\s*\>.*\r\n.*\<Version\>)(?<version>.*)(?<suffix>\</Version\>.*\r\n.*\</PackageReference\>)"
+			if ($ProjectFileContent -match "$matchPattern") {
+				Write-Host "# Version variable matches dependency $packageName. Update."
+				
+				# Make sure that the version exists for the dependency. Else bail out.
+				if (!$(Test-TagExist `
+					-RepositoryName $dependency `
+					-Version $dependencyVersion `
+					-TeamProjectName $TeamProjectName)) {
+					Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
+					return $null
+				}
+				
+				# This reuse the matched group so make sure we don't lose the original package name.
+				$replaceString = '${prefix}' + "$dependencyVersion" + '${suffix}'
+				$ProjectFileContent = $ProjectFileContent -replace "$matchPattern",$replaceString
+			}
+			
+			# If HintPath exists. This is when a project is a .Net Framework. Update the Hint Path.
+			$matchPattern = "(?<prefix>\<HintPath\>\s*.*$packageName.*)\d+\.\d+\.\d+.*(?<suffix>\\lib.*\<\/HintPath\>)"
+			if ($ProjectFileContent -match "$matchPattern") {
+				Write-Host "# Version variable matches dependency $packageName. Update."
+				
+				# Make sure that the version exists for the dependency. Else bail out.
+				if (!$(Test-TagExist `
+					-RepositoryName $dependency `
+					-Version $dependencyVersion `
+					-TeamProjectName $TeamProjectName)) {
+					Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
+					return $null
+				}
+				
+				# This reuse the matched group so make sure we don't lose the original package name.
+				$replaceString = '${prefix}' + "$dependencyVersion" + '${suffix}'
+				$ProjectFileContent = $ProjectFileContent -replace "$matchPattern",$replaceString
+			}
 		}
 	}
 	return $ProjectFileContent
+}
+
+<#
+  .Description
+  Update package dependencies for a package file
+  which can be .csproj or packages.config file.
+  
+  .Parameter FilePath
+  Path to a package file
+  
+  .Parameter Dependencies
+  List of dependencies to be updated
+  
+  .Parameter TeamProjectName
+  Name of a Team Project that the changes should be
+  made to.
+  
+  .Outputs
+  true or false
+#>
+function Update-DotnetPackageDependenciesPerFile {
+	param (
+		[Parameter(Mandatory)]
+		[string]$FilePath,
+		[Parameter(Mandatory)]
+		[string[]]$Dependencies,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
+	)
+	Write-Host ""
+	Write-Host "# Updating package file $FilePath"
+	$projFileContent = $(Get-Content $FilePath -Raw)
+	$isPackagesConfig = $FilePath -match ".*packages.config"
+	$updatedContent = Update-DotnetPackageFileContent `
+		-Dependencies $Dependencies `
+		-ProjectFileContent $projFileContent `
+		-TeamProjectName $TeamProjectName `
+		-IsPackagesConfig $isPackagesConfig
+	
+	# Check if content has been updated.
+	if ($updatedContent -ne $null) {
+		if ($updatedContent -ne $projFileContent) {
+			Write-Host "# Dependency version has been updated. Update the $FilePath content."
+			if (![FileHandler]::SetContent($FilePath, $updatedContent)) {
+				Write-Host "# ERROR: Failed to update the $FilePath content."
+				return $false
+			}
+			
+			# Stage the change
+			if (![GitHandler]::Add("$FilePath")) {
+				Write-Host "# ERROR: Failed to stage the change."
+				return $false
+			}
+		}
+	} else {
+		Write-Host "# ERROR: error occurs while updating content of package file."
+		return $false
+	}
+	return $true
 }
 
 <#
@@ -262,29 +366,22 @@ function Update-DotnetPackageDependencies {
 	if ($dependencies -ne $null -and $dependencies.count -gt 0) {
 		# Update each .csproj file.
 		foreach ($project in $(Get-ChildItem -Filter *.csproj -Recurse)) {
-			$projFileContent = $(Get-Content $project.FullName -Raw)
-			$updatedContent = Update-DotnetPackageFileContent `
+			if (!$(Update-DotnetPackageDependenciesPerFile `
+				-FilePath $project.FullName `
 				-Dependencies $dependencies `
-				-ProjectFileContent $projFileContent `
-				-TeamProjectName $TeamProjectName
-			
-			# Check if .csproj has been updated.
-			if ($updatedContent -ne $null) {
-				if ($updatedContent -ne $projFileContent) {
-					Write-Host "# Dependency version has been updated. Update the $($project.FullName) content."
-					if (![FileHandler]::SetContent($project.FullName, $updatedContent)) {
-						Write-Host "# ERROR: Failed to update the $project.FullName content."
-						return $false
-					}
-					
-					# Stage the change
-					if (![GitHandler]::Add("$($project.FullName)")) {
-						Write-Host "# ERROR: Failed to stage the change."
-						return $false
-					}
-				}
-			} else {
-				Write-Host "# ERROR: error occurs while updating content of package file."
+				-TeamProjectName $TeamProjectName)) {
+				Write-Host "# ERROR: Failed to update package file $($project.FullName)"
+				return $false
+			}
+		}
+		
+		# Update each packages.config file.
+		foreach ($project in $(Get-ChildItem -Filter packages.config -Recurse)) {
+			if (!$(Update-DotnetPackageDependenciesPerFile `
+				-FilePath $project.FullName `
+				-Dependencies $dependencies `
+				-TeamProjectName $TeamProjectName)) {
+				Write-Host "# ERROR: Failed to update package file $($project.FullName)"
 				return $false
 			}
 		}

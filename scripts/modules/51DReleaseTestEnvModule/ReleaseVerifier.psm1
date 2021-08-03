@@ -116,7 +116,7 @@ function Test-DotnetPackageDependencies {
 			foreach ($dependency in $dependencies) {
 				$packageName = $Repositories."$dependency".packageName
 				if ([string]::IsNullOrEmpty($packageName)) { continue }
-				# This pattern has a match group name 'name'. That will be used to preserv the actual matched package name.
+				# This pattern has a match group name 'name'. That will be used to preserve the actual matched package name.
 				$matchPattern = "\<PackageReference \s*Include=\`"(?<name>$packageName.*)\`" \s*Version=\`"(?<version>\d+\.\d+\.\d+)\`"\s*/\>"
 				if ($projFileContent -match "$matchPattern") {
 					Write-Host "# Version variable matches dependency $packageName."
@@ -127,8 +127,41 @@ function Test-DotnetPackageDependencies {
 					}
 				}
 				
-				# This pattern has a match group name 'name'. That will be used to preserv the actual matched package name.
+				# This pattern has a match group name 'name'. That will be used to preserve the actual matched package name.
 				$matchPattern = "(?<prefix>\<PackageReference \s*Include=\`"$packageName.*\`"\s*\>.*\r\n.*\<Version\>)(?<version>\d+\.\d+\.\d+)(?<suffix>\</Version\>.*\r\n.*\</PackageReference\>)"
+				if ($projFileContent -match "$matchPattern") {
+					Write-Host "# Version variable matches dependency $packageName."
+					$dependencyVersion = $Repositories."$dependency".version
+					if ($Matches['version'] -ne $dependencyVersion) {
+						Write-Host "# FAIL: Version '$($Matches['version'])' of $dependency does not match $dependencyVersion"
+						return $false
+					}
+				}
+				
+				# This pattern has a match group name 'name'. That will be used to preserve the actual matched package name.
+				$matchPattern = "(?<prefix>\<HintPath\>\s*.*$packageName.*)(?<version>\d+\.\d+\.\d+)(?<suffix>\\lib.*\<\/HintPath\>)"
+				if ($projFileContent -match "$matchPattern") {
+					Write-Host "# Version variable matches dependency $packageName."
+					$dependencyVersion = $Repositories."$dependency".version
+					if ($Matches['version'] -ne $dependencyVersion) {
+						Write-Host "# FAIL: Version '$($Matches['version'])' of $dependency does not match $dependencyVersion"
+						return $false
+					}
+				}
+			}
+		}
+		
+		# Test each packages.config file.
+		foreach ($project in $(Get-ChildItem -Filter packages.config -Recurse)) {
+			Write-Host "# Working on project $project"
+			$projFileContent = $(Get-Content $project.FullName -Raw)
+			# Test each packages.config file with dependency versions.
+			foreach ($dependency in $dependencies) {
+				$packageName = $Repositories."$dependency".packageName
+				if ([string]::IsNullOrEmpty($packageName)) { continue }
+				# This pattern has a match group name 'name'. That will be used to preserve the actual matched package name.
+				$matchPattern = "\<PackageReference \s*Include=\`"(?<name>$packageName.*)\`" \s*Version=\`"(?<version>\d+\.\d+\.\d+)\`"\s*/\>"
+				$matchPattern = "(?<prefix>\<package \s*id=\`"$packageName.*\`" \s*version=\`")(?<version>\d+\.\d+\.\d+)(?<suffix>\`"\s*targetFramework=\`".*\`"\s*/\>)"
 				if ($projFileContent -match "$matchPattern") {
 					Write-Host "# Version variable matches dependency $packageName."
 					$dependencyVersion = $Repositories."$dependency".version
