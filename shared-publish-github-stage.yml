@@ -38,60 +38,64 @@ stages:
               retryCount: 5
               
           - bash: |
-             # Copy ssh keys to expected location
-             mkdir ~/.ssh
-             mv $(githubsshkey.secureFilePath) ~/.ssh/id_rsa
-             mv $(githubsshkeypublic.secureFilePath) ~/.ssh/id_rsa.pub
-             if [ ! -f ~/.ssh/id_rsa ] && [ ! -f ~/.ssh/id_rsa ]; then
-               echo "Failed to obtain ssh keys."
-               exit 1               
-             fi
-             
-             # Have to change permissions on key files in order for SSH to work with them.
-             chmod 600 ~/.ssh/id_rsa
-             chmod 600 ~/.ssh/id_rsa.pub
-             export id_rsa_perm=`stat -c '%a' ~/.ssh/id_rsa`
-             export id_rsa_pub_perm=`stat -c '%a' ~/.ssh/id_rsa.pub`
-             if [ "$id_rsa_perm" != "600" ] && [ "$id_rsa_pub_perm" != "600" ]; then
-                echo "Failed to change permission on key files."
+              # Copy ssh keys to expected location
+              mkdir ~/.ssh
+              mv $(githubsshkey.secureFilePath) ~/.ssh/id_rsa
+              mv $(githubsshkeypublic.secureFilePath) ~/.ssh/id_rsa.pub
+              if [ ! -f ~/.ssh/id_rsa ] && [ ! -f ~/.ssh/id_rsa ]; then
+                echo "Failed to obtain ssh keys."
+                exit 1               
+              fi
+              
+              # Have to change permissions on key files in order for SSH to work with them.
+              chmod 600 ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa.pub
+              export id_rsa_perm=`stat -c '%a' ~/.ssh/id_rsa`
+              export id_rsa_pub_perm=`stat -c '%a' ~/.ssh/id_rsa.pub`
+              if [ "$id_rsa_perm" != "600" ] && [ "$id_rsa_pub_perm" != "600" ]; then
+                 echo "Failed to change permission on key files."
+                 exit 1
+              fi
+              
+              # Uncomment the line below to debug issues with SSH
+              #ssh -vT git@github.com
+              
+              echo "Cloning git repository"
+              git clone https://a:$(System.AccessToken)@dev.azure.com/51degrees/$(System.TeamProject)/_git/$(Build.Repository.Name) source
+              if [ ! -d source ]; then
+                echo "Failed to checkout repository."
                 exit 1
-             fi
-             
-             # Uncomment the line below to debug issues with SSH
-             #ssh -vT git@github.com
-             
-             echo "Cloning git repository"
-             git clone https://a:$(System.AccessToken)@dev.azure.com/51degrees/$(System.TeamProject)/_git/$(Build.Repository.Name) source
-             if [ ! -d source ]; then
-               echo "Failed to checkout repository."
-               exit 1
-             fi
-             
-             cd source
-             
-             echo "Checking out branch '$(Build.SourceBranchName)'"
-             git checkout $(Build.SourceBranchName)
-             if [ $? != 0 ]; then
-               echo "Failed to checkout branch '$(Build.SourceBranchName)'."
-               exit 1
-             fi
-             
-             echo "Adding GitHub remote"
-             git remote add github git@github.com:51Degrees/$(Build.Repository.Name).git
-             if [ $? != 0 ]; then
-               echo "Failed to add GitHub remote."
-               exit 1
-             fi
-             
-             echo "Pushing branch '$(Build.SourceBranchName)' to GitHub"
-             git push github $(Build.SourceBranchName)
-             if [ $? != 0 ]; then
-               echo "Failed to push branch '$(Build.SourceBranchName)' to GitHub."
-               exit 1
-             fi
+              fi
+              
+              cd source
+              
+              echo "Checking out branch '$(Build.SourceBranchName)'"
+              git checkout $(Build.SourceBranchName)
+              if [ $? != 0 ]; then
+                echo "Failed to checkout branch '$(Build.SourceBranchName)'."
+                exit 1
+              fi
+              
+              echo "Adding GitHub remote"
+              git remote add github git@github.com:51Degrees/$(Build.Repository.Name).git
+              if [ $? != 0 ]; then
+                echo "Failed to add GitHub remote."
+                exit 1
+              fi
+              
+              echo "Pushing branch '$(Build.SourceBranchName)' to GitHub"
+              git push github $(Build.SourceBranchName)
+              if [ $? != 0 ]; then
+                echo "Failed to push branch '$(Build.SourceBranchName)' to GitHub."
+                exit 1
+              fi
+            displayName: 'Push branch to Github'
 
           - ${{ if eq(parameters.skipTagging, false) }}:
             - bash: |
+                # Move to checkout directory in previous task.
+                cd source
+                
                 export tagName="`git tag --points-at $(Build.SourceBranchName)`"
                 
                 echo "Pushing tag '$tagName' to GitHub"
@@ -101,4 +105,3 @@ stages:
                   exit 1
                 fi
               displayName: 'Push tags to GitHub'
-              failOnStderr: true
