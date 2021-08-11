@@ -135,5 +135,5 @@ function Get-ReviewerId {
 }
 
 # When using this script locally uncomment and update the below environment accordingly.
-$env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI = "https://51degrees.visualstudio.com/DefaultCollection/"
-$env:SYSTEM_TEAMPROJECTID = "APIs%20Release%20Test%20Environment"
+# $env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI = "https://51degrees.visualstudio.com/DefaultCollection/"
+# $env:SYSTEM_TEAMPROJECTID = "APIs%20Release%20Test%20Environment"

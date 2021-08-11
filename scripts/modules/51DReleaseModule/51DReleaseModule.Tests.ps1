@@ -26,7 +26,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj"
+		$result = Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj"
 		$result | Should -BeExactly $true
 	}
 	
@@ -42,7 +42,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = $(Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj")
+		$result = $(Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj")
 		$result | Should -BeExactly $false
 	}
 	
@@ -60,7 +60,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = $(Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj")
+		$result = $(Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj")
 		$result | Should -BeExactly $false
 	}
 	
@@ -80,7 +80,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj"
+		$result = Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj"
 		$result | Should -BeExactly $false
 	}
 	
@@ -102,7 +102,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj"
+		$result = Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj"
 		$result | Should -BeExactly $false
 	}
 	
@@ -128,7 +128,8 @@ Describe 'Update-CommitPushPullSub' {
 		}' | ConvertFrom-Json
 		$result = Update-CommitPushPullSub `
 			-Configuration $configuration `
-			-TeamProjectName "testproj"
+			-DepTeamProjectName "testproj" `
+			-PrTeamProjectName "testproj"
 		$result | Should -BeExactly $false
 	}
 	
@@ -156,7 +157,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj"
+		$result = Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj"
 		$result | Should -BeExactly $true
 	}
 	
@@ -186,7 +187,7 @@ Describe 'Update-CommitPushPullSub' {
 				}
 			}
 		}' | ConvertFrom-Json
-		$result = Update-CommitPushPullSub -Configuration $configuration -TeamProjectName "testproj"
+		$result = Update-CommitPushPullSub -Configuration $configuration -DepTeamProjectName "testproj" -PrTeamProjectName "testproj"
 		$result | Should -BeExactly $false
 	}
 }

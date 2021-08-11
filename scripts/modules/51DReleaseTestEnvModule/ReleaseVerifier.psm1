@@ -116,6 +116,7 @@ function Test-DotnetPackageDependencies {
 			foreach ($dependency in $dependencies) {
 				$packageName = $Repositories."$dependency".packageName
 				if ([string]::IsNullOrEmpty($packageName)) { continue }
+				
 				# This pattern has a match group name 'name'. That will be used to preserve the actual matched package name.
 				$matchPattern = "\<PackageReference \s*Include=\`"(?<name>$packageName.*)\`" \s*Version=\`"(?<version>\d+\.\d+\.\d+)\`"\s*/\>"
 				if ($projFileContent -match "$matchPattern") {

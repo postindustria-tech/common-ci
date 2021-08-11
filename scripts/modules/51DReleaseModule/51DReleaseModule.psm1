@@ -414,8 +414,13 @@ function Start-Release {
   .Parameter Configuration
   A configuration object from a configuration file.
   
-  .Parameter TeamProjectName
-  Name ofthe repository team project
+  .Parameter DepTeamProjectName
+  Name of the repository team project to be used for
+  dependency updates.
+  
+  .Parameter PrTeamProjectName
+  Name of the repository team project to be used for
+  creating pull request to main.
   
   .Outputs
   true or false
@@ -425,7 +430,9 @@ function Update-CommitPushPullSub {
 		[Parameter(Mandatory)]
 		[object]$Configuration,
 		[Parameter(Mandatory)]
-		[string]$TeamProjectName
+		[string]$DepTeamProjectName,
+		[Parameter(Mandatory)]
+		[string]$PrTeamProjectName
 	)
 	
 	Initialize-GlobalVariables -Configuration $Configuration
@@ -443,7 +450,7 @@ function Update-CommitPushPullSub {
 	if ($(Test-TagExist `
 		-RepositoryName $repoName `
 		-Version $targetVersion `
-		-TeamProjectName $TeamProjectName)) {
+		-TeamProjectName $PrTeamProjectName)) {
 		Write-Host "# ERROR: A tag for the target version $targetVersion already exists."
 		return $false
 	}
@@ -453,7 +460,7 @@ function Update-CommitPushPullSub {
 	Write-Host "# Checkout release branch for version $targetVersion"
 	if (!$(Get-ReleaseBranch `
 		-Version $targetVersion `
-		-TeamProjectName $TeamProjectName)) {
+		-TeamProjectName $PrTeamProjectName)) {
 		return $false
 	}
 
@@ -471,7 +478,7 @@ function Update-CommitPushPullSub {
 	Write-Host "# Updating package dependencies"
 	if (!$(Update-PackageDependencies `
 		-Configuration $Configuration `
-		-TeamProjectName $TeamProjectName)) {
+		-TeamProjectName $DepTeamProjectName)) {
 		return $false
 	}
 	
@@ -489,12 +496,12 @@ function Update-CommitPushPullSub {
 	$pullRequest = Get-PullRequestToMain `
 		-RepositoryName $repoName `
 		-ReleaseBranch "refs/heads/$targetBranch" `
-		-TeamProjectName $TeamProjectName
+		-TeamProjectName $PrTeamProjectName
 	if ($pullRequest -eq $null) {
 		if (!(New-PullRequestToMain `
 			-RepositoryName $repoName `
 			-SourceBranchRef "refs/heads/$targetBranch" `
-			-TeamProjectName $TeamProjectName)) {
+			-TeamProjectName $PrTeamProjectName)) {
 			return $false
 		}
 	} else {
@@ -512,8 +519,13 @@ function Update-CommitPushPullSub {
   .Parameter ConfigFile
   Full path to the configuration file.
   
-  .Parameter TeamProjectName
-  Name ofthe repository team project
+  .Parameter DepTeamProjectName
+  Name of the repository team project to be used for
+  dependency updates.
+  
+  .Parameter PrTeamProjectName
+  Name of the repository team project to be used for
+  creating pull request to main.
   
   .Outputs
   true or false
@@ -523,13 +535,18 @@ function Update-CommitPushPull {
 		[Parameter(Mandatory)]
 		[string]$ConfigFile,
 		[Parameter(Mandatory)]
-		[string]$TeamProjectName
+		[string]$DepTeamProjectName,
+		[Parameter(Mandatory)]
+		[string]$PrTeamProjectName
 	)
 
 	# Reinitialise the script variables.
 	$configuration = Get-Content $ConfigFile | Out-String | ConvertFrom-Json
 	
-	return Update-CommitPushPullSub -Configuration $configuration -TeamProjectName $TeamProjectName
+	return Update-CommitPushPullSub `
+		-Configuration $configuration `
+		-DepTeamProjectName $DepTeamProjectName `
+		-PrTeamProjectName $PrTeamProjectName
 }
 
 Export-ModuleMember -Function Start-Release

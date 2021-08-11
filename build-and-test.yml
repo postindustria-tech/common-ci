@@ -31,7 +31,12 @@ stages:
         
         # Make sure all modules are loaded
         cd scripts\modules
-        Get-ChildItem -Directory | Foreach { Import-Module $_.Name -Force }
+        Get-ChildItem -Directory | ForEach-Object { 
+            if($(Get-ChildItem $_.FullName | Where-Object {($_ -like '*.psm1') -or ($_ -like '*.psd1')}).length -gt 0) {
+                Write-Output $_.Name
+                Import-Module $_.Name -Force 
+            }
+        }
         
         # Run all tests
         # Enable test environment so that production environment is not impacted

@@ -1,6 +1,13 @@
 parameters:
 - name: imageName # Name of the image to run the job on
-
+- name: commonCiRef # The common-ci repo reference to checkout.
+  type: string
+  default: main
+- name: project # The DevOps project executing this template.
+  displayName: 'Calling project is cloud or non-cloud'
+  type: string
+  default: 'non-cloud'
+  
 jobs:
 - job: Versioning
   
@@ -16,7 +23,13 @@ jobs:
   
   # Checkout the common-ci repo so the GitVersion config file can
   # be used.
-  - checkout: 'git://$(System.TeamProject)/common-ci'
+  # Special consideration is given to the Cloud project as when executing 
+  # this template the, git url would resolve to git://Cloud/common-ci
+  # which is not valid.
+  - ${{ if eq(parameters.project, 'cloud') }}:
+    - checkout: 'git://Pipeline/common-ci@${{ parameters.commonCiRef }}'
+  - ${{ if ne(parameters.project, 'cloud') }}:
+    - checkout: 'git://$(System.TeamProject)/common-ci@${{ parameters.commonCiRef }}'
 
   # NOTE: This task can be used on both Windows and Linux machine so make sure to use
   # '\' instead '/', and everything is case sensitive.
