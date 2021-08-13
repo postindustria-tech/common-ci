@@ -102,7 +102,7 @@ function Get-NonLeafAction {
 				# Check if action required for a dependency.
 				if (!$script:traveledTable[$dependency]) {
 					Get-Action `
-						-PojectName $dependency `
+						-RepositoryName $dependency `
 						-TeamProjectName $TeamProjectName
 				}
 				
