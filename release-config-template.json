@@ -121,8 +121,17 @@
 			"dependencies": [
 				"common-ci",
 				"device-detection-cxx",
+				"caching-dotnet",
 				"common-dotnet",
 				"pipeline-dotnet"
+			]
+		},
+		"license-dotnet": {
+			"version": "4.3.0",
+			"packageName": "FiftyOne.(License|Resource)",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
 			]
 		},
 		"entitlement-dotnet": {
@@ -131,6 +140,7 @@
 			"dependencies": [
 				"common-ci",
 				"common-dotnet",
+				"license-dotnet",
 				"pipeline-dotnet"
 			]
 		},

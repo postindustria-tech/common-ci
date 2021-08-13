@@ -318,9 +318,11 @@ InModuleScope 51DPackageModule {
 InModuleScope '51DPackageModule' {
 	Describe 'Update-DotnetPackageFileContent' {
 		BeforeAll {
-			function Test-DotnetSuccessfulVersionUpdateOneLine {
+			function Test-DotnetSuccessfulVersionUpdateOneLineBase {
 				param (
-					[string]$SourceVersion
+					[string]$SourceVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName
 				)
 				
 				$depRepo = "dependent-dotnet"
@@ -340,7 +342,7 @@ InModuleScope '51DPackageModule' {
 					"$repoName": $repoConfigStr,
 					"$depRepo": {
 						"version": "4.3.0",
-						"packageName": "dep.dotnet"
+						"packageName": "$ConfigDepPackageName"
 					}
 				}
 "@
@@ -358,7 +360,7 @@ InModuleScope '51DPackageModule' {
 				
 				Mock Test-TagExist { return $true } `
 					-ModuleName 51DPackageModule
-				$content = '<PackageReference Include="dep.dotnet" Version="$SourceVersion" />'
+				$content = "<PackageReference Include=`"$ActualDepPackageName`" Version=`"$SourceVersion`" />"
 				
 				$updatedContent = Update-DotnetPackageFileContent `
 					-Dependencies $repoConfig.dependencies `
@@ -366,13 +368,109 @@ InModuleScope '51DPackageModule' {
 					-TeamProjectName "testproject" `
 					-IsPackagesConfig $false
 				
-				$updatedContent | Should -BeExactly '<PackageReference Include="dep.dotnet" Version="4.3.0" />'
+				$updatedContent | Should -BeExactly "<PackageReference Include=`"$ActualDepPackageName`" Version=`"4.3.0`" />"
+			}
+
+			function Test-DotnetSuccessfulVersionUpdateOneLine {
+				param (
+					[string]$SourceVersion
+				)
+				Test-DotnetSuccessfulVersionUpdateOneLineBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateOneLineRegex {
+				param (
+					[string]$SourceVersion
+				)
+				Test-DotnetSuccessfulVersionUpdateOneLineBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateMultiLinesBase {
+				param (
+					[string]$SourceVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName
+				)
+				
+				$depRepo = "dependent-dotnet"
+				$repoName = "test-dotnet"
+				$repoConfigStr = @"
+				{
+					"version": "4.3.0",
+					"packageName": "test.dotnet",
+					"dependencies": [
+						"$depRepo"
+					]
+				}
+"@
+				$repoConfig = $repoConfigStr | ConvertFrom-Json
+				$reposStr = @"
+				{
+					"$repoName": $repoConfigStr,
+					"$depRepo": {
+						"version": "4.3.0",
+						"packageName": "$ConfigDepPackageName"
+					}
+				}
+"@
+				$repos = $reposStr | ConvertFrom-Json
+				
+				$configStr = @"
+				{
+					"repositories": $reposStr
+				}
+"@
+				$config = $configStr | ConvertFrom-Json
+				
+				Mock Test-TagExist { return $true } `
+					-ModuleName 51DPackageModule
+	
+				# Initialize script scope variable
+				Initialize-GlobalVariables -Configuration $config
+				
+				$content = "<PackageReference Include=`"$ActualDepPackageName`">`r`n<Version>$SourceVersion</Version>`r`n</PackageReference>"
+				
+				$updatedContent = Update-DotnetPackageFileContent `
+					-Dependencies $repoConfig.dependencies `
+					-ProjectFileContent $content `
+					-TeamProjectName "testproject" `
+					-IsPackagesConfig $false
+				
+				$updatedContent | Should -BeExactly "<PackageReference Include=`"$ActualDepPackageName`">`r`n<Version>4.3.0</Version>`r`n</PackageReference>"
 			}
 			
 			function Test-DotnetSuccessfulVersionUpdateMultiLines {
 				param (
 					[string]$SourceVersion
 				)
+				Test-DotnetSuccessfulVersionUpdateMultiLinesBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateMultiLinesRegex {
+				param (
+					[string]$SourceVersion
+				)
+				Test-DotnetSuccessfulVersionUpdateMultiLinesBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkProjectBase {
+				param (
+					[string]$SourceVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName
+				)
 				
 				$depRepo = "dependent-dotnet"
 				$repoName = "test-dotnet"
@@ -391,7 +489,7 @@ InModuleScope '51DPackageModule' {
 					"$repoName": $repoConfigStr,
 					"$depRepo": {
 						"version": "4.3.0",
-						"packageName": "dep.dotnet"
+						"packageName": "$ConfigDepPackageName"
 					}
 				}
 "@
@@ -410,72 +508,42 @@ InModuleScope '51DPackageModule' {
 				# Initialize script scope variable
 				Initialize-GlobalVariables -Configuration $config
 				
-				$content = "<PackageReference Include=`"dep.dotnet`">`r`n<Version>$SourceVersion</Version>`r`n</PackageReference>"
-				
+				$content = "<HintPath>..\..\..\..\..\packages\$($ActualDepPackageName).test.$($SourceVersion)\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>"
+
 				$updatedContent = Update-DotnetPackageFileContent `
 					-Dependencies $repoConfig.dependencies `
 					-ProjectFileContent $content `
 					-TeamProjectName "testproject" `
 					-IsPackagesConfig $false
 				
-				$updatedContent | Should -BeExactly "<PackageReference Include=`"dep.dotnet`">`r`n<Version>4.3.0</Version>`r`n</PackageReference>"
+				$updatedContent | Should -BeExactly "<HintPath>..\..\..\..\..\packages\$($ActualDepPackageName).test.4.3.0\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>"
 			}
 			
 			function Test-DotnetSuccessfulVersionUpdateNetFrameworkProject {
 				param (
 					[string]$SourceVersion
 				)
-				
-				$depRepo = "dependent-dotnet"
-				$repoName = "test-dotnet"
-				$repoConfigStr = @"
-				{
-					"version": "4.3.0",
-					"packageName": "test.dotnet",
-					"dependencies": [
-						"$depRepo"
-					]
-				}
-"@
-				$repoConfig = $repoConfigStr | ConvertFrom-Json
-				$reposStr = @"
-				{
-					"$repoName": $repoConfigStr,
-					"$depRepo": {
-						"version": "4.3.0",
-						"packageName": "dep.dotnet"
-					}
-				}
-"@
-				$repos = $reposStr | ConvertFrom-Json
-				
-				$configStr = @"
-				{
-					"repositories": $reposStr
-				}
-"@
-				$config = $configStr | ConvertFrom-Json
-				
-				Mock Test-TagExist { return $true } `
-					-ModuleName 51DPackageModule
-	
-				# Initialize script scope variable
-				Initialize-GlobalVariables -Configuration $config
-				
-				$content = "<HintPath>..\..\..\..\..\packages\dep.dotnet.test.$SourceVersion\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>"
-				
-				$updatedContent = Update-DotnetPackageFileContent `
-					-Dependencies $repoConfig.dependencies `
-					-ProjectFileContent $content `
-					-TeamProjectName "testproject" `
-					-IsPackagesConfig $false
-				
-				$updatedContent | Should -BeExactly "<HintPath>..\..\..\..\..\packages\dep.dotnet.test.4.3.0\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>"
+				Test-DotnetSuccessfulVersionUpdateNetFrameworkProjectBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet"
 			}
 			
-			function Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig {
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkProjectRegex {
 				param (
 					[string]$SourceVersion
+				)
+				Test-DotnetSuccessfulVersionUpdateNetFrameworkProjectBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfigBase {
+				param (
+					[string]$SourceVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName
 				)
 				
 				$depRepo = "dependent-dotnet"
@@ -495,7 +563,7 @@ InModuleScope '51DPackageModule' {
 					"$repoName": $repoConfigStr,
 					"$depRepo": {
 						"version": "4.3.0",
-						"packageName": "dep.dotnet"
+						"packageName": "$ConfigDepPackageName"
 					}
 				}
 "@
@@ -514,7 +582,7 @@ InModuleScope '51DPackageModule' {
 				# Initialize script scope variable
 				Initialize-GlobalVariables -Configuration $config
 				
-				$content = "<package id=`"dep.dotnet.test`" version=`"$SourceVersion`" targetFramework=`"net472`" />"
+				$content = "<package id=`"$($ActualDepPackageName).test`" version=`"$SourceVersion`" targetFramework=`"net472`" />"
 				
 				$updatedContent = Update-DotnetPackageFileContent `
 					-Dependencies $repoConfig.dependencies `
@@ -522,22 +590,58 @@ InModuleScope '51DPackageModule' {
 					-TeamProjectName "testproject" `
 					-IsPackagesConfig $true
 				
-				$updatedContent | Should -BeExactly "<package id=`"dep.dotnet.test`" version=`"4.3.0`" targetFramework=`"net472`" />"
+				$updatedContent | Should -BeExactly "<package id=`"$($ActualDepPackageName).test`" version=`"4.3.0`" targetFramework=`"net472`" />"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig {
+				param (
+					[string]$SourceVersion
+				)
+				Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfigBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet"
+			}
+			
+			function Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfigRegex {
+				param (
+					[string]$SourceVersion
+				)
+				Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfigBase `
+					-SourceVersion $SourceVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet"
 			}
 		}
 		It 'successfully update the well formed package version xml syntax `<PackageReference `/`>' {
 			Test-DotnetSuccessfulVersionUpdateOneLine -SourceVersion "0.0.0"
 		}
 		
+		It 'successfully update the well formed package version xml syntax `<PackageReference `/`> with regex' {
+			Test-DotnetSuccessfulVersionUpdateOneLineRegex -SourceVersion "0.0.0"
+		}
+		
 		It 'successfully update the non release well formed package version xml syntax `<PackageReference `/`>' {
 			Test-DotnetSuccessfulVersionUpdateOneLine -SourceVersion "0.0.0-beta.18+1"
+		}
+		
+		It 'successfully update the non release well formed package version xml syntax `<PackageReference `/`> with regex' {
+			Test-DotnetSuccessfulVersionUpdateOneLineRegex -SourceVersion "0.0.0-beta.18+1"
 		}
 		
 		It 'successfully update the well formed package version xml syntax `<PackageReference`>`<`/PackageReference`>' {
 			Test-DotnetSuccessfulVersionUpdateMultiLines -SourceVersion "0.0.0"
 		}
 		
+		It 'successfully update the well formed package version xml syntax `<PackageReference`>`<`/PackageReference`> with regex' {
+			Test-DotnetSuccessfulVersionUpdateMultiLinesRegex -SourceVersion "0.0.0"
+		}
+		
 		It 'successfully update the non well formed package version xml syntax `<PackageReference`>`<`/PackageReference`>' {
+			Test-DotnetSuccessfulVersionUpdateMultiLines -SourceVersion "0.0.0-beta.18+1"
+		}
+		
+		It 'successfully update the non well formed package version xml syntax `<PackageReference`>`<`/PackageReference`> with regex' {
 			Test-DotnetSuccessfulVersionUpdateMultiLines -SourceVersion "0.0.0-beta.18+1"
 		}
 		
@@ -545,16 +649,32 @@ InModuleScope '51DPackageModule' {
 			Test-DotnetSuccessfulVersionUpdateNetFrameworkProject -SourceVersion "0.0.0"
 		}
 		
+		It 'successfully update the well formed package version xml dotnet framework syntax with regex' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkProjectRegex -SourceVersion "0.0.0"
+		}
+		
 		It 'successfully update the non well formed package version xml dotnet framework syntax' {
 			Test-DotnetSuccessfulVersionUpdateNetFrameworkProject -SourceVersion "0.0.0-beta.18+1"
+		}
+		
+		It 'successfully update the non well formed package version xml dotnet framework syntax with regex' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkProjectRegex -SourceVersion "0.0.0-beta.18+1"
 		}
 		
 		It 'successfully update the well formed package version xml dotnet framework packages config file' {
 			Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig -SourceVersion "0.0.0"
 		}
 		
+		It 'successfully update the well formed package version xml dotnet framework packages config file with regex' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfigRegex -SourceVersion "0.0.0"
+		}
+		
 		It 'successfully update the non well formed package version xml dotnet framework packages config file' {
 			Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfig -SourceVersion "0.0.0-beta.18+1"
+		}
+		
+		It 'successfully update the non well formed package version xml dotnet framework packages config file with regex' {
+			Test-DotnetSuccessfulVersionUpdateNetFrameworkPackagesConfigRegex -SourceVersion "0.0.0-beta.18+1"
 		}
 	}
 }
