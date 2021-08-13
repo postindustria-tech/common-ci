@@ -137,7 +137,7 @@ function New-CosmosAccount {
     [Array]$locations = @(
       (New-AzCosmosDBLocationObject -LocationName "West Europe" -FailoverPriority 0 -IsZoneRedundant 0),
       (New-AzCosmosDBLocationObject -LocationName "Central US" -FailoverPriority 1 -IsZoneRedundant 0)
-      # TODO add central india as a cosmos db region.
+      # TODO consider adding central india as a cosmos db region.
       #(New-AzCosmosDBLocationObject -LocationName "Central India" -FailoverPriority 1 -IsZoneRedundant 0)
     )
   )
@@ -211,7 +211,7 @@ function New-CosmosAccount {
       }   
     } else {
       Write-Host -ForegroundColor Magenta ("Cosmos DB account '$($accountName)' " +
-        "exisits, using exsiting account.")
+        "exists, using existing account.")
     }
   }
 

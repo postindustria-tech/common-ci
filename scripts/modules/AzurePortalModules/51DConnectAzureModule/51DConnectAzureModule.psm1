@@ -16,7 +16,15 @@ function Connect-AzSubscription {
         "Press enter to continue...")
     Connect-AzAccount
 
-    Get-AzSubscription | Format-Table
+    $subs = Get-AzSubscription 
+
+    if ($subs.Length -eq 0) {
+        Write-Host ("No Azure subscriptions for this account could be found." + 
+            "Please confirm this account has access to azure and try again.")
+        exit 1
+    }
+
+    $subs | Format-Table
     
     while ($null -eq $ctx) {
         while ('' -eq $subscriptionId) {
