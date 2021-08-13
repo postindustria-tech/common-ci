@@ -234,18 +234,23 @@ API release process steps:
 ## Automation
 Fully automated release process use the following flow:
 1. Changes are prepared in `release|hotfix` branches.
-2. `Trigger release` job starts; or all `leaf submodules` are manually or automatically merged to `main|master`.
-3. All `leaf submodules` `release|hotfix` branches are merged to `main`.
+2. Switch `AutomatedRelease` variable in `CIAutomation` variable group to `On`.
+3. `Trigger release` job starts; or all `leaf submodules` are manually or automatically merged to `main|master`.
+   1. Since `common-ci` is a submodule of all APIs, this is normally done by having `common-ci` `release|hotfix` branch merged to `main`.
+   2. To merge `common-ci` `release|hotfix` branch to `main`, creating a pull request to `main` is enough since the pull request will be automatically completed at the end of the pull request `build-and-test` check. This is done by a task that calls a set of APIs in `Release` modules.
+4. All `leaf submodules` `release|hotfix` branches are merged to `main`.
    1. NOTE: `leaf submodules` are modules which do not have any dependencies.
-4. Completion of submodule merging triggers tag and packages deployment of the submodules. If module does not generate packages, then it will be the tag creation step.
-5. Tag and package deployment (or creation) completion triggers merging of the `release|hotfix` branches of the modules which depend on these submodules.
-6. Completion of merging `release|hotfix` branches to `main` will also trigger `deployment` of packages both internally and externally in the same way that the submodules were done.
-7. At the end of the `release` process, packages are available to be collected internally; and `deployment` to external reposition are left to be approved by `release engineer`.
+5. Completion of submodule merging triggers tag and packages deployment of the submodules. If module does not generate packages, then it will be the tag creation step.
+6. Tag and package deployment (or creation) completion triggers `submodule_trigger` pipelines of the parent APIs, which will then update submodule references, package dependencies versions and create a pull request to `main` if one does not exist.
+7. The pull request of parent APIs will then again be completed once the `build_and_test` check passes.
+8. Completion of merging `release|hotfix` branches to `main` will also trigger `deployment` of packages both internally and externally in the same way that the submodules were done.
+9. At the end of the `release` process, packages are available to be collected internally; and `deployment` to external repositories are left to be approved by `release engineer`.
+10. Switch `AutomatedRelease` variable in `CIAutomation` variable group to `Off` to prevent any accidental references update or pull request completion after this stage.
 
-The fully automated release process is controlled by a `release-config.json` file, located in the `common-ci` repository. The automated release process can also be enabled or disabled by a global variable `AutomatedRelease` as part of the Azure Devops variable group `CIAutomation`. To support automating the deployment process, powershell scripts and additional pipelines are required. These scripts are located under `common-ci` repository, and are grouped into modules. The additional pipelines are required per API, but shared templated can be reused from `common-ci`.
+The fully automated release process is controlled by a `release-config.json` file, located in the `common-ci` repository. There also exists a `release-config-template.json` which contains all settings and APIs that can be included in a `release-config.json`. The automated release process can also be enabled or disabled by a global variable `AutomatedRelease` as part of the Azure Devops variable group `CIAutomation`. To support automating the deployment process, powershell scripts and additional pipelines are required. These scripts are located under `common-ci` repository, and are grouped into modules. The additional pipelines are required per API, but shared templated can be reused from `common-ci`.
 
 Additional pipelines:
-- The `submodule trigger` pipeline is required for each API to pick up the package deployment from each of its submodules. Since a module can have multiple submodules, multiple triggers might happen at the same time. Thus, this pipeline should cancel all previous builds and only one at a single time.
+- The `submodule trigger` pipeline is required for each API to pick up the package deployment from each of its submodules. Since a module can have multiple submodules, multiple triggers might happen at the same time. Thus, this pipeline should cancel all previous builds and only run one at a single time.
   - This must be triggered only by a submodule deployment that happened on the 'main' branch.
   - This pipeline, will then perform update of all submodule references and package dependencies, using the versions specified in the `release-config.json`.
 - The `pull request completion` job is required to be done at the end of each `build and test` pipeline.
@@ -253,6 +258,7 @@ Additional pipelines:
     - The `AutomatedRelease` variable has been enabled.
     - All submodule references and package dependencies have been updated.
     - The pull request has been approved and comments have been left unresolved; or approval is not required.
+- Both of the above pipelines will not proceed if a tag already exists for a release version.
 
 Fully automated deployment trigger procedure:
 1. At the start, `release engineer` will need to update the `release-config.json` to specify all release packages and their target release version. Any additional details should also be specified.
@@ -261,6 +267,12 @@ Fully automated deployment trigger procedure:
    1. Complete the pull request that contains the updated `release-config.json` changes to the `main` branch. This will only work based on the assumption that the `common-ci` is specified as submodule of all release APIs.
       1. This pull request can be completed manually or automatically by the `build-and-test.yml` auto completion pull request task. The automatic completion is only enabled if the global variable `AutomatedRelease` specified in the variables group `CIAutomation` is set to `On`.
    2. Trigger the `trigger-release` pipeline of the `common-ci`.
+
+`release-config.json` structure:
+- The structure of the `release-config.json` is pretty straight forward and self-explained. However, there are some rules that a release engineer will need to pay attention to when updating the file.
+  1. `packageName`: This name is used to search for matching package reference in a package file of a target language. This is used as part of a regular expression search so regex syntax can also be used. Most of the time, the value will just be a prefix of the package name since an API usually uses unique prefix such as `FiftyOne.DeviceDetection`. However, there are APIs which use more than one prefixes such as `license-dotnet`, where `FiftyOne.License` and `FiftyOne.Resource` are used. In this specific case, the value of a `packageName` can be `FiftyOne.(License|Resource)`. Currently `DotNet` is only one which tests and supports regex `packageName`. Others language APIs have unique package `prefix` so regex is not required.
+  2. `dependencies`: When specify dependencies, make sure the definition of the dependencies are also specified, so that the release process can detect what tag to update to for submodule reference or what version to be updated for package dependencies. Failing to include the dependency definition will result in submodule references and package dependencies not being updated.
+     1. A `dependency` can be either a submodule or a package dependency.
 
 ### Automated Release Scripts
 As briefly mentioned, the automated release process requires powershell scripts to support tasks that have been done manually. These scripts are located in the directory `scripts/modules` of the `common-ci` repository.

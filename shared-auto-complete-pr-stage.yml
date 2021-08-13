@@ -2,6 +2,13 @@ parameters:
 - name: stageDependencies
   type: object
   default: []
+- name: commonCiRef # The common-ci repo reference to checkout.
+  type: string
+  default: main
+- name: project # The DevOps project executing this template.
+  displayName: 'Calling project is cloud or non-cloud'
+  type: string
+  default: 'non-cloud'
 
 stages:
 # This stage check if current branch runs on a pull request merge branch,
@@ -26,10 +33,16 @@ stages:
     - checkout: self
       submodules: recursive
       persistCredentials: true
-      # Check out to access the latest release info.
-    - checkout: 'git://$(System.TeamProject)/common-ci'
-      
 
+      # Checkout the common-ci to access the latest release configuration.
+      # Special consideration is given to the cloud project as when executing 
+      # this template the git url would resolve to git://Cloud/common-ci
+      # which is not valid.
+    - ${{ if eq(parameters.project, 'cloud') }}:
+      - checkout: 'git://Pipeline/common-ci@${{ parameters.commonCiRef }}'
+    - ${{ if ne(parameters.project, 'cloud') }}:
+      - checkout: 'git://$(System.TeamProject)/common-ci@${{ parameters.commonCiRef }}'
+      
     - powershell: |
         # Install all modules
         $Env:PSModulePath += ";$($(Get-Location).Path)\common-ci\scripts\modules"

@@ -1,3 +1,24 @@
+parameters:
+- name: commonCiRef # The common-ci repo reference to checkout.
+  type: string
+  default: main
+- name: releaseConfigFile # The release config file to load.
+  displayName: 'Release Config File'
+  type: string
+  default: release-config.json
+- name: project # The DevOps project executing this template.
+  displayName: 'Calling project is cloud or non-cloud'
+  type: string
+  default: 'non-cloud'
+- name: depTeamProjectName # The DevOps project containing the dependencies.
+  displayName: 'Release Config File'
+  type: string
+  default: ''
+- name: prTeamProjectName # The project containing the repo to update.
+  displayName: 'Release Config File'
+  type: string
+  default: ''
+
 stages:
 - stage: UpdateReference
   displayName: 'Update Reference'
@@ -15,8 +36,38 @@ stages:
     - checkout: self
       submodules: recursive
       persistCredentials: true
+
       # Checkout the common-ci to access the latest release configuration.
-    - checkout: 'git://$(System.TeamProject)/common-ci'
+      # Special consideration is given to the Cloud project as when executing 
+      # this template the, git url would resolve to git://Cloud/common-ci
+      # which is not valid.
+    - ${{ if eq(parameters.project, 'cloud') }}:
+      - checkout: 'git://Pipeline/common-ci@${{ parameters.commonCiRef }}'
+    - ${{ if ne(parameters.project, 'cloud') }}:
+      - checkout: 'git://$(System.TeamProject)/common-ci@${{ parameters.commonCiRef }}'
+
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Get the project names or IDs from parameters
+          $depTeamProjectName = "${{ parameters.depTeamProjectName }}"
+          $prTeamProjectName = "${{ parameters.prTeamProjectName }}"
+
+          # If the parameters are not set then use the default which should be
+          # the current project.
+          if(-not $depTeamProjectName -or '' -eq $depTeamProjectName){
+            $depTeamProjectName = "$(System.TeamProjectId)"
+          }
+
+          if(-not $prTeamProjectName -or '' -eq $prTeamProjectName){
+            $prTeamProjectName = "$(System.TeamProjectId)"
+          }
+          
+          # Set project name variables for use in later steps
+          echo "##vso[task.setvariable variable=depTeamProjectName]$depTeamProjectName"
+          echo "##vso[task.setvariable variable=prTeamProjectName]$prTeamProjectName"
+      name: DefaultProjectNames
       
     - powershell: |
         # Install all modules
@@ -24,7 +75,7 @@ stages:
         Write-Host "Module Path: $($Env:PsModulePath)"
         
         # Get release-config.json path
-        $configFile = "$($(Get-Location).Path)\common-ci\release-config.json"
+        $configFile = "$($(Get-Location).Path)\common-ci\${{ parameters.releaseConfigFile }}"
         
         # Cancel any previous builds
         Write-Host ""
@@ -37,7 +88,7 @@ stages:
             -PipelineName $Env:BUILD_DEFINITIONNAME `
             -Branch $Env:BUILD_SOURCEBRANCH `
             -CurrentBuildId $Env:BUILD_BUILDID `
-            -TeamProjectName $Env:SYSTEM_TEAMPROJECTID)) {
+            -TeamProjectName $(prTeamProjectName))) {
             Write-Host "# ERROR: Failed to cancel the previous builds."
             exit 1
         }
@@ -47,7 +98,8 @@ stages:
         Write-Host "# Try to update repository $Env:BUILD_REPOSITORY_NAME."
         if (!$(Update-CommitPushPull `
             -ConfigFile $configFile `
-            -TeamProjectName $Env:SYSTEM_TEAMPROJECTID)) {
+            -DepTeamProjectName $(depTeamProjectName) `
+            -PrTeamProjectName $(prTeamProjectName))) {
             Write-Host "# ERROR: Failed to update submodule references and package dependencies."
             exit 1
         }

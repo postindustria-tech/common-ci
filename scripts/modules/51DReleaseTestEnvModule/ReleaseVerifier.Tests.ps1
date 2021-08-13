@@ -495,10 +495,12 @@ InModuleScope ReleaseVerifier {
 	
 	Describe 'Test-DotnetPackageDependencies' {
 		BeforeAll {
-			function Test-DotnetPackageDependenciesOneline {
+			function Test-DotnetPackageDependenciesOnelineBase {
 				param (
 					[string]$ExpectedVersion,
 					[string]$ActualVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName,
 					[boolean]$ExpectedResult
 				)
 				$depRepo = "dependent-dotnet"
@@ -518,7 +520,7 @@ InModuleScope ReleaseVerifier {
 					"$repoName": $repoConfigStr,
 					"$depRepo": {
 						"version": "$ExpectedVersion",
-						"packageName": "dep.dotnet"
+						"packageName": "$ConfigDepPackageName"
 					}
 				}
 "@
@@ -528,7 +530,81 @@ InModuleScope ReleaseVerifier {
 					-ModuleName ReleaseVerifier
 				Mock Get-ChildItem { return @($('{ "FullName": "file1.csproj" }' | ConvertFrom-Json)) } `
 					-ModuleName ReleaseVerifier
-				Mock Get-Content { return "<PackageReference Include=`"dep.dotnet`" Version=`"$ActualVersion`" />" } `
+				Mock Get-Content { return "<PackageReference Include=`"$ActualDepPackageName)`" Version=`"$ActualVersion`" />" } `
+					-ModuleName ReleaseVerifier
+				
+				$result = Test-DotnetPackageDependencies `
+					-RepositoryName $repoName `
+					-RepositoryConfig $repoConfig `
+					-Repositories $repos
+				
+				$result | Should -BeExactly $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesOneline {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[boolean]$ExpectedResult
+				)
+				Test-DotnetPackageDependenciesOnelineBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesOnelineRegex {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[boolean]$ExpectedResult
+				)
+				Test-DotnetPackageDependenciesOnelineBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesMultilinesBase {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName,
+					[boolean]$ExpectedResult
+				)
+				$depRepo = "dependent-dotnet"
+				$repoName = "test-dotnet"
+				$repoConfigStr = @"
+				{
+					"version": "4.3.0",
+					"packageName": "test.dotnet",
+					"dependencies": [
+						"$depRepo"
+					]
+				}
+"@
+				$repoConfig = $repoConfigStr | ConvertFrom-Json
+				$reposStr = @"
+				{
+					"$repoName": $repoConfigStr,
+					"$depRepo": {
+						"version": "$ExpectedVersion",
+						"packageName": "$ConfigDepPackageName"
+					}
+				}
+"@
+				$repos = $reposStr | ConvertFrom-Json
+				
+				Mock Test-Path { return $true } `
+					-ModuleName ReleaseVerifier
+				Mock Get-ChildItem { return @($('{ "FullName": "file1.csproj" }' | ConvertFrom-Json)) } `
+					-ModuleName ReleaseVerifier
+				Mock Get-Content { return "<PackageReference Include=`"$ActualDepPackageName`">`r`n<Version>$ActualVersion</Version>`r`n</PackageReference>" } `
 					-ModuleName ReleaseVerifier
 				
 				$result = Test-DotnetPackageDependencies `
@@ -545,6 +621,36 @@ InModuleScope ReleaseVerifier {
 					[string]$ActualVersion,
 					[boolean]$ExpectedResult
 				)
+				Test-DotnetPackageDependenciesMultilinesBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesMultilinesRegex {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[boolean]$ExpectedResult
+				)
+				Test-DotnetPackageDependenciesMultilinesBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesNetFrameworkProjectBase {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName,
+					[boolean]$ExpectedResult
+				)
 				$depRepo = "dependent-dotnet"
 				$repoName = "test-dotnet"
 				$repoConfigStr = @"
@@ -562,7 +668,7 @@ InModuleScope ReleaseVerifier {
 					"$repoName": $repoConfigStr,
 					"$depRepo": {
 						"version": "$ExpectedVersion",
-						"packageName": "dep.dotnet"
+						"packageName": "$ConfigDepPackageName"
 					}
 				}
 "@
@@ -572,7 +678,7 @@ InModuleScope ReleaseVerifier {
 					-ModuleName ReleaseVerifier
 				Mock Get-ChildItem { return @($('{ "FullName": "file1.csproj" }' | ConvertFrom-Json)) } `
 					-ModuleName ReleaseVerifier
-				Mock Get-Content { return "<PackageReference Include=`"dep.dotnet`">`r`n<Version>$ActualVersion</Version>`r`n</PackageReference>" } `
+				Mock Get-Content { return "<HintPath>..\..\..\..\..\packages\$($ActualDepPackageName).test.$($ActualVersion)\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>" } `
 					-ModuleName ReleaseVerifier
 				
 				$result = Test-DotnetPackageDependencies `
@@ -589,48 +695,34 @@ InModuleScope ReleaseVerifier {
 					[string]$ActualVersion,
 					[boolean]$ExpectedResult
 				)
-				$depRepo = "dependent-dotnet"
-				$repoName = "test-dotnet"
-				$repoConfigStr = @"
-				{
-					"version": "4.3.0",
-					"packageName": "test.dotnet",
-					"dependencies": [
-						"$depRepo"
-					]
-				}
-"@
-				$repoConfig = $repoConfigStr | ConvertFrom-Json
-				$reposStr = @"
-				{
-					"$repoName": $repoConfigStr,
-					"$depRepo": {
-						"version": "$ExpectedVersion",
-						"packageName": "dep.dotnet"
-					}
-				}
-"@
-				$repos = $reposStr | ConvertFrom-Json
-				
-				Mock Test-Path { return $true } `
-					-ModuleName ReleaseVerifier
-				Mock Get-ChildItem { return @($('{ "FullName": "file1.csproj" }' | ConvertFrom-Json)) } `
-					-ModuleName ReleaseVerifier
-				Mock Get-Content { return "<HintPath>..\..\..\..\..\packages\dep.dotnet.test.$($ActualVersion)\lib\netstandard2.0\dep.dotnet.test.dll</HintPath>" } `
-					-ModuleName ReleaseVerifier
-				
-				$result = Test-DotnetPackageDependencies `
-					-RepositoryName $repoName `
-					-RepositoryConfig $repoConfig `
-					-Repositories $repos
-				
-				$result | Should -BeExactly $ExpectedResult
+				Test-DotnetPackageDependenciesNetFrameworkProjectBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
 			}
 			
-			function Test-DotnetPackageDependenciesPackagesConfig {
+			function Test-DotnetPackageDependenciesNetFrameworkProjectRegex {
 				param (
 					[string]$ExpectedVersion,
 					[string]$ActualVersion,
+					[boolean]$ExpectedResult
+				)
+				Test-DotnetPackageDependenciesNetFrameworkProjectBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesPackagesConfigBase {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[string]$ConfigDepPackageName,
+					[string]$ActualDepPackageName,
 					[boolean]$ExpectedResult
 				)
 				$depRepo = "dependent-dotnet"
@@ -650,7 +742,7 @@ InModuleScope ReleaseVerifier {
 					"$repoName": $repoConfigStr,
 					"$depRepo": {
 						"version": "$ExpectedVersion",
-						"packageName": "dep.dotnet"
+						"packageName": "$ConfigDepPackageName"
 					}
 				}
 "@
@@ -660,7 +752,7 @@ InModuleScope ReleaseVerifier {
 					-ModuleName ReleaseVerifier
 				Mock Get-ChildItem { return @($('{ "FullName": "packages.config" }' | ConvertFrom-Json)) } `
 					-ModuleName ReleaseVerifier
-				Mock Get-Content { return "<package id=`"dep.dotnet.test`" version=`"$ActualVersion`" targetFramework=`"net472`" />" } `
+				Mock Get-Content { return "<package id=`"$($ActualDepPackageName).test`" version=`"$ActualVersion`" targetFramework=`"net472`" />" } `
 					-ModuleName ReleaseVerifier
 				
 				$result = Test-DotnetPackageDependencies `
@@ -670,38 +762,98 @@ InModuleScope ReleaseVerifier {
 				
 				$result | Should -BeExactly $ExpectedResult
 			}
+			
+			function Test-DotnetPackageDependenciesPackagesConfig {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[boolean]$ExpectedResult
+				)
+				Test-DotnetPackageDependenciesPackagesConfigBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.dotnet" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
+			
+			function Test-DotnetPackageDependenciesPackagesConfigRegex {
+				param (
+					[string]$ExpectedVersion,
+					[string]$ActualVersion,
+					[boolean]$ExpectedResult
+				)
+				Test-DotnetPackageDependenciesPackagesConfigBase `
+					-ExpectedVersion $ExpectedVersion `
+					-ActualVersion $ActualVersion `
+					-ConfigDepPackageName "dep.(dotnet|SomethingElse)" `
+					-ActualDepPackageName "dep.dotnet" `
+					-ExpectedResult $ExpectedResult
+			}
 		}
 
 		It 'all package dependencies are up to date with syntax `<PackageReference `/`>' {
 			Test-DotnetPackageDependenciesOneline -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
 		}
 		
+		It 'all package dependencies are up to date with syntax `<PackageReference `/`> with regex' {
+			Test-DotnetPackageDependenciesOnelineRegex -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
+		}
+		
 		It 'a package dependency is not up to date with syntax `<PackageReference `/`>' {
 			Test-DotnetPackageDependenciesOneline -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
+		}
+		
+		It 'a package dependency is not up to date with syntax `<PackageReference `/`> with regex' {
+			Test-DotnetPackageDependenciesOnelineRegex -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
 		}
 		
 		It 'all package dependencies are up to date  with syntax `<PackageReference`>`<`/PackageReference`>' {
 			Test-DotnetPackageDependenciesMultilines -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
 		}
 		
+		It 'all package dependencies are up to date  with syntax `<PackageReference`>`<`/PackageReference`> with regex' {
+			Test-DotnetPackageDependenciesMultilinesRegex -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
+		}
+		
 		It 'a package dependency is not up to date  with syntax `<PackageReference`>`<`/PackageReference`>' {
 			Test-DotnetPackageDependenciesMultilines -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
+		}
+		
+		It 'a package dependency is not up to date  with syntax `<PackageReference`>`<`/PackageReference`> with regex' {
+			Test-DotnetPackageDependenciesMultilinesRegex -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
 		}
 		
 		It 'all package dependencies are up to date  with dotnet framework .csproj syntax' {
 			Test-DotnetPackageDependenciesNetFrameworkProject -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
 		}
 		
+		It 'all package dependencies are up to date  with dotnet framework .csproj syntax with regex' {
+			Test-DotnetPackageDependenciesNetFrameworkProjectRegex -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
+		}
+		
 		It 'a package dependency is not up to date  with dotnet framework .csproj syntax' {
 			Test-DotnetPackageDependenciesNetFrameworkProject -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
+		}
+		
+		It 'a package dependency is not up to date  with dotnet framework .csproj syntax with regex' {
+			Test-DotnetPackageDependenciesNetFrameworkProjectRegex -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
 		}
 		
 		It 'all package dependencies are up to date with packages.config file' {
 			Test-DotnetPackageDependenciesPackagesConfig -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
 		}
 		
+		It 'all package dependencies are up to date with packages.config file with regex' {
+			Test-DotnetPackageDependenciesPackagesConfigRegex -ExpectedVersion "4.3.0" -ActualVersion "4.3.0" -ExpectedResult $true
+		}
+		
 		It 'a package dependency is not up to date with packages.config file' {
 			Test-DotnetPackageDependenciesPackagesConfig -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
+		}
+		
+		It 'a package dependency is not up to date with packages.config file with regex' {
+			Test-DotnetPackageDependenciesPackagesConfigRegex -ExpectedVersion "4.3.0" -ActualVersion "4.2.9" -ExpectedResult $false
 		}
 	}
 	

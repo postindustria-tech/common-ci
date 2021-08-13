@@ -591,16 +591,16 @@ function Update-SubmoduleReferences {
 			$targetTag = $script:repositories."$subRepoName".version
 			Write-Host "# Checking tag $targetTag"
 			
-			# Get all tag
-			Write-Host "# Fetch all tags"
-			if (![GitHandler]::FetchAllTags()) {
-				Write-Host "# ERROR: Failed to fetch tags. Cannot reliably check submodule deployment."
-				Pop-Location
-				return $false
-			}
-			
 			$tagUpdated = $false
 			if ($targetTag -ne $null) {
+				# Get all tag
+				Write-Host "# Fetch all tags"
+				if (![GitHandler]::FetchAllTags()) {
+					Write-Host "# ERROR: Failed to fetch tags. Cannot reliably check submodule deployment."
+					Pop-Location
+					return $false
+				}
+
 				$remoteRepo = git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" config --get remote.origin.url
 				Write-Host "# Remote repository found '$remoteRepo'"
 				# Make sure to sort the tag, so only pick up the biggest tag.
