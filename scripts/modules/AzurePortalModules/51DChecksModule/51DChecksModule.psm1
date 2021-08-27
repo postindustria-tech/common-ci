@@ -29,6 +29,9 @@ function Get-UriHTTPStatus {
     $HTTP_Status = $null
     While ($HTTP_Status -ne 200 -And $Tries -le $NumberOfTries) {
 
+        # Wait before querying Uri
+        Start-Sleep -Seconds $SecondsBetweenTries
+
         # Get HTTP status code from invoking a request for the Uri.
         try{
             $HTTP_Status = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -DisableKeepAlive).StatusCode
@@ -47,10 +50,6 @@ function Get-UriHTTPStatus {
 
         $Tries = $Tries +1
         Write-Host -NoNewLine "."
-
-        if($HTTP_Status -ne 200 -And $Tries -le 5) {
-            Start-Sleep -Seconds 10
-        }
     }
     
     Write-Host ""
