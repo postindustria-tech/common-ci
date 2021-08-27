@@ -274,6 +274,15 @@
 				"pipeline-php-engines",
 				"pipeline-php-cloudrequestengine"
 			]
+		},
+		"pipeline-wordpress": {
+			"version": "0.9.0",
+			"packageName": "fiftyonedegrees.wordpress",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-cloudrequestengine"
+			]
 		}
 	},
 	"approvalRequired": false
