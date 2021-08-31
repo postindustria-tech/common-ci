@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.6",
+			"version": "4.3.7",
 			"isLeaf": true
 		},
 		"common-cxx": {
@@ -81,6 +81,42 @@
 				"common-ci",
 				"pipeline-node",
 				"device-detection-node"
+			]
+		},
+		"pipeline-php-core": {
+			"version": "4.3.2",
+			"packageName": "fiftyone.pipeline.core",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"pipeline-php-engines": {
+			"version": "4.3.2",
+			"packageName": "fiftyone.pipeline.engines",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core"
+			]
+		},
+		"pipeline-php-cloudrequestengine": {
+			"version": "4.3.2",
+			"packageName": "fiftyone.pipeline.cloudrequestengine",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines"
+			]
+		},
+		"pipeline-wordpress": {
+			"version": "0.9.0",
+			"packageName": "fiftyonedegrees.wordpress",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-cloudrequestengine"
 			]
 		}
 	},
