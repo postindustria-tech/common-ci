@@ -19,6 +19,7 @@ jobs:
           manifest: .github/labels.yml
           repository: |
               51Degrees/caching-dotnet
+              51Degrees/common-ci
               51Degrees/common-cxx
               51Degrees/data-file-tool
               51Degrees/device-detection-cxx
