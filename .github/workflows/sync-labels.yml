@@ -44,5 +44,6 @@ jobs:
               51Degrees/pipeline-php-core
               51Degrees/pipeline-php-engines
               51Degrees/pipeline-python
+              51Degrees/pipeline-specification
               51Degrees/Renderer
           token: ${{ secrets.LABEL_SYNC_TOKEN }}
