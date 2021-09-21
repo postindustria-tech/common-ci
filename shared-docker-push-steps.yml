@@ -1,8 +1,7 @@
-# Steps to build and push a Docker container to a Docker repository.
+# Steps to push a Docker container to a Docker repository.
 
 parameters:
 - name: imageRepository # Name of the repository.
-- name: dockerfilePath # Path to the Dockerfile.
 - name: dockerRegistryServiceConnection # A Docker registry service connection.
 - name: tag # A list of tags in separate lines. e.g. beta1.1, latest
 
@@ -14,14 +13,13 @@ steps:
     containerRegistry: '${{ parameters.dockerRegistryServiceConnection }}'
     command: 'login'
 
-# Build and push the container to the register
+# Push the docker container to the registy
 - task: Docker@2
-  displayName: Build and push an image to container registry
+  displayName: Docker Push
   inputs:
     containerRegistry: '${{ parameters.dockerRegistryServiceConnection }}'
     repository: '${{ parameters.imageRepository }}'
-    command: 'buildAndPush'
-    Dockerfile: '${{ parameters.dockerfilePath }}'
+    command: 'push'
     tags: |
       ${{ parameters.tag }}
       latest

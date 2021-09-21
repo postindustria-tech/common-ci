@@ -1,0 +1,52 @@
+# Steps to test a Docker container image which exposes an http interface.
+
+parameters:
+- name: imageRepository # Name of the repository.
+- name: tag # A list of tags in separate lines. e.g. beta1.1, latest
+- name: containerPort # A tcp port for http connections exposed by the container.
+  type: number
+  default: 80
+- name: machinePort # The port to open on the machine.
+  type: number
+  default: 8080
+- name: scheme # The HTTP scheme to use when testing endpoints.
+  type: string
+  default: http
+- name: endpoints # A list of URIs to test against the docker container, these should exclude the base URL, e.g. '/api/info/name'
+  type: object
+  default: []
+- name: additionalDockerArguments # Additional arguments to pass to the docker run command
+  type: string
+  default: '' 
+- name: project # The DevOps project executing this template.
+  displayName: 'Calling project is cloud or non-cloud'
+  type: string
+  default: 'non-cloud'
+- name: commonCiRef # The common-ci repo reference to checkout.
+  type: string
+  default: 'main'
+
+steps:
+# Checkout the common-ci repo which contains the checkSlot script.
+# Special consideration is given to the Cloud project as when executing 
+# this template the, git url would resolve to git://Cloud/common-ci
+# which is not valid.
+- ${{ if eq(parameters.project, 'cloud') }}:
+  - checkout: 'git://Pipeline/common-ci@${{ parameters.commonCiRef }}'
+- ${{ if ne(parameters.project, 'cloud') }}:
+  - checkout: 'git://$(System.TeamProject)/common-ci@${{ parameters.commonCiRef }}'
+
+# Run the docker container in detached mode with provided ports and any additional arguments provided in the parameters.
+- task: CmdLine@2
+  inputs:
+    script: 'docker run -d ${{ format(''-p {0}:{1}'', parameters.machinePort, parameters.containerPort) }} ${{ parameters.additionalDockerArguments }} ${{ parameters.imageRepository }}:${{ parameters.tag }} '
+  displayName: Run docker container
+
+# Check the provided endpoints against the running container.
+- ${{ each endpoint in parameters.endpoints }}:
+  - task: PowerShell@2
+    displayName: 'Test ${{ parameters.scheme }}://localhost:${{ parameters.machinePort }}${{ endpoint }}'
+    inputs:
+      filePath: '$(Build.SourcesDirectory)/common-ci/scripts/azure/checkSlot.ps1'
+      arguments: '-ModulePath $(Build.SourcesDirectory)/common-ci/scripts/modules -Uri ''${{ parameters.scheme }}://localhost:${{ parameters.machinePort }}${{ endpoint }}'''
+      failOnStderr: true
