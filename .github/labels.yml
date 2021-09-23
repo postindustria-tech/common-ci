@@ -16,6 +16,9 @@
 - name: "status: to be scheduled"
   description: This item has not been scheduled for a particular release
   color: c2e0c6
+- name: "status: assigned"
+  description: This item has been assigned to an engineer
+  color: 6ff076
 - name: "status: duplicate"
   description: This issue or pull request already exists
   color: cfd3d7
