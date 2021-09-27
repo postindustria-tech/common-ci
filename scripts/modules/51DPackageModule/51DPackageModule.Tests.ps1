@@ -51,19 +51,6 @@ Describe 'Update-PackageDependencies' {
 		$result | Should -BeExactly $true
 	}
 	
-	It 'successfully update all package version go' {
-		Mock Initialize-GlobalVariables { } `
-			-ModuleName 51DPackageModule
-		Mock Get-RepositoryName { return 'test-go' } `
-			-ModuleName 51DPackageModule
-		Mock Update-GoPackageDependencies { return $true } `
-			-ModuleName 51DPackageModule
-		$result = Update-PackageDependencies `
-			-Configuration $(New-Object -TypeName Object) `
-			-TeamProjectName "testproj"
-		$result | Should -BeExactly $true
-	}
-	
 	It 'package does not need to be updated' {
 		Mock Initialize-GlobalVariables { } `
 			-ModuleName 51DPackageModule
@@ -73,89 +60,6 @@ Describe 'Update-PackageDependencies' {
 			-Configuration $(New-Object -TypeName Object) `
 			-TeamProjectName "testproj"
 		$result | Should -BeExactly $true
-	}
-}
-
-InModuleScope 51DPackageModule {
-	Describe 'Update-GoPackageContent' {
-		BeforeAll {
-			function Test-GoSuccessfulVersionUpdate {
-				param (
-					[string]$SourceVersion
-				)
-				
-				$depRepo = "dependent-go"
-				$repoName = "test-go"
-				$repoConfigStr = @"
-				{
-					"version": "4.3.0",
-					"dependencies": [
-						"$depRepo"
-					]
-				}
-"@
-				$repoConfig = $repoConfigStr | ConvertFrom-Json
-				$reposStr = @"
-				{
-					"$repoName": $repoConfigStr,
-					"$depRepo": {
-						"version": "4.3.0"
-					}
-				}
-"@
-				$repos = $reposStr | ConvertFrom-Json
-				
-				$configStr = @"
-				{
-					"repositories": $reposStr
-				}
-"@
-				$config = $configStr | ConvertFrom-Json
-				
-				# Initialize script scope variable
-				Initialize-GlobalVariables -Configuration $config
-				
-				Mock Test-TagExist { return $true } `
-					-ModuleName 51DPackageModule
-				$content = "require github.com/51Degrees/dependent-go v$SourceVersion"
-				$contentWithComment = "require github.com/51Degrees/dependent-go v$SourceVersion // indirect"
-				$contentWithReplace = "require github.com/51Degrees/dependent-go v$SourceVersion`r`n" +
-					"replace github.com/51Degrees/dependent-go v$SourceVersion => ./local"
-				
-				Write-Host $content
-				Write-Host $repoConfig.dependencies
-				# Test default content
-				$updatedContent = Update-GoPackageContent `
-					-Dependencies $repoConfig.dependencies `
-					-GoModContent $content `
-					-TeamProjectName "TestProject"				
-				$updatedContent | Should -BeExactly "require github.com/51Degrees/dependent-go v4.3.0"
-				
-				# Test content with comment
-				$updatedContentWithComment = Update-GoPackageContent `
-					-Dependencies $repoConfig.dependencies `
-					-GoModContent $contentWithComment `
-					-TeamProjectName "TestProject"				
-				$updatedContentWithComment | Should -BeExactly "require github.com/51Degrees/dependent-go v4.3.0 // indirect"
-				
-				# Test content with replace
-				$expected = "require github.com/51Degrees/dependent-go v4.3.0`r`n" +
-					"replace github.com/51Degrees/dependent-go v4.3.0 => ./local"
-				$updatedContentWithReplace = Update-GoPackageContent `
-					-Dependencies $repoConfig.dependencies `
-					-GoModContent $contentWithReplace `
-					-TeamProjectName "TestProject"				
-				$updatedContentWithReplace | Should -BeExactly $expected
-			}
-		}
-
-		It 'successfully update the content with well formed version' {
-			Test-GoSuccessfulVersionUpdate -SourceVersion "0.0.0"
-		}
-		
-		It 'successfully update the content with non release well formed version' {
-			Test-GoSuccessfulVersionUpdate -SourceVersion "0.0.0-beta.18+1"
-		}
 	}
 }
 
