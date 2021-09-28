@@ -283,6 +283,23 @@
 				"common-ci",
 				"pipeline-php-cloudrequestengine"
 			]
+		},
+		"device-detection-go": {
+			"version": "4.3.0",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-examples-go": {
+			"version": "4.3.0",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"device-detection-go"
+			]
 		}
 	},
 	"approvalRequired": false
