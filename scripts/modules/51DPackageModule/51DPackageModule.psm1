@@ -718,6 +718,134 @@ function Update-PythonPackageDependencies {
 
 <#
   .Description
+  Update dependencies of all Golang packages in a repository.
+  
+  .Parameter Dependencies
+  An array of dependencies
+  
+  .Parameter SharedVariableContent
+  Content to be updated.
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
+  
+  .Outputs
+  Updated content. $null if error occurs
+#>
+function Update-GoPackageContent {
+	param (
+		[Parameter(Mandatory)]
+		[string[]]$Dependencies,
+		[Parameter(Mandatory)]
+		[string]$GoModContent,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
+	)
+	foreach ($dependency in $Dependencies) {
+		$matchPattern = "(?<prefix>(require|replace)\s*((?!$dependency).)*$dependency\s*)v\d+\.\d+\.\d+((?!\s).)*"
+		if ($GoModContent -match $matchPattern) {
+			Write-Host "# go.mod content match $dependency. Update."
+			$dependencyVersion = $script:repositories."$dependency".version
+			
+			# Make sure that the version exists for the dependency. Else bail out.
+			if (!$(Test-TagExist `
+				-RepositoryName $dependency `
+				-Version $dependencyVersion `
+				-TeamProjectName $TeamProjectName)) {
+				Write-Host "# ERROR: Tag $dependencyVersion for repository $dependency does not exist."
+				return $null
+			}
+			$replaceString = '${prefix}' + "v$dependencyVersion"
+			$GoModContent = $GoModContent -replace `
+				$matchPattern, `
+				$replaceString
+		} else {
+			Write-Host "# Nothing to update for dependency $dependency"
+		}
+	}
+	return $GoModContent
+}
+
+<#
+  .Description
+  Update dependencies of all Golang packages in a repository.
+  This function updates go.mod but won't update go.sum. This
+  is not future proof, but enough for GO MVP implementation.
+  
+  .Parameter RepositoryName
+  Name of a repository
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
+  
+  .Outputs
+  true or false
+#>
+function Update-GoPackageDependencies {
+	param (
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
+	)
+	
+	Write-Host ""
+	Write-Host "Update Go Package Dependencies"
+	Write-Host "================================="
+	
+	# TODO: If go.sum is ever required, this approach needs to be changed. "go mod"
+	# will be required and dependencies will need to be available publicly to use
+	# "go mod". At the point of implementation, using "go mod" requires changes to
+	# changes to release process flow and need to be carefully considered. Thus,
+	# is an overkill for MVP version of go support at this point.
+	if (Test-Path go.sum) {
+		Write-Host "# ERROR: go.sum is not currently handled. " +
+			"Updating go.sum requires dependencies to be available publicly, " +
+			"so updating go.mod is not enough."
+		return $false
+	}
+	
+	$dependencies = $script:repositories."$RepositoryName".dependencies
+	if ($dependencies -ne $null -and $dependencies.count -gt 0) {
+		# Check if shared-variables.yml exists
+		if (Test-Path go.mod) {
+			$goModContent = $(Get-Content go.mod -Raw)
+			$updatedContent = Update-GoPackageContent `
+				-Dependencies $dependencies `
+				-GoModContent $goModContent `
+				-TeamProjectName $TeamProjectName
+			
+			if ($updatedContent -ne $null) {
+				# Check if go.mod has been updated.
+				if ($updatedContent -ne $goModContent) {
+					Write-Host "# Dependency version has been updated. Update the go.mod content."
+					if (![FileHandler]::SetContent("go.mod", $updatedContent)) {
+						Write-Host "# ERROR: Failed to update the go.mod content."
+						return $false
+					}
+					
+					# Stage the change
+					if (![GitHandler]::Add("go.mod")) {
+						Write-Host "# ERROR: Failed to stage the change."
+						return $false
+					}
+				}
+			} else {
+				Write-Host "# ERROR: error occured during the update of the go.mod"
+				return $false
+			}
+		} else {
+			Write-Host "# No go.mod file is found at this directory. Nothing to update."
+		}
+	} else {
+		Write-Host "# There is no dependencies defined in configuration file. Skipped."
+	}
+	
+	return $true
+}
+
+<#
+  .Description
   Update dependencies of all packages in a repository.
   This determine the type of package based on repository name.
   Any change will be automatically staged.
@@ -745,7 +873,7 @@ function Update-PackageDependencies {
 	
 	Write-Host ""
 	Write-Host "# Update package dependencies"
-	Write-Host "============================"
+	Write-Host "============================="
 	
 	# Initialise the script variables
 	Initialize-GlobalVariables -Configuration $Configuration
@@ -777,6 +905,12 @@ function Update-PackageDependencies {
 		"*python" {
 			Write-Host "# $repoName is a Python package."
 			$succeeded = Update-PythonPackageDependencies `
+				-RepositoryName $repoName -TeamProjectName $TeamProjectName
+			Break
+		}
+		"*go" {
+			Write-Host "# $repoName is a Golang package."
+			$succeeded = Update-GoPackageDependencies `
 				-RepositoryName $repoName -TeamProjectName $TeamProjectName
 			Break
 		}

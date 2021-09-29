@@ -65,5 +65,7 @@ jobs:
   - powershell: |
       Write-Host "##vso[task.setvariable variable=GitVersionSemVer;isOutput=true]$(GitVersion.SemVer)"
       Write-Host "##vso[task.setvariable variable=GitVersionNuGetVer;isOutput=true]$(GitVersion.NuGetVersion)"
+      Write-Host "##vso[task.setvariable variable=GitVersionAssemblyVer;isOutput=true]$(GitVersion.AssemblySemVer)"
+      Write-Host "##vso[task.setvariable variable=GitVersionAssemblyFileVer;isOutput=true]$(GitVersion.AssemblySemFileVer)"
     name: SetGitVersionVars
     displayName: 'Export GitVersion variables'
