@@ -25,6 +25,9 @@ parameters:
 - name: commonCiRef # The common-ci repo reference to checkout.
   type: string
   default: 'main'
+- name: instanceName # Name of docker instance to create.
+  type: string
+  default: 'cloudInstance'
 
 steps:
 # Checkout the common-ci repo which contains the checkSlot script.
@@ -39,8 +42,14 @@ steps:
 # Run the docker container in detached mode with provided ports and any additional arguments provided in the parameters.
 - task: CmdLine@2
   inputs:
-    script: 'docker run -d ${{ format(''-p {0}:{1}'', parameters.machinePort, parameters.containerPort) }} ${{ parameters.additionalDockerArguments }} ${{ parameters.imageRepository }}:${{ parameters.tag }} '
+    script: 'docker run -d ${{ format(''-p {0}:{1}'', parameters.machinePort, parameters.containerPort) }} ${{ parameters.additionalDockerArguments }} --name ${{ parameters.instanceName }} ${{ parameters.imageRepository }}:${{ parameters.tag }} '
   displayName: Run docker container
+  
+# List all active docker container instances
+- task: CmdLine@2
+  inputs:
+    script: 'docker ps'
+  displayName: List docker containers
 
 # Check the provided endpoints against the running container.
 - ${{ each endpoint in parameters.endpoints }}:
@@ -50,3 +59,11 @@ steps:
       filePath: '$(Build.SourcesDirectory)/common-ci/scripts/azure/checkSlot.ps1'
       arguments: '-ModulePath $(Build.SourcesDirectory)/common-ci/scripts/modules -Uri ''${{ parameters.scheme }}://localhost:${{ parameters.machinePort }}${{ endpoint }}'''
       failOnStderr: true
+      
+# Output the logs from container instance.
+- task: CmdLine@2
+  inputs:
+    script: 'docker logs ${{ parameters.instanceName }}'
+  displayName: Output logs
+  # Always run this to make sure logs are available in failure instances.
+  condition: always()
