@@ -46,3 +46,14 @@
 - name: "status: released/4.4.0"
   description: This change was released in the specified version
   color: 376842
+
+  # Scheduled Labels
+- name: "scheduled: 6th Oct 2021"
+  description: This item has been scheduled for 6th Oct 2021 release
+  color: 6ff076
+- name: "scheduled: 20th Oct 2021"
+  description: This item has been scheduled for 20th Oct 2021 release
+  color: 6ff076
+- name: "scheduled: 3rd Nov 2021"
+  description: This item has been scheduled for 3rd Nov 2021 release
+  color: 6ff076
