@@ -4,8 +4,16 @@
 			"version": "4.3.14",
 			"isLeaf": true
 		},
+		"device-detection-cxx": {
+			"version": "4.3.6",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-cxx"
+			]
+		},
 		"device-detection-java": {
-			"version": "4.3.4",
+			"version": "4.3.5",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
