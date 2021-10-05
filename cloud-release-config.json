@@ -1,25 +1,25 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.10",
+			"version": "4.3.16",
 			"isLeaf": true
 		},
 		"pipeline-dotnet": {
-			"version": "4.3.3",
+			"version": "4.3.7",
 			"packageName": "FiftyOne.Pipeline",
 			"isLeaf": true
 		},
 		"entitlement-dotnet": {
-			"version": "4.1.10",
+			"version": "4.1.12",
 			"isLeaf": true
 		},
 		"location-dotnet": {
-		    "version": "4.3.5",
+		    "version": "4.3.6",
 			"packageName": "FiftyOne.Geolocation",
 			"isLeaf": true
 		},
 		"device-detection-dotnet": {
-			"version": "4.3.6",
+			"version": "4.3.7",
 			"packageName": "FiftyOne.DeviceDetection",
 			"isLeaf": true
 		},
