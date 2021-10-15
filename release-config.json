@@ -1,12 +1,19 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.17",
+			"version": "4.3.18",
 			"isLeaf": true
 		},
 		"device-detection-data": {
 			"version": "4.3.1",
 			"isLeaf": false
+		},
+		"common-cxx": {
+			"version": "4.3.1",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
 		},
 		"device-detection-cxx": {
 			"version": "4.3.8",
