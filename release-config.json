@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.19",
+			"version": "4.3.20",
 			"isLeaf": true
 		},
 		"device-detection-data": {
@@ -22,6 +22,37 @@
 				"common-ci",
 				"common-cxx",
 				"device-detection-data"
+			]
+		},
+		"pipeline-java": {
+			"version": "4.3.4",
+			"packageName": "pipeline",
+			"versionVariableName": "pipeline.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-java": {
+		    "version": "4.3.3",
+			"packageName": "pipeline.geo-location",
+			"versionVariableName": "geolocation.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-java",
+				"device-detection-java"
+			]
+		},
+		"device-detection-java": {
+			"version": "4.3.6",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-java"
 			]
 		},
 		"pipeline-php-core": {
