@@ -1,0 +1,17 @@
+parameters:
+- name: gpgPassPhrase
+
+steps:
+# Download Java Maven GPG Key from SecureFile Library
+- task: DownloadSecureFile@1
+  name: PackageSigningKey
+  displayName: 'Download Maven GPG Key'
+  inputs:
+    secureFile: 'Java Maven GPG Key Private.pgp'
+    retryCount: 5
+
+- task: Bash@3
+  displayName: 'Import Maven GPG Key'
+  inputs:
+    targetType: 'inline'
+    script: 'echo ${{ parameters.gpgPassPhrase }} | gpg --import --batch --yes --passphrase-fd 0 "$(PackageSigningKey.secureFilePath)"'
