@@ -1,38 +1,12 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.22",
+			"version": "4.3.23",
 			"isLeaf": true
 		},
-		"pipeline-java": {
+		"device-detection-node": {
 			"version": "4.3.5",
-			"packageName": "pipeline",
-			"versionVariableName": "pipeline.version",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"location-java": {
-		    "version": "4.3.4",
-			"packageName": "pipeline.geo-location",
-			"versionVariableName": "geolocation.version",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-java"
-			]
-		},
-		"device-detection-nginx": {
-			"version": "4.3.3",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"device-detection-dotnet": {
-			"version": "4.3.9",
-			"packageName": "FiftyOne.DeviceDetection",
+			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
