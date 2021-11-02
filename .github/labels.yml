@@ -57,3 +57,12 @@
 - name: "scheduled: 3rd Nov 2021"
   description: This item has been scheduled for 3rd Nov 2021 release
   color: 6ff076
+- name: "scheduled: 17th Nov 2021"
+  description: This item has been scheduled for 17th Nov 2021 release
+  color: 6ff076
+- name: "scheduled: 1st Dec 2021"
+  description: This item has been scheduled for 1st Dec 2021 release
+  color: 6ff076
+- name: "scheduled: 15th Dec 2021"
+  description: This item has been scheduled for 15th Dec 2021 release
+  color: 6ff076
