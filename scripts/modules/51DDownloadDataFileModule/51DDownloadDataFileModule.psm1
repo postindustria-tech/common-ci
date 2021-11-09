@@ -21,37 +21,29 @@ function Get-DataFile {
         [Parameter(Mandatory=$true)]
         [string]$fullFilePath
     )
-
-    $timeoutWebclientCode = @"
-using System.Net;
-
-public class TimeoutWebClient : WebClient
-{
-    public int TimeoutSeconds;
-
-    protected override WebRequest GetWebRequest(System.Uri address)
-    {
-        WebRequest request = base.GetWebRequest(address);
-        if (request != null)
-        {
-        request.Timeout = TimeoutSeconds * 1000;
-        }
-        return request;
-    }
-
-    public TimeoutWebClient()
-    {
-        TimeoutSeconds = 100; // Timeout value by default
-    }
-}
-"@;
     
-    Add-Type -TypeDefinition $timeoutWebclientCode -Language CSharp
-    $webClient = New-Object TimeoutWebClient;
-    $webClient.TimeoutSeconds = 240;
+    $webClient = New-Object System.Net.Http.HttpClient;
+    $webClient.Timeout = New-TimeSpan -Seconds 240
     $url ="https://distributor.51degrees.com/api/v2/download?LicenseKeys=$($licenseKey)&Type=$($dataType)&Download=True&Product=$($product)"
-    $start_time = Get-Date   
-    $webClient.DownloadFile($url, $fullFilePath)
+    $start_time = Get-Date
+
+    # Get download stream
+    $stream = $webClient.GetStreamAsync($url)
+    $stream.ConfigureAwait($false) > $null
+    if ($null -ne $stream.Exception){ throw $stream.Exception }
+
+    # Save stream to path
+    try
+    {
+        $fileStream = [System.IO.File]::Create($fullFilePath)
+        $stream.Result.CopyTo($fileStream)
+    }
+    finally
+    {
+        if ($null -ne $fileStream){ $fileStream.Dispose() }
+        if (($null -ne $stream) -and ($stream.IsCompleted -eq $true)){ $stream.Dispose() }
+    }
+
     Write-Output "Time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
 }
 
