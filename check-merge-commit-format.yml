@@ -43,7 +43,13 @@ stages:
           $found = $title -match "Merge branch '.*'"
           if ( $found -eq $false) {
             # The format does not match, so fail the build.
-            $errMsg = "`"$title`" does not match the format `"Merge branch '[branchname]' ...`""
+            $errMsg = ("The expected format for the title should be either of the following:`n" + 
+                       "`tMerge branch '[source branch name]'`n" +
+                       "`tMerge branch '[source branch name]' into '[target branch name]'`n" +
+                       "`n" +
+                       "Any other format will not be accepted, including:`n" +
+                       "`tMerge branch [source branch name]`n" +
+                       "`tMerge branch `"[source branch name]`"")
             Write-Error $errMsg
             exit 1
           }
