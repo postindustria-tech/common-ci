@@ -22,6 +22,9 @@
 - name: "status: duplicate"
   description: This issue or pull request already exists
   color: cfd3d7
+- name: "status: awaiting external input"
+  description: This item is awaiting for external input
+  color: 6699ff
 - name: "status: released/4.3.0"
   description: This change was released in the specified version
   color: a8d131
