@@ -1,92 +1,15 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.26",
+			"version": "4.3.27",
 			"isLeaf": true
 		},
-		"device-detection-cxx": {
+		"pipeline-dotnet": {
 			"version": "4.3.9",
+			"packageName": "FiftyOne.Pipeline",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
-			]
-		},
-		"device-detection-node": {
-			"version": "4.3.7",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"device-detection-python": {
-			"version": "4.3.2",
-			"packageName": "fiftyone_devicedetection",
-			"versionVariableName": "deviceDetectionVersion",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"pipeline-php-core": {
-			"version": "4.3.5",
-			"packageName": "fiftyone.pipeline.core",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"pipeline-php-engines": {
-			"version": "4.3.4",
-			"packageName": "fiftyone.pipeline.engines",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-php-core"
-			]
-		},
-		"pipeline-php-cloudrequestengine": {
-			"version": "4.3.5",
-			"packageName": "fiftyone.pipeline.cloudrequestengine",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-php-core",
-				"pipeline-php-engines"
-			]
-		},
-		"location-php": {
-			"version": "4.3.4",
-			"packageName": "fiftyone.geolocation",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-php-core",
-				"pipeline-php-engines",
-				"pipeline-php-cloudrequestengine",
-				"device-detection-php"
-			]
-		},
-		"device-detection-php": {
-			"version": "4.3.4",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-php-core",
-				"pipeline-php-engines",
-				"pipeline-php-cloudrequestengine"
-			]
-		},
-		"pipeline-wordpress": {
-			"version": "1.0.2",
-			"packageName": "fiftyonedegrees.wordpress",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-php-cloudrequestengine"
 			]
 		}
 	},
