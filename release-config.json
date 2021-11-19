@@ -11,7 +11,7 @@
 			"dependencies": [
 				"common-ci"
 			]
-		}
+		},
 		"pipeline-java": {
 			"version": "4.3.6",
 			"packageName": "pipeline",
