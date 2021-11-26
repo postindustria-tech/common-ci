@@ -1,26 +1,110 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.28",
+			"version": "4.3.30",
 			"isLeaf": true
 		},
-		"pipeline-dotnet": {
+		"device-detection-cxx": {
 			"version": "4.3.10",
-			"packageName": "FiftyOne.Pipeline",
 			"isLeaf": false,
 			"dependencies": [
-				"common-ci"
+				"common-ci",
+				"common-cxx",
+				"device-detection-data"
 			]
 		},
 		"pipeline-java": {
-			"version": "4.3.6",
+			"version": "4.3.7",
 			"packageName": "pipeline",
 			"versionVariableName": "pipeline.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
-		}
+		},
+		"device-detection-java": {
+			"version": "4.3.11",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-java"
+			]
+		},
+		"pipeline-dotnet": {
+			"version": "4.3.11",
+			"packageName": "FiftyOne.Pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-dotnet": {
+		    "version": "4.3.8",
+			"packageName": "FiftyOne.Geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet",
+				"device-detection-dotnet"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.3.11",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"caching-dotnet",
+				"common-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.3.8",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-node"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.3.5",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-php-core",
+				"pipeline-php-engines"
+			]
+		},
+		"device-detection-php": {
+			"version": "4.3.5",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines",
+				"pipeline-php-cloudrequestengine"
+			]
+		},
+		"pipeline-wordpress": {
+			"version": "1.0.3",
+			"packageName": "fiftyonedegrees.wordpress",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-cloudrequestengine"
+			]
+		},
 	},
 	"approvalRequired": false
 }
