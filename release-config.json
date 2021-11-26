@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.30",
+			"version": "4.3.31",
 			"isLeaf": true
 		},
 		"device-detection-cxx": {
@@ -104,7 +104,7 @@
 				"common-ci",
 				"pipeline-php-cloudrequestengine"
 			]
-		},
+		}
 	},
 	"approvalRequired": false
 }
