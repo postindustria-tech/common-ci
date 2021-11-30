@@ -592,7 +592,9 @@ function Update-SubmoduleReferences {
 			Write-Host "# Checking tag $targetTag"
 			
 			$tagUpdated = $false
-			if ($targetTag -ne $null) {
+			$targetSpecified = $null -ne $targetTag
+
+			if ($targetSpecified) {
 				# Get all tag
 				Write-Host "# Fetch all tags"
 				if (![GitHandler]::FetchAllTags()) {
@@ -628,18 +630,20 @@ function Update-SubmoduleReferences {
 			}
 			
 			Pop-Location
-			
-			# Exit if not all tags have been found.
-			if (!$tagUpdated) {
-				Write-Host "# ERROR: Failed to update Submodule $subRepoName to tag $targetTag."
-				return $false
-			}
-			
-			# Stage the submodule update
-			Write-Host "# Stage the submodule $submodulePath"
-			if (![GitHandler]::Add($submodulePath)) {
-				Write-Host "# ERROR: Failed to stage the submodule $subRepoName."
-				return $false
+						
+			if($targetSpecified) {
+				# Exit if not all tags have been found.
+				if (!$tagUpdated) {
+					Write-Host "# ERROR: Failed to update Submodule $subRepoName to tag $targetTag."
+					return $false
+				}
+
+				# Stage the submodule update
+				Write-Host "# Stage the submodule $submodulePath"
+				if (![GitHandler]::Add($submodulePath)) {
+					Write-Host "# ERROR: Failed to stage the submodule $subRepoName."
+					return $false
+				}
 			}
 		} else {
 			Write-Host "# ERROR: Failed to extract module path from $submodulePath"
