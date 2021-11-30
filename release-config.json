@@ -1,16 +1,41 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.32",
+			"version": "4.3.33",
 			"isLeaf": true
 		},
+		"device-detection-data": {
+			"version": "4.3.4",
+			"isLeaf": false
+		},
 		"device-detection-cxx": {
-			"version": "4.3.10",
+			"version": "4.3.11",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
 				"common-cxx",
 				"device-detection-data"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.3.8",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-node"
+			]
+		},
+		"device-detection-php": {
+			"version": "4.3.6",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines",
+				"pipeline-php-cloudrequestengine"
 			]
 		},
 		"device-detection-go": {
