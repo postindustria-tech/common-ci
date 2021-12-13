@@ -34,7 +34,7 @@
 				"common-ci",
 				"pipeline-php-cloudrequestengine"
 			]
-		},
+		}
 	},
 	"approvalRequired": false
 }
