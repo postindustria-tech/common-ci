@@ -1,11 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.34",
+			"version": "4.3.35",
 			"isLeaf": true
 		},
 		"pipeline-dotnet": {
-			"version": "4.3.12",
+			"version": "4.3.13",
 			"packageName": "FiftyOne.Pipeline",
 			"isLeaf": false,
 			"dependencies": [
@@ -24,15 +24,6 @@
 				"caching-dotnet",
 				"common-dotnet",
 				"pipeline-dotnet"
-			]
-		},
-		"pipeline-wordpress": {
-			"version": "1.0.5",
-			"packageName": "fiftyonedegrees.wordpress",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-php-cloudrequestengine"
 			]
 		}
 	},
