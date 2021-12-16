@@ -1,18 +1,30 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.36",
+			"version": "4.3.37",
 			"isLeaf": true
 		},
-		"location-dotnet": {
-		    "version": "4.3.9",
-			"packageName": "FiftyOne.Geolocation",
+
+		"entitlement-dotnet": {
+			"version": "4.1.17",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
 				"common-dotnet",
+				"license-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"internal-engines-dotnet": {
+			"version": "4.3.6",
+			"packageName": "FiftyOne.GeoLocation.OnPremise",
+			"isLeaf": false,			
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
 				"pipeline-dotnet",
-				"device-detection-dotnet"
+				"device-detection-dotnet",
+				"location-dotnet"
 			]
 		}
 	},
