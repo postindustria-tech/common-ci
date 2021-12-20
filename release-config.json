@@ -1,11 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.38",
+			"version": "4.3.39",
 			"isLeaf": true
 		},
 		"pipeline-wordpress": {
-			"version": "1.0.8",
+			"version": "1.0.10",
 			"packageName": "fiftyonedegrees.wordpress",
 			"isLeaf": false,
 			"dependencies": [
