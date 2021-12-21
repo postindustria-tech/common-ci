@@ -1,8 +1,52 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.39",
+			"version": "4.3.40",
 			"isLeaf": true
+		},
+		"pipeline-dotnet": {
+			"version": "4.3.14",
+			"packageName": "FiftyOne.Pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"caching-dotnet"
+			]
+		},
+		"location-dotnet": {
+		    "version": "4.3.10",
+			"packageName": "FiftyOne.Geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet",
+				"device-detection-dotnet"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.3.13",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"caching-dotnet",
+				"common-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.3.8",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-php-core",
+				"pipeline-php-engines"
+			]
 		},
 		"pipeline-wordpress": {
 			"version": "1.0.10",
