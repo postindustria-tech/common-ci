@@ -1,60 +1,87 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.40",
+			"version": "4.3.41",
 			"isLeaf": true
 		},
-		"pipeline-dotnet": {
-			"version": "4.3.14",
-			"packageName": "FiftyOne.Pipeline",
+		"device-detection-cxx": {
+			"version": "4.3.12",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-java": {
+		    "version": "4.3.7",
+			"packageName": "pipeline.geo-location",
+			"versionVariableName": "geolocation.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
-				"caching-dotnet"
+				"device-detection-java"
 			]
 		},
-		"location-dotnet": {
-		    "version": "4.3.10",
-			"packageName": "FiftyOne.Geolocation",
+		"device-detection-java": {
+			"version": "4.3.12",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
-				"pipeline-dotnet",
-				"device-detection-dotnet"
+				"device-detection-cxx"
 			]
 		},
-		"device-detection-dotnet": {
-			"version": "4.3.13",
-			"packageName": "FiftyOne.DeviceDetection",
+		"location-node": {
+		    "version": "4.3.5",
+			"packageName": "fiftyone.geolocation",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"device-detection-cxx",
-				"caching-dotnet",
-				"common-dotnet",
-				"pipeline-dotnet"
+				"device-detection-node"
 			]
 		},
-		"device-detection-php-onpremise": {
-			"version": "4.3.8",
+		"device-detection-node": {
+			"version": "4.3.9",
 			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"device-detection-cxx",
-				"pipeline-php-core",
-				"pipeline-php-engines"
+				"device-detection-cxx"
 			]
 		},
-		"pipeline-wordpress": {
-			"version": "1.0.10",
-			"packageName": "fiftyonedegrees.wordpress",
+		"device-detection-python": {
+			"version": "4.3.3",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"pipeline-php-cloudrequestengine"
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.3.9",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-go": {
+			"version": "4.3.3",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-examples-go": {
+			"version": "4.3.2",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-go"
 			]
 		}
 	},

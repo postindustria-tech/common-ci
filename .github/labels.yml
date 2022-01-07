@@ -25,6 +25,9 @@
 - name: "status: awaiting external input"
   description: This item is awaiting for external input
   color: 6699ff
+- name: "status: will not fix"
+  description: This item will not be fixed
+  color: 6392fa
 - name: "status: released/4.3.0"
   description: This change was released in the specified version
   color: a8d131
@@ -69,6 +72,9 @@
 - name: "scheduled: 15th Dec 2021"
   description: This item has been scheduled for 15th Dec 2021 release
   color: 6ff076
+- name: "scheduled: 12th Jan 2022"
+  description: This item has been scheduled for 12th Jan 2022 release
+  color: d49233
 - name: "scheduled: 19th Jan 2022"
   description: This item has been scheduled for 19th Jan 2022 release
   color: d49291
