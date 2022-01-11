@@ -1,18 +1,26 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.41",
+			"version": "4.3.42",
 			"isLeaf": true
 		},
-		"device-detection-cxx": {
-			"version": "4.3.12",
+		"common-cxx": {
+			"version": "4.3.7",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
+		"device-detection-cxx": {
+			"version": "4.3.13",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-cxx"
+			]
+		},
 		"location-java": {
-		    "version": "4.3.7",
+		    "version": "4.3.8",
 			"packageName": "pipeline.geo-location",
 			"versionVariableName": "geolocation.version",
 			"isLeaf": false,
@@ -22,7 +30,7 @@
 			]
 		},
 		"device-detection-java": {
-			"version": "4.3.12",
+			"version": "4.3.13",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
@@ -31,57 +39,13 @@
 				"device-detection-cxx"
 			]
 		},
-		"location-node": {
-		    "version": "4.3.5",
-			"packageName": "fiftyone.geolocation",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-node"
-			]
-		},
-		"device-detection-node": {
-			"version": "4.3.9",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"device-detection-python": {
-			"version": "4.3.3",
-			"packageName": "fiftyone_devicedetection",
-			"versionVariableName": "deviceDetectionVersion",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
 		"device-detection-php-onpremise": {
-			"version": "4.3.9",
+			"version": "4.3.10",
 			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
 				"device-detection-cxx"
-			]
-		},
-		"device-detection-go": {
-			"version": "4.3.3",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"device-detection-examples-go": {
-			"version": "4.3.2",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-go"
 			]
 		}
 	},
