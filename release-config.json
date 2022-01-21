@@ -1,11 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.42",
+			"version": "4.3.43",
 			"isLeaf": true
 		},
 		"common-cxx": {
-			"version": "4.3.7",
+			"version": "4.3.8",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
@@ -19,6 +19,43 @@
 				"common-cxx"
 			]
 		},
+		"pipeline-node": {
+			"version": "4.3.7",
+			"packageName": "fiftyone.pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-node": {
+		    "version": "4.3.6",
+			"packageName": "fiftyone.geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-node",
+				"device-detection-node"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.3.10",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-node"
+			]
+		},
+		"pipeline-java": {
+			"version": "4.3.8",
+			"packageName": "pipeline",
+			"versionVariableName": "pipeline.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
 		"location-java": {
 		    "version": "4.3.8",
 			"packageName": "pipeline.geo-location",
@@ -26,6 +63,7 @@
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
+				"pipeline-java",
 				"device-detection-java"
 			]
 		},
@@ -39,13 +77,117 @@
 				"device-detection-cxx"
 			]
 		},
-		"device-detection-php-onpremise": {
-			"version": "4.3.10",
-			"packageName": "fiftyone.devicedetection",
+		"common-dotnet": {
+			"version": "4.3.5",
+			"packageName": "FiftyOne.Common",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"caching-dotnet": {
+			"version": "4.3.5",
+			"packageName": "FiftyOne.Caching",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"pipeline-dotnet": {
+			"version": "4.3.15",
+			"packageName": "FiftyOne.Pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"caching-dotnet"
+			]
+		},
+		"location-dotnet": {
+		    "version": "4.3.11",
+			"packageName": "FiftyOne.Geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet",
+				"device-detection-dotnet"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.3.14",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"caching-dotnet",
+				"common-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"license-dotnet": {
+			"version": "4.3.3",
+			"packageName": "FiftyOne.(License|Resource)",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"entitlement-dotnet": {
+			"version": "4.1.18",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"license-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"pipeline-python": {
+			"version": "4.3.5",
+			"packageName": "fiftyone_pipeline",
+			"versionVariableName": "pipelineVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-python": {
+		    "version": "4.3.2",
+			"packageName": "fiftyone_location",
+			"versionVariableName": "locationVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-python"
+			]
+		},
+		"device-detection-python": {
+			"version": "4.3.4",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-python"
+			]
+		},
+		"device-detection-go": {
+			"version": "4.3.4",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
 				"device-detection-cxx"
+			]
+		},
+		"device-detection-examples-go": {
+			"version": "4.3.3",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-go"
 			]
 		}
 	},
