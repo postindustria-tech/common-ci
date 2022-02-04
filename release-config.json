@@ -1,27 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.44",
+			"version": "4.3.45",
 			"isLeaf": true
 		},
-		"device-detection-node": {
-			"version": "4.3.11",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"device-detection-dotnet": {
-			"version": "4.3.15",
-			"packageName": "FiftyOne.DeviceDetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
 		"pipeline-wordpress": {
-			"version": "1.0.11",
+			"version": "1.0.12",
 			"packageName": "fiftyonedegrees.wordpress",
 			"isLeaf": false,
 			"dependencies": [
