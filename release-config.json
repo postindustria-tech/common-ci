@@ -1,16 +1,8 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.46",
+			"version": "4.3.47",
 			"isLeaf": true
-		},
-		"pipeline-wordpress": {
-			"version": "1.0.13",
-			"packageName": "fiftyonedegrees.wordpress",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
 		},
 		"pipeline-java": {
 			"version": "4.3.9",
@@ -22,7 +14,7 @@
 			]
 		},
 		"location-java": {
-		    "version": "4.3.14",
+		    "version": "4.3.10",
 			"packageName": "pipeline.geo-location",
 			"versionVariableName": "geolocation.version",
 			"isLeaf": false,
@@ -33,7 +25,7 @@
 			]
 		},
 		"device-detection-java": {
-			"version": "4.3.9",
+			"version": "4.3.14",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
