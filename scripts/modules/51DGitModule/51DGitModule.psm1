@@ -26,27 +26,47 @@ class GitHandler {
 		}
 		return $rtnCode
 	}
+
+	static [boolean]UpdateSubmodules() {
+		git submodule update --init --recursive
+		[boolean]$rtnCode = $LASTEXITCODE -eq 0
+		if (!$rtnCode) {
+			Write-Host "# WARNING: Could not update submodules recursively."
+		}
+		return $rtnCode
+	}
 	
 	static [boolean]Checkout ([string]$branchName) {
 		Write-Host "# Checkout $branchName"
-		git checkout "$branchName" --recurse-submodules
+		git checkout "$branchName"
 		[boolean]$rtnCode = $LASTEXITCODE -eq 0
 		if (!$rtnCode) {
 			Write-Host "# ERROR: Failed to checkout '$branchName' recursively."
 			return $rtnCode
 		}
+
+		$rtnCode = [GitHandler]::UpdateSubmodules()
+		if (!$rtnCode) {
+			return $rtnCode
+		}
+
 		return [GitHandler]::Clean()
 	}
 	
 	static [boolean]CheckoutTrack ([string]$branchName) {
 		Write-Host "# Checkout track $branchName"
-		git checkout --track "$branchName" --recurse-submodules
+		git checkout --track "$branchName"
 		[boolean]$rtnCode = $LASTEXITCODE -eq 0
 		if (!$rtnCode) {
 			Write-Host "# ERROR: Failed to checkout '$branchName' recursively."
 			return $rtnCode
 		}
-		
+
+		$rtnCode = [GitHandler]::UpdateSubmodules()
+		if (!$rtnCode) {
+			return $rtnCode
+		}
+
 		return [GitHandler]::Clean()
 	}
 	
@@ -602,15 +622,8 @@ function Update-SubmoduleReferences {
 		if ($submodulePath -ne $null) {
 			Write-Host "# Path $submodulePath extracted."
 			Push-Location $submodulePath
-			Get-Location
-			git branch
-			git status
-			dir
 			if (!$?) {
 				Write-Host "# ERROR: Failed to navigate to submodule $submodulePath"
-				Get-Location
-				git branch
-				git status
 				return $false
 			}
 			
