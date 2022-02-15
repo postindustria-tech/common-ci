@@ -1,11 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.47",
+			"version": "4.3.48",
 			"isLeaf": true
 		},
 		"pipeline-java": {
-			"version": "4.3.9",
+			"version": "4.3.10",
 			"packageName": "pipeline",
 			"versionVariableName": "pipeline.version",
 			"isLeaf": false,

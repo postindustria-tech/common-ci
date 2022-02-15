@@ -18,35 +18,55 @@ $script:releaseConfig = $null
 $script:repositories = $null
 
 class GitHandler {
+	static [boolean]Clean () {
+		git clean -f -d
+		[boolean]$rtnCode = $LASTEXITCODE -eq 0
+		if (!$rtnCode) {
+			Write-Host "# WARNING: Could not clean current dir properly."
+		}
+		return $rtnCode
+	}
+	
 	static [boolean]Checkout ([string]$branchName) {
 		Write-Host "# Checkout $branchName"
-		git checkout "$branchName"
-		return $?
+		git checkout "$branchName" --recurse-submodules
+		[boolean]$rtnCode = $LASTEXITCODE -eq 0
+		if (!$rtnCode) {
+			Write-Host "# ERROR: Failed to checkout '$branchName' recursively."
+			return $rtnCode
+		}
+		return [GitHandler]::Clean()
 	}
 	
 	static [boolean]CheckoutTrack ([string]$branchName) {
 		Write-Host "# Checkout track $branchName"
-		git checkout --track "$branchName"
-		return $?
+		git checkout --track "$branchName" --recurse-submodules
+		[boolean]$rtnCode = $LASTEXITCODE -eq 0
+		if (!$rtnCode) {
+			Write-Host "# ERROR: Failed to checkout '$branchName' recursively."
+			return $rtnCode
+		}
+		
+		return [GitHandler]::Clean()
 	}
 	
 	static [boolean]CheckoutNew ([string]$branchName) {
 		Write-Host "# Checkout New $branchName"
 		git checkout -b "$branchName"
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]Pull () {
 		Write-Host "# Git pull"
 		git pull
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]FetchAllTags () {
 		Write-Host "# Fetch all tags"
 		# git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" fetch --all --tags
 		git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" fetch --all --tags
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]Push ([string]$branchName) {
@@ -57,41 +77,41 @@ class GitHandler {
 			Write-Host "# Git Push"
 			git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" push origin "$branchName"
 		}
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]Commit ([string]$message) {
 		Write-Host "# Git commit"
 		git commit -m "$message"
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]Config ([string]$email, [string]$name) {
 		Write-Host "# Git config email '$email' and name '$name'"
 		git config user.email "$email"
-		[boolean]$returnCode = $?
+		[boolean]$returnCode = $LASTEXITCODE -eq 0
 		git config user.name "$name"
-		return $returnCode -and $?
+		return $returnCode -and ($LASTEXITCODE -eq 0)
 	}
 	
 	static [boolean]Add ([string]$path) {
 		Write-Host "# Git stage '$path'"
 		git add "$path"
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]CheckoutWithAuthorization ([string]$branchName) {
 		Write-Host "# Checkout with authorization $branchName"
 		# git -c http.extraheader="AUTHORIZATION: bearer $env:SYSTEM_ACCESSTOKEN" checkout "$branchName"
 		git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" checkout "$branchName"
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 	
 	static [boolean]Clone ([string]$url) {
 		Write-Host "# Clone $url"
 		# git -c http.extraheader="AUTHORIZATION: Bearer $env:SYSTEM_ACCESSTOKEN" clone "$url"
 		git -c http.extraheader="AUTHORIZATION: $([Authorization]::AuthorizationString)" clone "$url"
-		return $?
+		return $LASTEXITCODE -eq 0
 	}
 }
 
