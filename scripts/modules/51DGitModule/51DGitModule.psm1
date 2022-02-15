@@ -597,11 +597,22 @@ function Update-SubmoduleReferences {
 	Write-Host "================"
 	foreach ($submodule in $(git config --file .gitmodules --name-only --get-regexp path)) {
 		Write-Host ""
-		Write-Host "# Process submodule path $submodulePath."
+		Write-Host "# Process submodule path $submodule."
 		$submodulePath = Find-SubmodulePath -GitSubmodulePath $submodule
 		if ($submodulePath -ne $null) {
 			Write-Host "# Path $submodulePath extracted."
 			Push-Location $submodulePath
+			Get-Location
+			git branch
+			git status
+			dir
+			if (!$?) {
+				Write-Host "# ERROR: Failed to navigate to submodule $submodulePath"
+				Get-Location
+				git branch
+				git status
+				return $false
+			}
 			
 			# Get repo name
 			$subRepoName = Get-RepositoryName
