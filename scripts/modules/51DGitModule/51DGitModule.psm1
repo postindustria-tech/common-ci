@@ -622,15 +622,8 @@ function Update-SubmoduleReferences {
 		if ($submodulePath -ne $null) {
 			Write-Host "# Path $submodulePath extracted."
 			Push-Location $submodulePath
-			Get-Location
-			git branch
-			git status
-			dir
 			if (!$?) {
 				Write-Host "# ERROR: Failed to navigate to submodule $submodulePath"
-				Get-Location
-				git branch
-				git status
 				return $false
 			}
 			
