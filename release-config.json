@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.53",
+			"version": "4.3.54",
 			"isLeaf": true
 		},
 		"pipeline-java": {
@@ -25,7 +25,7 @@
 			]
 		},
 		"device-detection-java": {
-			"version": "4.3.15",
+			"version": "4.3.16",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
