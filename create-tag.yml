@@ -25,12 +25,15 @@ stages:
       submodules: recursive
       persistCredentials: true
     
-    - task: gittools.gitversion.gitversion-task.GitVersion@5
-      displayName: 'Determine Version Number'
-      # Give this task a name so we can use the variables it sets later.
-      name: GitVersion
+    - task: gitversion/setup@0
+      displayName: Install GitVersion
       inputs:
-        preferBundledVersion: false
+        versionSpec: '5.x'
+    
+    - task: gitversion/execute@0
+      displayName: Determine Version
+      inputs:
+        useConfigFile: true
         configFilePath: '$(Build.SourcesDirectory)/GitVersion.yml'
     
     # Add a tag to the git repository with the version number.
