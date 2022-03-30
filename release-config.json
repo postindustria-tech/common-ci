@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.3.59",
+			"version": "4.3.60",
 			"isLeaf": true
 		},
 		"device-detection-data": {
@@ -102,6 +102,34 @@
 				"caching-dotnet",
 				"common-dotnet",
 				"pipeline-dotnet"
+			]
+		},
+		"pipeline-node": {
+			"version": "4.3.8",
+			"packageName": "fiftyone.pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-node": {
+		    "version": "4.3.7",
+			"packageName": "fiftyone.geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-node",
+				"device-detection-node"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.3.12",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-node"
 			]
 		},
 		"device-detection-python": {
