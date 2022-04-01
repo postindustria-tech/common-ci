@@ -104,6 +104,28 @@
 				"pipeline-dotnet"
 			]
 		},
+		"entitlement-dotnet": {
+			"version": "4.1.19",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"license-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"internal-engines-dotnet": {
+			"version": "4.3.7",
+			"packageName": "FiftyOne.GeoLocation.OnPremise",
+			"isLeaf": false,			
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet",
+				"device-detection-dotnet",
+				"location-dotnet"
+			]
+		},
 		"pipeline-node": {
 			"version": "4.3.8",
 			"packageName": "fiftyone.pipeline",
