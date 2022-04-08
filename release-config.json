@@ -1,12 +1,21 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.3",
+			"version": "4.4.4",
 			"isLeaf": true
 		},
-		"device-detection-node": {
+		"internal-engines-dotnet": {
 			"version": "4.4.1",
-			"packageName": "fiftyone.devicedetection",
+			"packageName": "FiftyOne.GeoLocation.OnPremise",
+			"isLeaf": false,			
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-onpremise-java": {
+		    "version": "4.4.2",
+			"packageName": "geo-location.digitalelement",
+			"versionVariableName": "geolocation.digitalelement.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
