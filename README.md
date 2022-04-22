@@ -83,7 +83,7 @@ Job <b>must</b> indicate a <b>fail state</b> if any of the following occurs:
 - Build step fails with error or warning - all warnings should be treated as errors
 - Any test fails
 
-If multiple operating system platforms should be supported according to [version support table](https://51degrees.com/documentation/_info__version_support.html) “Build and test” job should either:
+If multiple operating system platforms should be supported according to the [tested versions table](https://51degrees.com/documentation/_info__tested_versions.html) “Build and test” job should either:
 - implement support for each operating system in a single `yml` file, or
 - implement support for each operating system in a separate `yml` file and create a combining `yml` script.
 
@@ -161,7 +161,7 @@ Although relatively self descriptive, could be extended by comments:
 ```
 
 ### Build and test platforms
-51Degrees provides information about supported platforms and language/API versions. The full table is available on [51Degrees documentation website](https://51degrees.com/documentation/index.html) on [Information/Version support page](https://51degrees.com/documentation/_info__version_support.html). Azure DevOps Pipelines should be configured to at least mirror the requirements setup by the documentation. If platform architecture is not specified in the support version matrix, it is assumed that both 32 and 64 bit platforms are supported and relevant continuous integration jobs should be provided (please ignore 32bit architecture for the operating systems not supporting x86 platforms). If any changes are applied, support removed or added, either the documentation table or CI configuration must be updated to assure full synchronization between the two.
+51Degrees provides information about supported platforms and language/API versions. The full table is available on the [tested versions page](https://51degrees.com/documentation/_info__tested_versions.html). Azure DevOps Pipelines should be configured to at least mirror the requirements setup by the documentation. If platform architecture is not specified in the support version matrix, it is assumed that both 32 and 64 bit platforms are supported and relevant continuous integration jobs should be provided (please ignore 32bit architecture for the operating systems not supporting x86 platforms). If any changes are applied, support removed or added, either the documentation table or CI configuration must be updated to assure full synchronization between the two.
 ### Testing principles
 Whenever testing environment is set up for a project, continuous integration scripts should be configured to perform full set of tests for:
 - All platforms supported by the software project
