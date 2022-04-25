@@ -16,47 +16,6 @@
 				"device-detection-data"
 			]
 		},
-		"device-detection-nginx": {
-			"version": "4.4.2",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"location-java": {
-		    "version": "4.4.4",
-			"packageName": "pipeline.geo-location",
-			"versionVariableName": "geolocation.version",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-java",
-				"pipeline-java"
-			]
-		},
-		"location-onpremise-java": {
-		    "version": "4.4.5",
-			"packageName": "geo-location.digitalelement",
-			"versionVariableName": "geolocation.digitalelement.version",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"location-java",
-				"pipeline-java"
-			]
-		},
-		"device-detection-java": {
-			"version": "4.4.4",
-			"packageName": "pipeline.device-detection",
-			"versionVariableName": "devicedetection.version",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-java",
-				"device-detection-cxx"
-			]
-		},
 		"location-dotnet": {
 		    "version": "4.4.3",
 			"packageName": "FiftyOne.Geolocation",
