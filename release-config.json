@@ -1,18 +1,20 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.7",
+			"version": "4.4.8",
 			"isLeaf": true
-		},
-		"device-detection-cxx": {
+		},  
+		"pipeline-java": {
 			"version": "4.4.3",
+			"packageName": "pipeline",
+			"versionVariableName": "pipeline.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
-		},        
+		},
 		"location-java": {
-			"version": "4.4.4",
+			"version": "4.4.5",
 			"packageName": "pipeline.geo-location",
 			"versionVariableName": "geolocation.version",
 			"isLeaf": false,
@@ -20,9 +22,9 @@
 					"common-ci",
 					"device-detection-java"
 			]
-	},
-	"location-onpremise-java": {
-			"version": "4.4.5",
+		},
+		"location-onpremise-java": {
+			"version": "4.4.6",
 			"packageName": "geo-location.digitalelement",
 			"versionVariableName": "geolocation.digitalelement.version",
 			"isLeaf": false,
@@ -30,52 +32,32 @@
 					"common-ci",
 					"location-java"
 			]
-	},
-	"device-detection-java": {
-			"version": "4.4.4",
+		},
+		"device-detection-java": {
+			"version": "4.4.5",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
 			"dependencies": [
 					"common-ci",
-					"device-detection-cxx"
-			]
-	},
-		"location-dotnet": {
-		    "version": "4.4.3",
-			"packageName": "FiftyOne.Geolocation",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-dotnet"
+					"pipeline-java"
 			]
 		},
-		"device-detection-dotnet": {
-			"version": "4.4.3",
-			"packageName": "FiftyOne.DeviceDetection",
+		"pipeline-python": {
+			"version": "4.4.1",
+			"packageName": "fiftyone_pipeline",
+			"versionVariableName": "pipelineVersion",
 			"isLeaf": false,
 			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
+				"common-ci"
 			]
 		},
-		"internal-engines-dotnet": {
-			"version": "4.4.4",
-			"packageName": "FiftyOne.GeoLocation.OnPremise",
-			"isLeaf": false,			
-			"dependencies": [
-				"common-ci",
-				"device-detection-dotnet",
-				"location-dotnet"
-			]
-		},
-		"device-detection-node": {
-			"version": "4.4.4",
-			"packageName": "fiftyone.devicedetection",
+		"pipeline-wordpress": {
+			"version": "4.4.1",
+			"packageName": "fiftyonedegrees.wordpress",
 			"isLeaf": false,
 			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
+				"common-ci"
 			]
 		}
 	},
