@@ -1,11 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.8",
+			"version": "4.4.9",
 			"isLeaf": true
-		},  
+		},
 		"pipeline-java": {
-			"version": "4.4.3",
+			"version": "4.4.4",
 			"packageName": "pipeline",
 			"versionVariableName": "pipeline.version",
 			"isLeaf": false,
@@ -14,50 +14,93 @@
 			]
 		},
 		"location-java": {
-			"version": "4.4.5",
+		    "version": "4.4.6",
 			"packageName": "pipeline.geo-location",
 			"versionVariableName": "geolocation.version",
 			"isLeaf": false,
 			"dependencies": [
-					"common-ci",
-					"device-detection-java"
-			]
-		},
-		"location-onpremise-java": {
-			"version": "4.4.6",
-			"packageName": "geo-location.digitalelement",
-			"versionVariableName": "geolocation.digitalelement.version",
-			"isLeaf": false,
-			"dependencies": [
-					"common-ci",
-					"location-java"
+				"common-ci",
+				"pipeline-java",
+				"device-detection-java"
 			]
 		},
 		"device-detection-java": {
-			"version": "4.4.5",
+			"version": "4.4.6",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
 			"dependencies": [
-					"common-ci",
-					"pipeline-java"
+				"common-ci",
+				"pipeline-java"
 			]
 		},
-		"pipeline-python": {
-			"version": "4.4.1",
-			"packageName": "fiftyone_pipeline",
-			"versionVariableName": "pipelineVersion",
+		"device-detection-dotnet": {
+			"version": "4.4.3",
+			"packageName": "FiftyOne.DeviceDetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
-		"pipeline-wordpress": {
-			"version": "4.4.1",
-			"packageName": "fiftyonedegrees.wordpress",
+		"device-detection-node": {
+			"version": "4.4.5",
+			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
+			]
+		},
+		"device-detection-python": {
+			"version": "4.4.4",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"pipeline-php-core": {
+			"version": "4.4.1",
+			"packageName": "fiftyone.pipeline.core",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"pipeline-php-engines": {
+			"version": "4.4.1",
+			"packageName": "fiftyone.pipeline.engines",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core"
+			]
+		},
+		"pipeline-php-cloudrequestengine": {
+			"version": "4.4.1",
+			"packageName": "fiftyone.pipeline.cloudrequestengine",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-engines"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.4.3",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-engines"
+			]
+		},
+		"device-detection-php": {
+			"version": "4.4.1",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-cloudrequestengine"
 			]
 		}
 	},
