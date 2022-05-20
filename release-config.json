@@ -1,47 +1,24 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.10",
+			"version": "4.4.11",
 			"isLeaf": true
 		},
-		"pipeline-java": {
-			"version": "4.4.5",
-			"packageName": "pipeline",
-			"versionVariableName": "pipeline.version",
+		"common-cxx": {
+			"version": "4.4.3",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
-		"location-java": {
-		    "version": "4.4.6",
-			"packageName": "pipeline.geo-location",
-			"versionVariableName": "geolocation.version",
+		"device-detection-cxx": {
+			"version": "4.4.4",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"pipeline-java",
-				"device-detection-java"
+				"common-cxx"
 			]
 		},
-		"device-detection-java": {
-			"version": "4.4.7",
-			"packageName": "pipeline.device-detection",
-			"versionVariableName": "devicedetection.version",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-java"
-			]
-		},
-		"device-detection-node": {
-			"version": "4.4.6",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		}
 	},
 	"approvalRequired": false
 }
