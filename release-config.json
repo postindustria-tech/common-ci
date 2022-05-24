@@ -1,22 +1,180 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.11",
+			"version": "4.4.12",
 			"isLeaf": true
 		},
-		"common-cxx": {
-			"version": "4.4.3",
+		"pipeline-java": {
+			"version": "4.4.6",
+			"packageName": "pipeline",
+			"versionVariableName": "pipeline.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
-		"device-detection-cxx": {
-			"version": "4.4.4",
+		"location-java": {
+		  "version": "4.4.7",
+			"packageName": "pipeline.geo-location",
+			"versionVariableName": "geolocation.version",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-cxx"
+				"pipeline-java",
+				"device-detection-java"
+			]
+		},
+		"device-detection-java": {
+			"version": "4.4.8",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-java"
+			]
+		},
+		"pipeline-dotnet": {
+			"version": "4.4.2",
+			"packageName": "FiftyOne.Pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-dotnet": {
+		    "version": "4.4.3",
+			"packageName": "FiftyOne.Geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-dotnet",
+				"device-detection-dotnet"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.4.4",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-dotnet"
+			]
+		},
+		"pipeline-node": {
+			"version": "4.4.1",
+			"packageName": "fiftyone.pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-node": {
+		    "version": "4.4.2",
+			"packageName": "fiftyone.geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-node",
+				"device-detection-node"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.4.7",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-node"
+			]
+		},
+		"pipeline-python": {
+			"version": "4.4.2",
+			"packageName": "fiftyone_pipeline",
+			"versionVariableName": "pipelineVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"location-python": {
+		    "version": "4.4.1",
+			"packageName": "fiftyone_location",
+			"versionVariableName": "locationVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-python"
+			]
+		},
+		"device-detection-python": {
+			"version": "4.4.5",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-python"
+			]
+		},
+		"pipeline-php-core": {
+			"version": "4.4.2",
+			"packageName": "fiftyone.pipeline.core",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"pipeline-php-engines": {
+			"version": "4.4.2",
+			"packageName": "fiftyone.pipeline.engines",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core"
+			]
+		},
+		"pipeline-php-cloudrequestengine": {
+			"version": "4.4.2",
+			"packageName": "fiftyone.pipeline.cloudrequestengine",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines"
+			]
+		},
+		"location-php": {
+			"version": "4.4.1",
+			"packageName": "fiftyone.geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines",
+				"pipeline-php-cloudrequestengine",
+				"device-detection-php"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.4.4",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines"
+			]
+		},
+		"device-detection-php": {
+			"version": "4.4.2",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-php-core",
+				"pipeline-php-engines",
+				"pipeline-php-cloudrequestengine"
 			]
 		}
 	},
