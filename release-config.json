@@ -1,34 +1,84 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.13",
+			"version": "4.4.14",
 			"isLeaf": true
 		},
-		"pipeline-dotnet": {
+		"device-detection-data": {
 			"version": "4.4.2",
-			"packageName": "FiftyOne.Pipeline",
+			"isLeaf": false
+		},
+		"common-cxx": {
+			"version": "4.4.4",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
-		"location-dotnet": {
-		    "version": "4.4.3",
-			"packageName": "FiftyOne.Geolocation",
+		"device-detection-cxx": {
+			"version": "4.4.5",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"pipeline-dotnet",
-				"device-detection-dotnet"
+				"common-cxx",
+				"device-detection-data"
+			]
+		},
+		"pipeline-java": {
+			"version": "4.4.7",
+			"packageName": "pipeline",
+			"versionVariableName": "pipeline.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"device-detection-java": {
+			"version": "4.4.9",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-java"
 			]
 		},
 		"device-detection-dotnet": {
-			"version": "4.4.5",
+			"version": "4.4.6",
 			"packageName": "FiftyOne.DeviceDetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"pipeline-dotnet"
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.4.7",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-python": {
+			"version": "4.4.6",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.4.5",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
 			]
 		}
 	},
