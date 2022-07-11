@@ -1,34 +1,15 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.17",
+			"version": "4.4.18",
 			"isLeaf": true
 		},
 		"pipeline-dotnet": {
-			"version": "4.4.4",
+			"version": "4.4.5",
 			"packageName": "FiftyOne.Pipeline",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
-			]
-		},
-		"device-detection-dotnet": {
-			"version": "4.4.8",
-			"packageName": "FiftyOne.DeviceDetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"pipeline-dotnet"
-			]
-		},
-		"location-dotnet": {
-			"version": "4.4.4",
-			"packageName": "FiftyOne.DeviceDetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx",
-				"pipeline-dotnet"
 			]
 		}
 	},
