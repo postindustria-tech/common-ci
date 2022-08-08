@@ -1,11 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.21",
+			"version": "4.4.22",
 			"isLeaf": true
 		},
 		"device-detection-cxx": {
-			"version": "4.3.7",
+			"version": "4.4.7",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
@@ -22,15 +22,6 @@
 				"device-detection-cxx"
 			]
 		},
-		"pipeline-python": {
-			"version": "4.4.3",
-			"packageName": "fiftyone_pipeline",
-			"versionVariableName": "pipelineVersion",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
 		"device-detection-python": {
 			"version": "4.4.9",
 			"packageName": "fiftyone_devicedetection",
@@ -40,14 +31,6 @@
 				"common-ci",
 				"device-detection-cxx",
 				"pipeline-python"
-			]
-		},
-		"pipeline-node": {
-			"version": "4.4.3",
-			"packageName": "fiftyone.pipeline",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
 			]
 		},
 		"device-detection-node": {
