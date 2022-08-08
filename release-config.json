@@ -42,6 +42,17 @@
 				"device-detection-cxx",
 				"pipeline-node"
 			]
+		},
+		"device-detection-java": {
+			"version": "4.4.12",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-java"
+			]
 		}
 	},
 	"approvalRequired": false
