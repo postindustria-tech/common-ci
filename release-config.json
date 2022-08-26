@@ -110,7 +110,7 @@
 				"common-dotnet",
 				"pipeline-dotnet"
 			]
-		},
+		}
 	},
 	"approvalRequired": false
 }
