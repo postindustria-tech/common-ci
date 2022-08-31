@@ -160,6 +160,51 @@ function Update-MavenPackageDependencies {
 
 <#
   .Description
+  Update version of all Maven packages in a repository.
+  
+  .Parameter RepositoryName
+  Name of a repository
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
+  
+  .Outputs
+  true or false
+#>
+function Update-MavenPackageVersion {
+	param (
+		[Parameter(Mandatory)]
+		[string]$RepositoryName,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
+	)
+	
+	Write-Host ""
+	Write-Host "Update Maven Package Version"
+	Write-Host "================================="
+
+	$version = $script:releaseConfig.repositories."$RepositoryName".version
+	# Check if pom.xml exists
+	if (Test-Path pom.xml) {
+		Write-Host "Setting new version to $version"
+	    $newVersionCommand = "mvn versions:set `"-DnewVersion=$version`"" 
+		Write-Host $newVersionCommand
+		Invoke-Expression $newVersionCommand
+		# Stage the change
+		if (![GitHandler]::Add("*pom.xml")) {
+			Write-Host "# ERROR: Failed to stage the change."
+			return $false
+		}
+	} else {
+		Write-Host "# ERROR: No pom file is found at this directory. Nothing to update."
+		return $false
+	}
+	
+	return $true
+}
+
+<#
+  .Description
   Update dotnet package file content.
   
   .Parameter Dependencies
@@ -923,4 +968,76 @@ function Update-PackageDependencies {
 	return $succeeded
 }
 
+<#
+  .Description
+  Update the version of all packages in a repository.
+  This determines the type of package based on repository name.
+  Any change will be automatically staged.
+  
+  .Parameter Configuration
+  A configuration object
+  
+  .Parameter TeamProjectName
+  Name ofthe repository team project
+  
+  .Outputs
+  true or false
+#>
+function Update-PackageVersion {
+	param (
+		[Parameter(Mandatory)]
+		[object]$Configuration,
+		[Parameter(Mandatory)]
+		[string]$TeamProjectName
+	)
+	
+	Write-Host ""
+	Write-Host "# Update package versions"
+	Write-Host "============================="
+	
+	# Initialise the script variables
+	Initialize-GlobalVariables -Configuration $Configuration
+	
+	# Get repository name
+	$repoName = Get-RepositoryName
+	
+	$succeeded = $true
+	# Determine the type of package based on languages
+	switch -Wildcard ("$repoName") {
+		"*java" {
+			Write-Host "# $repoName is a Maven package."
+			$succeeded = Update-MavenPackageVersion `
+				-RepositoryName $repoName -TeamProjectName $TeamProjectName
+			Break
+		}
+		"*dotnet" {
+			Write-Host "# $repoName is a Dotnet package."
+			# TODO: This is not implemeted yet.
+			Break
+		}
+		"*node" {
+			Write-Host "# $repoName is a Node package."
+			# TODO: This is not implemeted yet.
+			Break
+		}
+		"*python" {
+			Write-Host "# $repoName is a Python package."
+			# TODO: This is not implemeted yet.
+			Break
+		}
+		"*go" {
+			Write-Host "# $repoName is a Golang package."
+			# TODO: This is not implemeted yet.
+			Break
+		}
+		Default {
+			Write-Host "# $repoName is of type that do not need to update package."
+			Break
+		}
+	}
+	
+	return $succeeded
+}
+
 Export-ModuleMember -Function Update-PackageDependencies
+Export-ModuleMember -Function Update-PackageVersion
