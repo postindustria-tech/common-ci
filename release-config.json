@@ -1,85 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.23",
+			"version": "4.4.24",
 			"isLeaf": true
 		},
-		"device-detection-data": {
-			"version": "4.4.3",
-			"isLeaf": false
-		},
-		"common-cxx": {
-			"version": "4.4.6",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"device-detection-cxx": {
-			"version": "4.4.8",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"common-cxx",
-				"device-detection-data"
-			]
-		},
-		"device-detection-varnish": {
-			"version": "4.4.2",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"device-detection-nginx": {
-			"version": "4.4.3",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
-		"pipeline-node": {
-			"version": "4.4.4",
-			"packageName": "fiftyone.pipeline",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"device-detection-node": {
-			"version": "4.4.11",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx",
-				"pipeline-node"
-			]
-		},
-		"pipeline-python": {
-			"version": "4.4.4",
-			"packageName": "fiftyone_pipeline",
-			"versionVariableName": "pipelineVersion",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"device-detection-python": {
-			"version": "4.4.10",
-			"packageName": "fiftyone_devicedetection",
-			"versionVariableName": "deviceDetectionVersion",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx",
-				"pipeline-python"
-			]
-		},
 		"device-detection-java": {
-			"version": "4.4.13",
+			"version": "4.4.14",
 			"packageName": "pipeline.device-detection",
 			"versionVariableName": "devicedetection.version",
 			"isLeaf": false,
@@ -87,28 +13,6 @@
 				"common-ci",
 				"device-detection-cxx",
 				"pipeline-java"
-			]
-		},
-		"pipeline-dotnet": {
-			"version": "4.4.7",
-			"packageName": "FiftyOne.Pipeline",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"common-dotnet",
-				"caching-dotnet"
-			]
-		},
-		"device-detection-dotnet": {
-			"version": "4.4.11",
-			"packageName": "FiftyOne.DeviceDetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx",
-				"caching-dotnet",
-				"common-dotnet",
-				"pipeline-dotnet"
 			]
 		}
 	},
