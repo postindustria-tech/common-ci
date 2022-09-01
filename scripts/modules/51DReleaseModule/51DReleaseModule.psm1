@@ -482,6 +482,13 @@ function Update-CommitPushPullSub {
 		return $false
 	}
 	
+	# Update the package version
+	if (!$(Update-PackageVersion `
+		-Configuration $Configuration `
+		-TeamProjectName $PrTeamProjectName)) {
+		return $false
+	}
+
 	# Commit and push any changes.
 	Write-Host ""
 	Write-Host "# Start commit and push changes"
