@@ -1,18 +1,23 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.24",
+			"version": "4.4.25",
 			"isLeaf": true
 		},
-		"device-detection-java": {
-			"version": "4.4.14",
-			"packageName": "pipeline.device-detection",
-			"versionVariableName": "devicedetection.version",
+		"device-detection-go": {
+			"version": "4.4.2",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"device-detection-cxx",
-				"pipeline-java"
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-examples-go": {
+			"version": "4.4.2",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-go"
 			]
 		}
 	},
