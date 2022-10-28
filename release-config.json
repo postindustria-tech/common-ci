@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.27",
+			"version": "4.4.28",
 			"isLeaf": true
 		},
 		"device-detection-data": {

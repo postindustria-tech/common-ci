@@ -23,7 +23,7 @@ jobs:
     
   # Fetch all the branches if they were not by the checkout above.
   - powershell: |
-      If ((git rev-parse --is-shallow-repository) -eq true) {
+      If ((git rev-parse --is-shallow-repository) -eq "true") {
         git fetch origin --unshallow
       }
     workingDirectory: '$(Build.Repository.LocalPath)/$(Build.Repository.Name)'
