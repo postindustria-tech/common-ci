@@ -20,7 +20,14 @@ jobs:
   # (Required for GitTag task)
   - checkout: self
     persistCredentials: true
-  
+    
+  # Fetch all the branches if they were not by the checkout above.
+  - task: CmdLine@2
+    displayName: 'Fetch all branches'
+    inputs:
+      script: 'git fetch origin --unshallow'
+      workingDirectory: '$(Build.Repository.LocalPath)/$(Build.Repository.Name)'
+
   # Checkout the common-ci repo so the GitVersion config file can
   # be used.
   # Special consideration is given to the Cloud project as when executing 
