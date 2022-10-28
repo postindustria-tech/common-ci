@@ -1,11 +1,79 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.25",
+			"version": "4.4.26",
 			"isLeaf": true
 		},
+		"device-detection-data": {
+			"version": "4.4.4",
+			"isLeaf": false
+		},
+		"device-detection-cxx": {
+			"version": "4.4.9",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-cxx",
+				"device-detection-data"
+			]
+		},
+		"device-detection-java": {
+			"version": "4.4.15",
+			"packageName": "pipeline.device-detection",
+			"versionVariableName": "devicedetection.version",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-java"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.4.12",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"caching-dotnet",
+				"common-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"device-detection-node": {
+			"version": "4.4.12",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-node"
+			]
+		},
+		"device-detection-python": {
+			"version": "4.4.11",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-python"
+			]
+		},
+		"device-detection-php-onpremise": {
+			"version": "4.4.7",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"pipeline-php-core",
+				"pipeline-php-engines"
+			]
+		},
 		"device-detection-go": {
-			"version": "4.4.2",
+			"version": "4.4.3",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
