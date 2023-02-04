@@ -1,34 +1,53 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.35",
+			"version": "4.4.36",
 			"isLeaf": true
 		},
-		"common-dotnet": {
-			"version": "4.4.3",
-			"packageName": "FiftyOne.Common",
+		"device-detection-data": {
+			"version": "4.4.7",
+			"isLeaf": false
+		},
+		"common-cxx": {
+			"version": "4.4.7",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
-		"pipeline-dotnet": {
-			"version": "4.4.10",
-			"packageName": "FiftyOne.Pipeline",
+		"device-detection-cxx": {
+			"version": "4.4.11",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet"
+				"common-cxx",
+				"device-detection-data"
 			]
 		},
-		"device-detection-dotnet": {
-			"version": "4.4.16",
-			"packageName": "FiftyOne.DeviceDetection",
+		"device-detection-node": {
+			"version": "4.4.13",
+			"packageName": "fiftyone.devicedetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
-				"pipeline-dotnet"
+				"device-detection-cxx",
+				"pipeline-node"
+			]
+		},
+		"device-detection-go": {
+			"version": "4.4.5",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx"
+			]
+		},
+		"device-detection-examples-go": {
+			"version": "4.4.3",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-go"
 			]
 		}
 	},
