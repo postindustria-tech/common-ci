@@ -1,7 +1,7 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.36",
+			"version": "4.4.37",
 			"isLeaf": true
 		},
 		"device-detection-data": {
@@ -32,6 +32,18 @@
 				"common-ci",
 				"device-detection-cxx",
 				"pipeline-node"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.4.17",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"caching-dotnet",
+				"common-dotnet",
+				"pipeline-dotnet"
 			]
 		},
 		"device-detection-go": {
