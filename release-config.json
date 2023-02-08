@@ -1,49 +1,11 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.36",
+			"version": "4.4.38",
 			"isLeaf": true
 		},
-		"device-detection-data": {
-			"version": "4.4.7",
-			"isLeaf": false
-		},
-		"common-cxx": {
-			"version": "4.4.7",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci"
-			]
-		},
-		"device-detection-cxx": {
-			"version": "4.4.11",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"common-cxx",
-				"device-detection-data"
-			]
-		},
-		"device-detection-node": {
-			"version": "4.4.13",
-			"packageName": "fiftyone.devicedetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx",
-				"pipeline-node"
-			]
-		},
-		"device-detection-go": {
-			"version": "4.4.5",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx"
-			]
-		},
 		"device-detection-examples-go": {
-			"version": "4.4.3",
+			"version": "4.4.4",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
