@@ -55,10 +55,9 @@ jobs:
     name: SetGitVersionPath
     displayName: 'Determine GitVersion.yml file to use.'
 
-  # GitVersion needs to be 5.6. The standard 5.0 breaks on Ubuntu 20.
   - task: gitversion/setup@0
     inputs:
-      versionSpec: '5.6.0'
+      versionSpec: '5.12.0'
 
   - task: gitversion/execute@0
     inputs:
