@@ -1,70 +1,43 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.41",
+			"version": "4.4.42",
 			"isLeaf": true
 		},
-		"caching-dotnet": {
-			"version": "4.4.2",
-			"packageName": "FiftyOne.Caching",
+		"pipeline-node": {
+			"version": "4.4.7",
+			"packageName": "fiftyone.pipeline",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
 			]
 		},
-		"pipeline-dotnet": {
+		"device-detection-node": {
+			"version": "4.4.15",
+			"packageName": "fiftyone.devicedetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"pipeline-node"
+			]
+		},
+		"pipeline-python": {
+			"version": "4.4.5",
+			"packageName": "fiftyone_pipeline",
+			"versionVariableName": "pipelineVersion",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci"
+			]
+		},
+		"device-detection-python": {
 			"version": "4.4.12",
-			"packageName": "FiftyOne.Pipeline",
+			"packageName": "fiftyone_devicedetection",
+			"versionVariableName": "deviceDetectionVersion",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
-				"caching-dotnet"
-			]
-		},
-		"location-dotnet": {
-		    "version": "4.4.6",
-			"packageName": "FiftyOne.Geolocation",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"common-dotnet",
-				"pipeline-dotnet",
-				"device-detection-dotnet"
-			]
-		},
-		"device-detection-dotnet": {
-			"version": "4.4.18",
-			"packageName": "FiftyOne.DeviceDetection",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"device-detection-cxx",
-				"caching-dotnet",
-				"common-dotnet",
-				"pipeline-dotnet"
-			]
-		},
-		"entitlement-dotnet": {
-			"version": "4.4.2",
-			"isLeaf": false,
-			"dependencies": [
-				"common-ci",
-				"common-dotnet",
-				"license-dotnet",
-				"pipeline-dotnet"
-			]
-		},
-		"internal-engines-dotnet": {
-			"version": "4.4.4",
-			"packageName": "FiftyOne.GeoLocation.OnPremise",
-			"isLeaf": false,			
-			"dependencies": [
-				"common-ci",
-				"common-dotnet",
-				"pipeline-dotnet",
-				"device-detection-dotnet",
-				"location-dotnet"
+				"pipeline-python"
 			]
 		}
 	},
