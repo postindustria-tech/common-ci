@@ -1,15 +1,70 @@
 {
 	"repositories": {
 		"common-ci": {
-			"version": "4.4.43",
+			"version": "4.4.44",
 			"isLeaf": true
 		},
-		"device-detection-dotnet": {
-			"version": "4.4.19",
-			"packageName": "FiftyOne.DeviceDetection",
+		"caching-dotnet": {
+			"version": "4.4.3",
+			"packageName": "FiftyOne.Caching",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci"
+			]
+		},
+		"pipeline-dotnet": {
+			"version": "4.4.13",
+			"packageName": "FiftyOne.Pipeline",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"caching-dotnet"
+			]
+		},
+		"device-detection-dotnet": {
+			"version": "4.4.20",
+			"packageName": "FiftyOne.DeviceDetection",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"device-detection-cxx",
+				"caching-dotnet",
+				"common-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"location-dotnet": {
+		    "version": "4.4.7",
+			"packageName": "FiftyOne.Geolocation",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet",
+				"device-detection-dotnet"
+			]
+		},
+		"entitlement-dotnet": {
+			"version": "4.4.3",
+			"isLeaf": false,
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"license-dotnet",
+				"pipeline-dotnet"
+			]
+		},
+		"internal-engines-dotnet": {
+			"version": "4.4.5",
+			"packageName": "FiftyOne.GeoLocation.OnPremise",
+			"isLeaf": false,			
+			"dependencies": [
+				"common-ci",
+				"common-dotnet",
+				"pipeline-dotnet",
+				"device-detection-dotnet",
+				"location-dotnet"
 			]
 		}
 	},
