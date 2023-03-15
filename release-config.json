@@ -11,7 +11,7 @@
 			"dependencies": [
 				"common-ci"
 			]
-		},
+		}
 	},
 	"approvalRequired": false
 }
