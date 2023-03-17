@@ -18,7 +18,6 @@
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
 				"caching-dotnet"
 			]
 		},
@@ -28,20 +27,17 @@
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
 				"pipeline-dotnet",
 				"device-detection-dotnet"
 			]
 		},
 		"device-detection-dotnet": {
-			"version": "4.4.21",
+			"version": "4.4.22",
 			"packageName": "FiftyOne.DeviceDetection",
 			"isLeaf": false,
 			"dependencies": [
 				"common-ci",
-				"device-detection-cxx",
 				"caching-dotnet",
-				"common-dotnet",
 				"pipeline-dotnet"
 			]
 		},
@@ -51,7 +47,6 @@
 			"isLeaf": false,			
 			"dependencies": [
 				"common-ci",
-				"common-dotnet",
 				"pipeline-dotnet",
 				"device-detection-dotnet",
 				"location-dotnet"
