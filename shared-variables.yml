@@ -2,6 +2,6 @@ variables:
 - name: windowsImage
   value: 'windows-2019'
 - name: linuxImage
-  value: 'ubuntu-20.04'
+  value: 'ubuntu-22.04'
 - name: macImage
   value: 'macOS-11'
