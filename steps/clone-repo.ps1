@@ -1,29 +1,36 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [Parameter(Mandatory=$true)]
     [string]$Branch
 )
+. ../constants.ps1
 
-$Url = "https://github.com/51degrees/$RepoName"
+$Url = "$BaseGitUrl$RepoName"
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
 Write-Output "Cloning '$Url'"
 git clone $Url
 
-Write-Output "Entering '$RepoPath'"
-Push-Location $RepoPath
+if ($null -ne $Branch) {
 
-$branches = $(git branch -a --format "%(refname)")
+    Write-Output "Entering '$RepoPath'"
+    Push-Location $RepoPath
+    $branches = $(git branch -a --format "%(refname)")
 
-if ($branches.Contains("refs/remotes/$Branch")) {
-    Write-Output "Checking out branch '$Branch'"
-    git checkout $Branch
+    if ($branches.Contains("refs/remotes/$Branch")) {
+
+        Write-Output "Checking out branch '$Branch'"
+        git checkout $Branch
+
+    }
+    else {
+
+        Write-Output "Creating new branch '$Branch'"
+        git checkout -b $Branch
+
+    }
+
+    Write-Output "Leaving '$RepoPath'"
+    Pop-Location
+
 }
-else {
-    Write-Output "Creating new branch '$Branch'"
-    git checkout -b $Branch
-}
-
-Write-Output "Leaving '$RepoPath'"
-Pop-Location

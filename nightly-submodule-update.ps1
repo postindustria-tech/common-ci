@@ -4,7 +4,9 @@ param (
     [string]$RepoName
 )
 
-$BranchName = "nightly-submodule-update"
+. ./constants.ps1
+
+$BranchName = $SubModuleUpdateBranch
 
 ./steps/clone-repo.ps1 -RepoName $RepoName -Branch $BranchName
 
