@@ -383,3 +383,11 @@ Parameters
 Implementations
 
 -   update-tags.ps1
+
+# Prerequisites
+
+To run these PowerShell scripts, either locally, or in a CI/CD pipeline, the following prerequisites must be set up.
+
+- [Git CLI](https://git-scm.com/downloads)
+- [Hub CLI](https://hub.github.com/)
+- `GITHUB_TOKEN` environment variable (this is automatically set if using GitHub actions)
