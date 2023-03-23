@@ -14,23 +14,30 @@ param (
 
 ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "fetch-assets.ps1"
 
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Result Result
+# TODO for now we are assuming the file exists. This needs to be defined in docs.
+$OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
 
-if ($Result -eq $True) {
+foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
 
-    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-unit-tests.ps1" -Result Result
+    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Result Result -Options $Options
 
-}
+    if ($Result -eq $True) {
 
-if ($Result -eq $True) {
+        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-unit-tests.ps1" -Result Result -Options $Options
 
-    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Result Result
+    }
 
-}
+    if ($Result -eq $True) {
 
-if ($Result -eq $True) {
+        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Result Result -Options $Options
 
-    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-performance-tests.ps1" -Result Result
+    }
+
+    if ($Result -eq $True) {
+
+        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-performance-tests.ps1" -Result Result -Options $Options
+
+    }
 
 }
 

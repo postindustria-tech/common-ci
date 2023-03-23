@@ -6,7 +6,8 @@ param(
     # TODO add arch
     [string]$ProjectDir = ".",
     [Parameter(Mandatory=$true)]
-    [string]$ResultName
+    [string]$ResultName,
+    $Options
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -16,7 +17,9 @@ Push-Location $RepoPath
 
 try {
 
-    dotnet build -c $Configuration $ProjectDir
+    ## TODO output is no longer correct
+    Write-Output "Building core $Configuration"
+    dotnet build $Options $ProjectDir
 
 }
 finally {

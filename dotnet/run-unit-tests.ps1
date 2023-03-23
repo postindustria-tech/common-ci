@@ -6,7 +6,8 @@ param(
     [string]$Arch,
     [string]$ProjectDir = ".",
     [Parameter(Mandatory=$true)]
-    [string]$ResultName
+    [string]$ResultName,
+    $Options
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -16,17 +17,9 @@ Push-Location $RepoPath
 
 try {
 
-    $TestArgs = "-c", $Configuration, $ProjectDir, "-r", "output", "--blame-crash"
-    if ("" -ne $Arch) {
+    $TestArgs = $ProjectDir, "-r", "output", "--blame-crash", "-l", "trx"
 
-        $TestArgs += "-l", "trx;LogFileName=TestResults-$Configuration-$Arch.trx", "--arch", $Arch
-
-    }
-    else {
-
-        $TestArgs += "-l", "trx;LogFileName=TestResults-$Configuration.trx"
-
-    }
+    $TestArgs += $Options
     
     dotnet test $TestArgs
 
