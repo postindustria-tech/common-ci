@@ -2,24 +2,18 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$ScriptName
+    [string]$ScriptName,
+    [string]$ResultName
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
-Write-Output "Entering '$RepoPath'"
-Push-Location $RepoPath
+$BuildScript = [IO.Path]::Combine($RepoPath, "ci", $ScriptName)
 
-try {
+Write-Output "Running script '$BuildScript'"
+# TODO Check if the script accepts results param and exists
+. $BuildScript -ResultName $ResultName
 
-    $BuildScript = [IO.Path]::Combine($RepoPath, "ci", $ScriptName)
-
-    . $BuildScript
-    
-}
-finally {
-
-    Write-Output "Leaving '$RepoPath'"
-    Pop-Location
-
-}
+Write-Output "Setting '`$$ResultName'"
+$InnerResult = Get-Variable -Name $ResultName
+Set-Variable -Name $ResultName -Value $InnerResult -Scope 1
