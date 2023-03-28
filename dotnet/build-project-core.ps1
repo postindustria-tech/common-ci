@@ -2,11 +2,7 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$Configuration = "Release",
-    # TODO add arch
     [string]$ProjectDir = ".",
-    [Parameter(Mandatory=$true)]
-    [string]$ResultName,
     $Options
 )
 
@@ -17,17 +13,19 @@ Push-Location $RepoPath
 
 try {
 
-    ## TODO output is no longer correct
-    Write-Output "Building core $Configuration"
-    dotnet build $Options $ProjectDir
+    Write-Output "Building $($Options.Name)"
+    $BuildArgs = @()
+    if ($Null -ne $Options.Configuration) {
+        $BuildArgs += "-c", $Options.Configuration
+    }
+    dotnet build $BuildArgs $ProjectDir
 
 }
 finally {
 
-    Write-Output "Setting '`$$ResultName'"
-    Set-Variable -Name $ResultName -Value $(0 -eq $LASTEXITCODE) -Scope 1
-    
     Write-Output "Leaving '$RepoPath'"
     Pop-Location
 
 }
+
+exit $LASTEXITCODE

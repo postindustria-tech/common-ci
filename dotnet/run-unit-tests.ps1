@@ -2,11 +2,7 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$Configuration = "Release",
-    [string]$Arch,
     [string]$ProjectDir = ".",
-    [Parameter(Mandatory=$true)]
-    [string]$ResultName,
     $Options
 )
 
@@ -17,20 +13,25 @@ Push-Location $RepoPath
 
 try {
 
-    $TestArgs = $ProjectDir, "-r", "output", "--blame-crash", "-l", "trx"
+    Write-Output "Testing $($Options.Name)"
 
-    $TestArgs += $Options
+    $TestArgs = $ProjectDir, "-r", "output", "--blame-crash", "-l", "trx;logfilename=$($Options.Name).trx"
+
+    if ($Null -ne $Options.Configuration) {
+        $TestArgs += "-c", $Options.Configuration
+    }
+    if ($Null -ne $Options.Arch) {
+        $TestArgs += "-a", $Options.Arch
+    }
     
     dotnet test $TestArgs
 
 }
 finally {
 
-    Write-Output "Setting '`$$ResultName'"
-    Set-Variable -Name $ResultName -Value $(0 -eq $LASTEXITCODE) -Scope 1
-
     Write-Output "Leaving '$RepoPath'"
     Pop-Location
 
 }
 
+exit $LASTEXITCODE
