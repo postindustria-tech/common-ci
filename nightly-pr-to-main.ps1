@@ -17,6 +17,8 @@ param (
 # TODO for now we are assuming the file exists. This needs to be defined in docs.
 $OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
 
+$Success = $True;
+
 foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
 
     ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Options $Options
@@ -39,9 +41,11 @@ foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
 
     }
 
+    $Success = $Success -and $($LASTEXITCODE -eq 0)
+
 }
 
-if ($LASTEXITCODE -eq 0) {
+if ($Success) {
 
     ./steps/approve-pr.ps1 -RepoName $RepoName -PullRequestId $PullRequestId
     
