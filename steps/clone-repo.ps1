@@ -21,7 +21,7 @@ if ("" -ne $Branch) {
 
         $branches = $(git branch -a --format "%(refname)")
 
-        if ($branches.Contains("refs/remotes/$Branch")) {
+        if ($branches.Contains("refs/remotes/origin/$Branch")) {
 
             Write-Output "Checking out branch '$Branch'"
             git checkout $Branch

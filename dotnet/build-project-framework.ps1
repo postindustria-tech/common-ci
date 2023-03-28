@@ -20,11 +20,10 @@ try {
 
 }
 finally {
-
-    Write-Output "Setting '`$$ResultName'"
-    Set-Variable -Name $ResultName -Value $(0 -eq $LASTEXITCODE) -Scope 1
-    
+   
     Write-Output "Leaving '$RepoPath'"
     Pop-Location
 
 }
+
+exit $LASTEXITCODE

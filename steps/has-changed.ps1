@@ -1,9 +1,7 @@
 
 param (
     [Parameter(Mandatory=$true)]
-    [string]$RepoName,
-    [Parameter(Mandatory=$true)]
-    [string]$ResultName
+    [string]$RepoName
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -21,8 +19,12 @@ try {
         Write-Output "`t$change"
     }
 
-    Write-Output "Setting '`$$ResultName'"
-    Set-Variable -Name $ResultName -Value $changes.count > 0 -Scope 1
+    if ($changes.count -gt 0) {
+        exit 0
+    }
+    else {
+        exit 1
+    }
 
 }
 finally {
