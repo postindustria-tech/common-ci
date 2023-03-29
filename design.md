@@ -72,7 +72,7 @@ Details of the steps can be found in [Readme](./README.md)
 | `package-dependency-update.ps1` |
 | `options.json` |
 
-*NOTE: these files in the table above MUST exist in the repository the workflow is run against, as they are called by the workflow. If a step is not relevant for a repository, then the file should do nothing and return an zero exit code.
+*NOTE: these files in the table above MUST exist in the repository the workflow is run against, as they are called by the workflow. If a step is not relevant for a repository, then the file should do nothing and return an zero exit code.*
 
 ### Passing Variables
 
