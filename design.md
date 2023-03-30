@@ -23,13 +23,18 @@ Details of the steps can be found in [Readme](./README.md)
 | root scripts |
 | ------------ |
 | `nightly-submodule-update.ps1` |
-| `nightly-submodule-update.yml` |
 | `nightly-package-update.ps1` |
-| `nightly-package-update.yml` |
 | `nightly-pr-to-main.ps1` |
-| `nightly-pr-to-main.yml` |
 | `nightly-package-publish.ps1` |
+
+| scripts in `.github/workflows` |
+| ------------------------------ |
+| `nightly-submodule-update.yml` |
+| `nightly-package-update.yml` |
+| `nightly-pr-to-main.yml` |
 | `nightly-package-publish.yml` |
+
+*NOTE: The scripts above are duplications of the root workflow scripts. The PowerShell scripts can be run locally, the YAML scripts are run on GitHub.*
 
 | scripts in `steps` |
 | ------------------ |
