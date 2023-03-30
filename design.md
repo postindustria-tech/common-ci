@@ -12,6 +12,8 @@ Workflows mainly focus on the order of steps, and the actual work is done by ind
 Workflows are implemented in both PowerShell, and GitHub Actions.
 A table of workflows can be found in [Readme](./README.md).
 
+Workflows contained in this repository are reused by all 51Degrees repositories to avoid repetition. See [reusing workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows).
+
 ### Steps
 
 Steps are the scripts called by workflows. Almost exclusively implemented in PowerShell. The only
