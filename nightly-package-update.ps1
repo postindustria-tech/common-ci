@@ -10,21 +10,21 @@ $BranchName = $SubModuleUpdateBranch
 
 ./steps/clone-repo.ps1 -RepoName $RepoName -Branch $BranchName
 
-./steps/update-sub-modules.ps1 -RepoName $RepoName
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "package-dependency-update.ps1"
 
 ./steps/has-changed.ps1 -RepoName $RepoName
 
 if ($LASTEXITCODE -eq 0) {
     
-    ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated submodules."
+    ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated packages."
 
     ./steps/push-changes.ps1 -RepoName $RepoName -Branch $BranchName
 
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated submodule."
-
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages."
+    
 }
 else {
 
-    Write-Host "No submodule changes, so not creating a pull request."
-    
+    Write-Host "No package changes, so not creating a pull request."
+
 }

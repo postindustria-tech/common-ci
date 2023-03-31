@@ -47,6 +47,6 @@ foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
 
 if ($Success) {
 
-    ./steps/approve-pr.ps1 -RepoName $RepoName -PullRequestId $PullRequestId
-    
+     ./steps/merge-pr.ps1 -RepoName $RepoName -PullRequestId $PullRequestId   
+
 }
