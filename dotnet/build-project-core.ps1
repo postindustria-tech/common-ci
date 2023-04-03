@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$ProjectDir = ".",
-    $Options
+    [string]$Name = "Release_x64",
+    [string]$Configuration = "Release"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -13,12 +14,8 @@ Push-Location $RepoPath
 
 try {
 
-    Write-Output "Building $($Options.Name)"
-    $BuildArgs = @()
-    if ($Null -ne $Options.Configuration) {
-        $BuildArgs += "-c", $Options.Configuration
-    }
-    dotnet build $BuildArgs $ProjectDir
+    Write-Output "Building '$Name'"
+    dotnet build -c $Configuration $ProjectDir
 
 }
 finally {
