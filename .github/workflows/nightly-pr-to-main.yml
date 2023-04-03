@@ -73,12 +73,10 @@ jobs:
     steps:
      - env:
          OUTPUT1: ${{ needs.configure.outputs.options }}
-         OUTPUT2: ${{ fromJSON(needs.configure.outputs.options) }}
        name: test
        shell: pwsh
        run: |
          Write-Output $OUTPUT1
-         Write-Output $OUTPUT2
 
   build-and-test:
     runs-on: ubuntu-latest
