@@ -1,0 +1,72 @@
+name: Nightly Submodule Update
+
+on:
+  workflow_call:
+    inputs:
+        repo-name:
+          required: true
+          type: string
+      
+jobs:
+  nightly-submodule-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
+          
+      - name: Checkout reusable workflow dir
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+        
+      - name: Configure Git
+        run: |
+          git config --global url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
+          git config --global user.email "CI@51Degrees.com"
+          git config --global user.name "51DCI"
+
+      
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }} -Branch $SubModuleUpdateBranch
+      
+      - name: Update Sub Modules
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/update-sub-modules.ps1 -RepoName ${{ inputs.repo-name }}
+
+      - name: Check for Changes
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/has-changed.ps1 -RepoName ${{ inputs.repo-name }}
+
+      - name: Commit Changes
+        if: ${{ success() }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/commit-changes.ps1 -RepoName ${{ inputs.repo-name }} -Message "REF: Updated submodules."
+
+      - name: Push Changes
+        if: ${{ success() }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/push-changes.ps1 -RepoName ${{ inputs.repo-name}} -Branch $SubModuleUpdateBranch
+
+      - name: Create Pull Request
+        if: ${{ success() }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/pull-request-to-main.ps1 -RepoName ${{ inputs.repo-name }} -Message "Updated submodule."
