@@ -63,7 +63,8 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
-          $Options = Get-Content $OptionsFile -Raw -replace "`r`n",  "" -replace "`n", ""
+          $Options = Get-Content $OptionsFile -Raw
+          $Options = $Options -replace "`r`n",  "" -replace "`n", ""
           Write-Host $Options
           echo "options=$Options" >> $GITHUB_OUTPUT
 
