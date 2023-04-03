@@ -6,7 +6,10 @@ on:
         repo-name:
           required: true
           type: string
-      
+    secrets:
+      token:
+        required: true
+
 jobs:
   nightly-submodule-update:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
         
       - name: Configure Git
         run: |
-          git config --global url.https://${{ secrets.GITHUB_TOKEN }}@github.com/.insteadOf https://github.com/
+          git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
           git config --global user.email "CI@51Degrees.com"
           git config --global user.name "51DCI"
 
