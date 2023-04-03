@@ -9,9 +9,6 @@ on:
         pull-request-id:
           required: true
           type: number
-        options:
-          required: true
-          type: string
     secrets:
       token:
         required: true
