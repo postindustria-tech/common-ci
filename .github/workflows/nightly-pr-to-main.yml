@@ -79,28 +79,28 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-project.ps1" -Options $(ConvertFrom-Json '${{ matrix.options }}')
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-project.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ matrix.options }}')
 
       - name: Run Unit Tests
         if: ${{ success() }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-unit-tests.ps1" -Options $(ConvertFrom-Json '${{ matrix.options }}')
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-unit-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ matrix.options }}')
 
       - name: Run Integration Tests
         if: ${{ success() }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $(ConvertFrom-Json '${{ matrix.options }}')
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ matrix.options }}')
           
       - name: Run Performance Tests
         if: ${{ success() }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json '${{ matrix.options }}')
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ matrix.options }}')
           
   complete:      
     runs-on: ubuntu-latest
