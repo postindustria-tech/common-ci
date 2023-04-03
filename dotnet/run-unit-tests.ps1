@@ -4,7 +4,8 @@ param(
     [string]$RepoName,
     [string]$ProjectDir = ".",
     [string]$Name = "Release_x64",
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [string]$Arch = "x64"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
