@@ -62,7 +62,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $OptionsFile = [IO.Path]::Combine($pwd, ${{ inputs.repo-name }}, "ci", "options.json")
+          $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
           $Options = Get-Content $OptionsFile
           echo "options='$Options'" >> $GITHUB_OUTPUT
 
