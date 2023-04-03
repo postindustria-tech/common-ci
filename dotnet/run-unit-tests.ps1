@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$ProjectDir = ".",
-    $Options
+    [string]$Name = "Release_x64",
+    [string]$Configuration = "Release"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -14,17 +15,8 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Testing $($Options.Name)"
-
-    $TestArgs = $ProjectDir, "-r", "output", "--blame-crash", "-l", "trx;logfilename=$($Options.Name).trx"
-
-    if ($Null -ne $Options.Configuration) {
-        $TestArgs += "-c", $Options.Configuration
-    }
-    if ($Null -ne $Options.Arch) {
-        $TestArgs += "-a", $Options.Arch
-    }
     
-    dotnet test $TestArgs
+    dotnet test $ProjectDir -r output --blame-crash -l "trx;logfilename=$Name.trx" -c $Configuration -a $Arch
 
 }
 finally {

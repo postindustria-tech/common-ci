@@ -19,7 +19,7 @@ $OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
 
 $Success = $True;
 
-foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
+foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json -AsHashtable)) {
 
     ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Options $Options
 
