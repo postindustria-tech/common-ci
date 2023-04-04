@@ -17,7 +17,7 @@ try {
 
     Write-Output "Testing $($Options.Name)"
     
-    dotnet test $ProjectDir --no-build --results-directory test-results --blame-crash -l "trx;LogFilePrefix=$Name" -c $Configuration -a $Arch
+    dotnet test $ProjectDir --no-build --no-restore --blame-crash -l "trx;logfilename=TestResults_$Name.trx" -c $Configuration -a $Arch
 
 }
 finally {
