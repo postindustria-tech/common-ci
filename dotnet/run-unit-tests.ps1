@@ -17,7 +17,7 @@ try {
 
     Write-Output "Testing $($Options.Name)"
     
-    dotnet test $ProjectDir --no-build --no-restore --results-directory "test-results/unit/$Name" --filter "FullyQualifiedName!~Performance&FullyQualifiedName!~Integration" --blame-crash -l "trx" -c $Configuration -a $Arch
+    dotnet test $ProjectDir --results-directory "test-results/unit/$Name"--filter "FullyQualifiedName!~Performance&FullyQualifiedName!~Integration" --blame-crash -l "trx" -c $Configuration -a $Arch
 
 }
 finally {
