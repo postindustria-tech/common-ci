@@ -60,7 +60,7 @@ jobs:
           $Options = Get-Content $OptionsFile -Raw
           $Options = $Options -replace "`r`n", "" -replace "`n", ""
           Write-Host $Options
-          echo "options=$Options" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo options=$Options | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 
   build-and-test:
     runs-on: ubuntu-latest
