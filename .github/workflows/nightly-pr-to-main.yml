@@ -135,13 +135,15 @@ jobs:
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action@v2.6.1
         if: always()
         with:
           files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/*/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/*/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/*/*.json
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.xml
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.trx
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.json
+            
+      
 
   complete:      
     runs-on: ubuntu-latest
