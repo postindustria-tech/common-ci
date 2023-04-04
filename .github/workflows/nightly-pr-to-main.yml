@@ -139,9 +139,9 @@ jobs:
         if: always()
         with:
           files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.json
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/*/*.xml
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/*/*.trx
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/*/*.json
 
   complete:      
     runs-on: ubuntu-latest
