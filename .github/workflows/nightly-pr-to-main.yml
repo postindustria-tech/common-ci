@@ -134,21 +134,16 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
 
-      - name: List Files
-        if: always()
-        shell: pwsh
-        run: |
-          ls ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults
-          ls ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**
-          
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2.6.1
         if: always()
         with:
+          # Workspace is moved to '/github/workspace' in this task, but replacement only works on the first.
+          # So here we use the known prefix.
           files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/TestResults/**/*.json
+            /github/workspace/common/${{ inputs.repo-name }}/TestResults/**/*.trx
+            /github/workspace/common/${{ inputs.repo-name }}/TestResults/**/*.xml
+            /github/workspace/common/${{ inputs.repo-name }}/TestResults/**/*.json
             
       
 
