@@ -21,10 +21,8 @@ jobs:
     outputs:
       options: ${{ steps.get_options.outputs.options }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-        
-      - name: Checkout reusable workflow dir
+    
+      - name: Checkout Common
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
@@ -71,16 +69,14 @@ jobs:
     runs-on: ${{ matrix.options.image }}
     
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-        
-      - name: Checkout reusable workflow dir
+
+      - name: Checkout Common
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
           ref: gh-refact
           path: common
-        
+
       - name: Configure Git
         run: |
           git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
@@ -171,6 +167,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-test
     steps:
+
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+
       - name: Merge Pull Request
         if: ${{ success() }}
         shell: pwsh
