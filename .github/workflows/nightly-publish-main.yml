@@ -46,7 +46,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . $${{ github.workspace }}/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
+          . ${{ github.workspace }}/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
           echo version=$Version | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Package Update Required
