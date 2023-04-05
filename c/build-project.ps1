@@ -34,13 +34,14 @@ if ($BuildMethod -eq "cmake") {
 elseif ($BuildMethod -eq "msbuild") {
 
     $RepoPath = [IO.Path]::Combine($pwd, $RepoName, $ProjectDir)
-    
+
     Write-Output "Entering '$RepoPath'"
     Push-Location $RepoPath
     
     try {
 
-        msbuild $ProjectDir /p:Configuration=$Configuration /property:Platform=$Arch
+        nuget restore
+        msbuild /p:Configuration=$Configuration /p:Platform=$Arch /p:OutDir=$RepoPath\build
 
     }
     finally {
