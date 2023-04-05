@@ -46,7 +46,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
           echo version=$Version | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Package Update Required
@@ -54,7 +54,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          ./steps/package-update-required.ps1 -RepoName $RepoName -Version ${{ steps.get_next_version.outputs.version }}
+          . ${{ github.workspace }}/common/steps/package-update-required.ps1 -RepoName $RepoName -Version ${{ steps.get_next_version.outputs.version }}
           if ($LASTEXITCODE -eq 0) {
             echo update_required=true | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           } else {
@@ -166,12 +166,12 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "publish-package.ps1" -Options @{Version = ${{ needs.configure.outputs.version }} }
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "publish-package.ps1" -Options @{Version = ${{ needs.configure.outputs.version }} }
 
       - name: Update Tag
         if: ${{ success() }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/steps/update-tag.ps1 -RepoName ${{ inputs.repo-name }} -Tag ${{ needs.configure.outputs.version }}
+          . ${{ github.workspace }}/common/steps/update-tag.ps1 -RepoName ${{ inputs.repo-name }} -Tag ${{ needs.configure.outputs.version }}
 
