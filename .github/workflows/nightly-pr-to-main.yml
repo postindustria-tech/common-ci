@@ -108,7 +108,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -AssetKeys $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
           
       - name: Build Project
         id: build
