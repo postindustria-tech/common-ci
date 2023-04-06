@@ -6,11 +6,8 @@ param (
     [string]$LicenseKey
 )
 
+$CommonPath = $pwd
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
-
-Write-Output "Adding data file module"
-$Env:PSModulePath += ";$([IO.Path]::Combine($pwd, 'scripts', 'modules'))"
-Write-Output "Module Path: $($Env:PSModulePath)"
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
@@ -20,7 +17,7 @@ try {
     $FileName = [IO.Path]::Combine($pwd, "TAC-HashV41.hash.gz")
     
     Write-Output "Downloading Hash data file"
-    $Result = $(Get-DataFile -licenseKey $LicenseKey -dataType "HashV41" -product "V4TAC" -fullFilePath $FileName)
+    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "HashV41" -product "V4TAC" -fullFilePath $FileName)
 
     if ($Result -eq $False) {
 
@@ -30,7 +27,7 @@ try {
     }
 
     Write-Output "Extracting $FileName"
-    Gunzip -Source $FileName
+    & $CommonPath\steps\unzip-file.ps1 -Source $FileName
     
 }
 finally {
