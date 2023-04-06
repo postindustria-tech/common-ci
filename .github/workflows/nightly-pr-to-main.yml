@@ -102,6 +102,12 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1"
 
+      - name: Setup Environment
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+
       - name: Build Project
         id: build
         if: ${{ success() }}
