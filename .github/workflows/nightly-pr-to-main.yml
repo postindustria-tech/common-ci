@@ -12,6 +12,8 @@ on:
     secrets:
       token:
         required: true
+      asset-keys:
+        required: false
 env:
   GITHUB_TOKEN: ${{ secrets.token }}
 
@@ -99,8 +101,6 @@ jobs:
       - name: Setup Environment
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
-        env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
                       
@@ -108,7 +108,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1"
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -AssetKeys $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
           
       - name: Build Project
         id: build
