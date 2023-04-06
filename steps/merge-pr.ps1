@@ -16,7 +16,7 @@ try {
 
     $PrTitle = $(hub pr show 1 -f "%i %H->%B : '%t'")
 
-    $Pr = hub api /repos/51degrees/common-cxx-test/pulls/$PullRequestId | ConvertFrom-Json
+    $Pr = hub api /repos/51degrees/$RepoName/pulls/$PullRequestId | ConvertFrom-Json
 
     if ($Pr.author_association -eq 'OWNER' ||
         $Pr.author_association -eq 'COLLABORATOR' ||
