@@ -14,18 +14,18 @@ Push-Location $RepoPath
 
 try {
 
-    $PrTitle = $(hub pr show 1 -f "%i %H->%B : '%t'")
+    $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     $Pr = hub api /repos/51degrees/$RepoName/pulls/$PullRequestId | ConvertFrom-Json
 
-    if ($Pr.author_association -eq 'OWNER' ||
-        $Pr.author_association -eq 'COLLABORATOR' ||
-        $Pr.author_association -eq 'CONTRIBUTOR' ||
+    if ($Pr.author_association -eq 'OWNER' -or
+        $Pr.author_association -eq 'COLLABORATOR' -or
+        $Pr.author_association -eq 'CONTRIBUTOR' -or
         $Pr.author_association -eq 'MEMBER')
     {
 
         Write-Output "Merging PR $PrTitle"
-        hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PullRequestId'"
+        hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"
     
     }
     else {
