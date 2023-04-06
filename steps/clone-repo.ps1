@@ -33,6 +33,9 @@ if ("" -ne $Branch) {
             git checkout -b $Branch
 
         }
+        
+        Write-Output "Checking out submodules"
+        git submodule update --init --recursive
 
     }
     finally {
