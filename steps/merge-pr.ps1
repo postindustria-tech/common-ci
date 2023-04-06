@@ -25,7 +25,7 @@ try {
     {
 
         Write-Output "Merging PR $PrTitle"
-        hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PullRequestId'"
+        hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"
     
     }
     else {
