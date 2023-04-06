@@ -14,7 +14,7 @@ Push-Location $RepoPath
 
 try {
 
-    $PrTitle = $(hub pr show 1 -f "%i %H->%B : '%t'")
+    $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     $Pr = hub api /repos/51degrees/$RepoName/pulls/$PullRequestId | ConvertFrom-Json
 
