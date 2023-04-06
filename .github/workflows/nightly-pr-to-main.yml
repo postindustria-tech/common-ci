@@ -105,6 +105,8 @@ jobs:
       - name: Setup Environment
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
             
