@@ -18,9 +18,9 @@ try {
 
     $Pr = hub api /repos/51degrees/$RepoName/pulls/$PullRequestId | ConvertFrom-Json
 
-    if ($Pr.author_association -eq 'OWNER' ||
-        $Pr.author_association -eq 'COLLABORATOR' ||
-        $Pr.author_association -eq 'CONTRIBUTOR' ||
+    if ($Pr.author_association -eq 'OWNER' -or
+        $Pr.author_association -eq 'COLLABORATOR' -or
+        $Pr.author_association -eq 'CONTRIBUTOR' -or
         $Pr.author_association -eq 'MEMBER')
     {
 
