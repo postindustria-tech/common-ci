@@ -16,8 +16,23 @@ try {
 
     $PrTitle = $(hub pr show 1 -f "%i %H->%B : '%t'")
 
-    Write-Output "Merging PR $PrTitle"
-    hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PullRequestId'"
+    $Pr = hub api /repos/51degrees/common-cxx-test/pulls/$PullRequestId | ConvertFrom-Json
+
+    if ($Pr.author_association -eq 'OWNER' ||
+        $Pr.author_association -eq 'COLLABORATOR' ||
+        $Pr.author_association -eq 'CONTRIBUTOR' ||
+        $Pr.author_association -eq 'MEMBER')
+    {
+
+        Write-Output "Merging PR $PrTitle"
+        hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PullRequestId'"
+    
+    }
+    else {
+
+        Write-Output "PR creator '$($Pr.user.login)' not permitted. Not merging PR $PrTitle"
+
+    }
 
 }
 finally {
