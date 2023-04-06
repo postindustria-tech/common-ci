@@ -98,18 +98,18 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
 
-      - name: Setup Environment
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-                      
       - name: Fetch Assets
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
           
+      - name: Setup Environment
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+                      
       - name: Build Project
         id: build
         if: ${{ success() }}
