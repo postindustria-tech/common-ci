@@ -12,12 +12,13 @@ $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 Write-Output "Cloning '$Url'"
 git clone $Url
 
-if ("" -ne $Branch) {
 
-    Write-Output "Entering '$RepoPath'"
-    Push-Location $RepoPath
+Write-Output "Entering '$RepoPath'"
+Push-Location $RepoPath
 
-    try {
+try {
+    
+    if ("" -ne $Branch) {
 
         $branches = $(git branch -a --format "%(refname)")
 
@@ -33,15 +34,15 @@ if ("" -ne $Branch) {
             git checkout -b $Branch
 
         }
-        
-        Write-Output "Checking out submodules"
-        git submodule update --init --recursive
-
     }
-    finally {
-        
-        Write-Output "Leaving '$RepoPath'"
-        Pop-Location
+    
+    Write-Output "Checking out submodules"
+    git submodule update --init --recursive
 
-    }
+}
+finally {
+    
+    Write-Output "Leaving '$RepoPath'"
+    Pop-Location
+
 }
