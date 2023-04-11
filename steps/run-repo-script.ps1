@@ -16,11 +16,17 @@ $Parameters = @{}
 
 foreach ($Option in $Options.GetEnumerator()) {
     if ($ScriptParameters.ContainsKey($Option.Key)) {
+        Write-Output "Adding parameter '$($Option.Key)'"
         $Parameters.Add($Option.Key, $Option.Value)
     }
 }
 
-Write-Output "Running script '$Script' with parameters: $Parameters"
+if ($ScriptParameters.ContainsKey("RepoName")) {
+    Write-Output "Adding parameter RepoName"
+    $Parameters.Add("RepoName", $RepoName)
+}
+
+Write-Output "Running script '$Script'."
 
 . $Script @Parameters
 
