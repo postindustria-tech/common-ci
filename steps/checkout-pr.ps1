@@ -19,6 +19,8 @@ try {
     Write-Output "Checking out PR $PrTitle"
     hub pr checkout $PullRequestId
 
+    git submodule update --init --recursive
+
 }
 finally {
 
