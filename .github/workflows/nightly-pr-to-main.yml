@@ -173,7 +173,7 @@ jobs:
       - name: Upload Performance Results Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: performance_results
+          name: performance_results_${{ str(inputs.pull-request-id) }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
             
@@ -208,3 +208,18 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/merge-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
+          
+      - name: Download a Build Artifact
+        if: ${{ success() }}
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: performance_results_${{ str(inputs.pull-request-id) }}
+          path: ${{ github.workspace }}/common
+          
+      - name: Upload Performance Results Artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: performance_results_passed_${{ str(inputs.pull-request-id) }}
+          path: ${{ github.workspace }}/common/performance_results_${{ str(inputs.pull-request-id) }}.zip
+          if-no-files-found: ignore
