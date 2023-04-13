@@ -173,7 +173,7 @@ jobs:
       - name: Upload Performance Results Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: poerformance_results
+          name: performance_results
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
             
