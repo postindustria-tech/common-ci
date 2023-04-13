@@ -53,6 +53,9 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/has-changed.ps1 -RepoName ${{ inputs.repo-name }}
+          if ($LASTEXITCODE -ne 0) {
+            hub api /repos/51Degrees/${{ inputs.repo-name }}/actions/runs/${{ github.run_id }}/cancel -X POST
+          }
 
       - name: Commit Changes
         if: ${{ success() }}
