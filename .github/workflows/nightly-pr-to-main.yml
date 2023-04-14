@@ -183,7 +183,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-          . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }}
+          . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }} -Path ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_${{ matrix.options.name }}.json
             
   Complete:      
     runs-on: ubuntu-latest
