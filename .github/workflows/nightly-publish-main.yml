@@ -32,6 +32,7 @@ jobs:
         
       - name: Configure Git
         run: |
+          git config --global core.longpaths true
           git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
           git config --global user.email "CI@51Degrees.com"
           git config --global user.name "51DCI"
