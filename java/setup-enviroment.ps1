@@ -17,7 +17,7 @@ try {
     Write-Output "Setting up $JavaSDKEnvVar"
 
     # Set the JAVA_HOME environment variable
-    [Environment]::SetEnvironmentVariable('JAVA_HOME', [Environment]::GetEnvironmentVariable($JavaSDKEnvVar))
+    [Environment]::SetEnvironmentVariable('JAVA_HOME', [Environment]::GetEnvironmentVariable($JavaSDKEnvVar), 'Machine')
 
     # Add the Java binary directory to the system PATH
     $env:Path = "$env:JAVA_HOME/bin;$env:Path"
