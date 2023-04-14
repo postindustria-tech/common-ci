@@ -6,11 +6,12 @@ param (
 
 . ./constants.ps1
 
+$TemporaryRepoName = "b"
 $Url = "$BaseGitUrl$RepoName"
-$RepoPath = [IO.Path]::Combine($pwd, $RepoName)
+$RepoPath = [IO.Path]::Combine($pwd, $TemporaryRepoName)
 
 Write-Output "Cloning '$Url'"
-git clone $Url
+git clone $Url $TemporaryRepoName
 
 
 Write-Output "Entering '$RepoPath'"
@@ -44,5 +45,8 @@ finally {
     
     Write-Output "Leaving '$RepoPath'"
     Pop-Location
+
+    Write-Output "Rename temporary directory"
+    Rename-Item $RepoPath $RepoName
 
 }
