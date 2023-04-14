@@ -181,7 +181,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/compare-performance-results.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }}
+          . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }}
             
   Complete:      
     runs-on: ubuntu-latest
