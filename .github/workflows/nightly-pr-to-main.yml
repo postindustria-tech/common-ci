@@ -180,6 +180,8 @@ jobs:
       - name: Compare Performance Results
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}
         run: |
           . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }}
             
