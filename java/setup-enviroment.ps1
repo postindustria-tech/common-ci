@@ -21,9 +21,14 @@ try {
 
     # Add the Java binary directory to the system PATH
     $env:Path = "$env:JAVA_HOME/bin;$env:Path"
+    
+    # Write the value of the environment variable to the GITHUB_ENV file,
+    # which makes the variable available to all subsequent steps in the job.
+    Write-Output "JAVA_HOME=$env:JAVA_HOME" | Out-File -Encoding utf8 -FilePath $env:GITHUB_ENV -Append
 
     if( $env:RUNNER_OS -eq "Linux" ){
-
+        # Create a symbolic link between the java binary in the JAVA_HOME directory 
+        # and the /usr/bin/java path, which is on the system's PATH.
         sudo ln -sf $env:JAVA_HOME/bin/java /usr/bin/java
     }
 
