@@ -176,18 +176,61 @@ jobs:
           name: performance_results_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
+                
+  Compare-Performance:
+    runs-on: windows-latest
+    needs: [ Configure, Build-and-Test ]
+    strategy:
+      matrix:
+        options: ${{ fromJSON(needs.configure.outputs.options ) }}
+    name: Compare Performance - ${{ matrix.options.name }}
+    steps:
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+
+      - name: Configure Git
+        run: |
+          git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
+          git config --global user.email "CI@51Degrees.com"
+          git config --global user.name "51DCI"
           
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+      
+      - name: Download Performance Artifact
+        if: ${{ success() }}
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: performance_results_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common
+
       - name: Compare Performance Results
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-          . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }} -ResultsPath ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_${{ matrix.options.name }}.json
-            
+          . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }} -ResultsPath ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
+          
+      - name: Upload Successful Performance Results Artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: performance_results_passed_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
+          if-no-files-found: ignore
+
   Complete:      
     runs-on: ubuntu-latest
-    needs: Build-and-Test
+    needs: [ Build-and-Test, Compare-Performance ]
     steps:
 
       - name: Checkout Common
@@ -217,17 +260,3 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/steps/merge-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
           
-      - name: Download a Build Artifact
-        if: ${{ success() }}
-        uses: actions/download-artifact@v2.1.1
-        with:
-          name: performance_results_${{ inputs.pull-request-id }}
-          path: ${{ github.workspace }}/common
-          
-      - name: Upload Performance Results Artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: performance_results_passed_${{ inputs.pull-request-id }}
-          path: ${{ github.workspace }}/common/results_*.json
-          if-no-files-found: ignore
