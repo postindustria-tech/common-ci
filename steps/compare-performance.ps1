@@ -160,6 +160,7 @@ function Generate-Performance-Results {
 
 # Get all the artifactrs
 $Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts  | ConvertFrom-Json).artifacts
+Write-Output $Artifacts
 
 # Get the artifact for the current run
 $CurrentArtifact = $Artifacts | Where-Object { $_.workflow_run.id -eq $RunId -and $_.name -eq "performance_results_$PullRequestId" }
@@ -172,7 +173,6 @@ $Artifacts = $Artifacts | Where-Object { $_.name.StartsWith("performance_results
 # Sort by date
 $Artifacts = $Artifacts | Sort-Object -Property created_at
 
-Write-Output $Artifacts
 
 # Get the performance results from the artifacts
 $Results = @()
