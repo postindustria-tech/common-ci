@@ -17,13 +17,14 @@ try {
     Write-Output "Setting up $JavaSDKEnvVar"
 
     # Set the JAVA_HOME environment variable
-    [Environment]::SetEnvironmentVariable('JAVA_HOME', [Environment]::GetEnvironmentVariable($JavaSDKEnvVar), 'Machine')
+    [Environment]::SetEnvironmentVariable('JAVA_HOME', [Environment]::GetEnvironmentVariable($JavaSDKEnvVar))
 
     # Add the Java binary directory to the system PATH
     $env:Path = "$env:JAVA_HOME/bin;$env:Path"
 
     if( $env:RUNNER_OS -eq "Linux" ){
 
+        echo "JAVA_HOME=$env:JAVA_HOME" | Out-File -Encoding utf8 -FilePath $env:GITHUB_ENV -Append
         sudo ln -sf $env:JAVA_HOME/bin/java /usr/bin/java
     }
 
