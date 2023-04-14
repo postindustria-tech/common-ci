@@ -172,6 +172,8 @@ $Artifacts = $Artifacts | Where-Object { $_.name.StartsWith("performance_results
 # Sort by date
 $Artifacts = $Artifacts | Sort-Object -Property created_at
 
+Write-Output $Artifacts
+
 # Get the performance results from the artifacts
 $Results = @()
 foreach ($Artifact in $Artifacts) {
@@ -186,22 +188,28 @@ if ($CurrentResult -eq 0) {
 }
 
 # Install ScottPlot
-$PlotPath = [IO.Path]::Combine($pwd, "plot")        
-if ($(Test-Path -Path $PlotPath)) {
-    Remove-Item -Recurse -Force -Path $PlotPath
-}
-mkdir $PlotPath
-Push-Location $PlotPath
+$PlotReady = $False
 try {
-    dotnet new console --force
-    dotnet add package scottplot
-    dotnet build -o bin
+    $Plot = [ScottPlot.Plot]::new(400, 300)
+    $PlotReady = $True
+} catch {}
+if ($PlotReady -eq $False) {
+    $PlotPath = [IO.Path]::Combine($pwd, "plot")        
+    if ($(Test-Path -Path $PlotPath)) {
+        Remove-Item -Recurse -Force -Path $PlotPath
+    }
+    mkdir $PlotPath
+    Push-Location $PlotPath
+    try {
+        dotnet new console --force
+        dotnet add package scottplot
+        dotnet build -o bin
+    }
+    finally {
+        Pop-Location
+    }
+    Add-Type -Path $([IO.Path]::Combine($PlotPath, "bin", "ScottPlot.dll"))
 }
-finally {
-    Pop-Location
-}
-Add-Type -Path $([IO.Path]::Combine($PlotPath, "bin", "ScottPlot.dll"))
-
 # Generate the performance results for all metrics
 foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
     $AvailableResults = $Results | Where-Object { $Null -ne $_.HigherIsBetter -and $Null -ne $_.HigherIsBetter[$Metric] }
