@@ -29,10 +29,10 @@ jobs:
           path: common
         
       - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
         run: |
-          git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
-          git config --global user.email "CI@51Degrees.com"
-          git config --global user.name "51DCI"
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
 
       
       - name: Clone Repo
