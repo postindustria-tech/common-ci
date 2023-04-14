@@ -10,7 +10,7 @@ on:
       token:
         required: true
       asset-keys:
-        required: false
+        required: true
 env:
   GITHUB_TOKEN: ${{ secrets.token }}
 
