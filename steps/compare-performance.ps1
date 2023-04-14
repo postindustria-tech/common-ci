@@ -6,7 +6,7 @@ param (
     [string]$Name,
     [string]$RunId,
     [string]$PullRequestId,
-    [string]$ResultsPath
+    [string]$ResultsPath = ""
 )
 
 # Disable progress bars
@@ -124,7 +124,7 @@ function Generate-Performance-Results {
     # Write out the summary for GitHub actions
     if ($Null -ne $env:GITHUB_STEP_SUMMARY) {
         Write-Output "# Performance Figures - $Name" >> $env:GITHUB_STEP_SUMMARY
-        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/51Degrees/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png)"
+        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/51Degrees/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| Date | $Metric |" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| ---- | ---------------- |" >> $env:GITHUB_STEP_SUMMARY
         foreach ($i in 0..$($Results.Length - 1)) {
@@ -161,7 +161,7 @@ function Generate-Performance-Results {
 $Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
 
 # Get the artifact for the current run
-if ($Null -ne $ResultsPath) {
+if ($ResultsPath -ne "") {
     $CurrentResult = Get-Content $ResultsPath | ConvertFrom-Json -AsHashtable
     $CurrentResult.Artifact = @{}
     $CurrentResult.Artifact.created_at = Get-Date
@@ -207,7 +207,7 @@ if ($PlotReady -eq $False) {
     mkdir $PlotPath
     Push-Location $PlotPath
     try {
-        dotnet new console --force
+        dotnet new console
         dotnet add package scottplot
         dotnet build -o bin
     }
