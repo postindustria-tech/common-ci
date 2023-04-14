@@ -14,6 +14,13 @@ Push-Location $RepoPath
 
 try {
 
+    if ($PullRequestId -eq 0) {
+
+        Write-Output "Not running for a PR"
+        exit 0
+    
+    }
+    
     $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     $Pr = hub api /repos/51degrees/$RepoName/pulls/$PullRequestId | ConvertFrom-Json
