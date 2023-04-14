@@ -31,12 +31,10 @@ jobs:
           path: common
         
       - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
         run: |
-          git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
-          git config --global user.email "CI@51Degrees.com"
-          git config --global user.name "51DCI"
-          git config --global filter.lfs.smudge "git-lfs smudge --skip -- %f"
-          git config --global filter.lfs.process "git-lfs filter-process --skip"          
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
           
       - name: Clone Repo
         shell: pwsh
@@ -101,13 +99,10 @@ jobs:
           path: common
 
       - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
         run: |
-          git config --global core.longpaths true
-          git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
-          git config --global user.email "CI@51Degrees.com"
-          git config --global user.name "51DCI"
-          git config --global filter.lfs.smudge "git-lfs smudge --skip -- %f"
-          git config --global filter.lfs.process "git-lfs filter-process --skip"
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
           
       - name: Clone Repo
         shell: pwsh
@@ -167,12 +162,10 @@ jobs:
           path: common
 
       - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
         run: |
-          git config --global url.https://${{ secrets.token }}@github.com/.insteadOf https://github.com/
-          git config --global user.email "CI@51Degrees.com"
-          git config --global user.name "51DCI"
-          git config --global filter.lfs.smudge "git-lfs smudge --skip -- %f"
-          git config --global filter.lfs.process "git-lfs filter-process --skip"
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
           
       - name: Clone Repo
         shell: pwsh
