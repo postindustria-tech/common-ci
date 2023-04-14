@@ -4,10 +4,9 @@ param (
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
     [string]$Name,
-    [Parameter(Mandatory=$true)]
     [string]$RunId,
-    [Parameter(Mandatory=$true)]
-    [string]$PullRequestId
+    [string]$PullRequestId,
+    [string]$ResultsPath
 )
 
 # Disable progress bars
@@ -159,13 +158,20 @@ function Generate-Performance-Results {
 }
 
 # Get all the artifactrs
-$Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts  | ConvertFrom-Json).artifacts
-Write-Output $Artifacts
+$Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
 
 # Get the artifact for the current run
-$CurrentArtifact = $Artifacts | Where-Object { $_.workflow_run.id -eq $RunId -and $_.name -eq "performance_results_$PullRequestId" }
+if ($Null -ne $ResultsPath) {
+    $CurrentResult = Get-Content $ResultsPath | ConvertFrom-Json -AsHashtable
+    $CurrentResult.Artifact = @{}
+    $CurrentResult.Artifact.created_at = Get-Date
+}
+else {
+    $CurrentArtifact = $Artifacts | Where-Object { $_.workflow_run.id -eq $RunId -and $_.name -eq "performance_results_$PullRequestId" }
+    $CurrentResult = Get-Artifact-Result -Artifact $CurrentArtifact -Name $Name
+}
+
 # Get the result for the current artifact
-$CurrentResult = Get-Artifact-Result -Artifact $CurrentArtifact -Name $Name
 
 # Filter the artifacts so we only have ones that have passed the performance tests
 $Artifacts = $Artifacts | Where-Object { $_.name.StartsWith("performance_results_passed") }
