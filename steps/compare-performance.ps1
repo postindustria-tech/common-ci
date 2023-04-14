@@ -162,6 +162,10 @@ $Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFro
 
 # Get the artifact for the current run
 if ($ResultsPath -ne "") {
+    if ($(Test-Path -Path $ResultsPath_ -eq $False) {
+        Write-Warning "The file '$ResultsPath' did not exist"
+        exit 0
+    }
     $CurrentResult = Get-Content $ResultsPath | ConvertFrom-Json -AsHashtable
     $CurrentResult.Artifact = @{}
     $CurrentResult.Artifact.created_at = Get-Date
