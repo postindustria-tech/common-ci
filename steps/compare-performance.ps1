@@ -162,7 +162,7 @@ $Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFro
 
 # Get the artifact for the current run
 if ($ResultsPath -ne "") {
-    if ($(Test-Path -Path $ResultsPath_ -eq $False) {
+    if ($(Test-Path -Path $ResultsPath) -eq $False) {
         Write-Warning "The file '$ResultsPath' did not exist"
         exit 0
     }
