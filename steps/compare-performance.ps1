@@ -222,16 +222,24 @@ if ($PlotReady -eq $False) {
 }
 # Generate the performance results for all metrics
 foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
-    $AvailableResults = $Results | Where-Object { $Null -ne $_.HigherIsBetter -and $Null -ne $_.HigherIsBetter[$Metric] }
-    
-    $MetricResults = $AvailableResults | ForEach-Object { $_.HigherIsBetter[$Metric] } 
-    $MetricArtifacts = $AvailableResults | ForEach-Object { $_.Artifact }
+    $MetricResults = @()
+    $MetricArtifacts = @()
+    foreach ($Result in $Results) {
+        if ($Null -ne $Result.HigherIsBetter -and $Null -ne $Result.HigherIsBetter[$Metric]) {
+            $MetricResults += $Result.HigherIsBetter[$Metric]
+            $MetricArtifacts += $Result.Artifact
+        }
+    }
     Generate-Performance-Results -Results $MetricResults -CurrentResult $CurrentResult.HigherIsBetter[$Metric] -Artifacts $MetricArtifacts -CurrentArtifact $CurrentResult.Artifact -Metric $Metric -HigherIsBetter $True
 }
 foreach ($Metric in $CurrentResult.LowerIsBetter.Keys) {
-    $AvailableResults = $Results | Where-Object { $Null -ne $_.LowerIsBetter -and $Null -ne $_.LowerIsBetter[$Metric] }
-    
-    $MetricResults = $AvailableResults | ForEach-Object { $_.LowerIsBetter[$Metric] } 
-    $MetricArtifacts = $AvailableResults | ForEach-Object { $_.Artifact }
+    $MetricResults = @()
+    $MetricArtifacts = @()
+    foreach ($Result in $Results) {
+        if ($Null -ne $Result.LowerIsBetter -and $Null -ne $Result.LowerIsBetter[$Metric]) {
+            $MetricResults += $Result.LowerIsBetter[$Metric]
+            $MetricArtifacts += $Result.Artifact
+        }
+    }
     Generate-Performance-Results -Results $MetricResults -CurrentResult $CurrentResult.LowerIsBetter[$Metric] -Artifacts $MetricArtifacts -CurrentArtifact $CurrentResult.Artifact -Metric $Metric -HigherIsBetter $False
 }
