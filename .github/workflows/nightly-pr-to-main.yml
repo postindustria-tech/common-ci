@@ -181,6 +181,8 @@ jobs:
     runs-on: windows-latest
     needs: [ Configure, Build-and-Test ]
     strategy:
+      # Allow only one at a time so there are no conflicts when committing images
+      max-parallel: 1
       matrix:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
     name: Compare Performance - ${{ matrix.options.name }}
