@@ -134,7 +134,7 @@ jobs:
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           
       - name: Run Performance Tests
-        if: ${{ steps.build.conclusion == 'success' }}
+        if: ${{ steps.build.conclusion == 'success' && matrix.options.runperformance }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
@@ -162,7 +162,7 @@ jobs:
             
       - name: Performance Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ steps.build.conclusion == 'success' }}
+        if: ${{ steps.build.conclusion == 'success' && matrix.options.runperformance }}
         with:
           check_name: Performance Tests - ${{ matrix.options.name }}
           files: |
@@ -172,6 +172,7 @@ jobs:
             
       - name: Upload Performance Results Artifact
         uses: actions/upload-artifact@v3.1.2
+        if: ${{ matrix.options.runperformance }}
         with:
           name: performance_results_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
@@ -202,13 +203,14 @@ jobs:
           
       - name: Clone Repo
         shell: pwsh
+        if: ${{ matrix.options.runperformance }}
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/constants.ps1
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
       
       - name: Download Performance Artifact
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.runperformance }}
         uses: actions/download-artifact@v2.1.1
         with:
           name: performance_results_${{ inputs.pull-request-id }}
@@ -216,6 +218,7 @@ jobs:
 
       - name: Compare Performance Results
         shell: pwsh
+        if: ${{ success() && matrix.options.runperformance }}
         working-directory: ${{ github.workspace }}/common/
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
@@ -223,7 +226,7 @@ jobs:
           . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }} -ResultsPath ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
           
       - name: Upload Successful Performance Results Artifact
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.runperformance }}
         uses: actions/upload-artifact@v3.1.2
         with:
           name: performance_results_passed_${{ inputs.pull-request-id }}
