@@ -97,7 +97,6 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
-
       - name: Fetch Assets
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
@@ -139,7 +138,6 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: ${{ steps.build.conclusion == 'success' }}
@@ -186,7 +184,6 @@ jobs:
       max-parallel: 1
       matrix:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
-    if: ${{ matrix.options.runperformance }}
     name: Compare Performance - ${{ matrix.options.name }}
     steps:
       - name: Checkout Common
@@ -204,13 +201,14 @@ jobs:
           
       - name: Clone Repo
         shell: pwsh
+        if: ${{ matrix.options.runperformance }}
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/constants.ps1
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
       
       - name: Download Performance Artifact
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.runperformance }}
         uses: actions/download-artifact@v2.1.1
         with:
           name: performance_results_${{ inputs.pull-request-id }}
@@ -218,7 +216,7 @@ jobs:
 
       - name: Compare Performance Results
         shell: pwsh
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.runperformance }}
         working-directory: ${{ github.workspace }}/common/
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
@@ -226,7 +224,7 @@ jobs:
           . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }} -ResultsPath ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
           
       - name: Upload Successful Performance Results Artifact
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.runperformance }}
         uses: actions/upload-artifact@v3.1.2
         with:
           name: performance_results_passed_${{ inputs.pull-request-id }}
@@ -264,4 +262,3 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/merge-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
-          
