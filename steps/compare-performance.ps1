@@ -100,7 +100,7 @@ function Generate-Performance-Results {
 
         # Set up the graph
         $Plot = [ScottPlot.Plot]::new(400, 300)
-        $Plot.AxisAuto(0.3, 0.3, 0, 0)
+        $Plot.AxisAuto(0.2, 0.5)
         $Plot.Legend($True, [ScottPlot.Alignment]::UpperLeft)
         $Plot.Title("Config : '$Name'", $Null, $Null, $Null, $Null)
         $Plot.XLabel("Date of Performance Test")
