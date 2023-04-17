@@ -39,7 +39,7 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }} -Branch $SubModuleUpdateBranch
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }} -Branch $PackageUpdateBranch
       
       - name: Update Packages
         shell: pwsh
