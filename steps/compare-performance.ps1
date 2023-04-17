@@ -132,8 +132,6 @@ function Generate-Performance-Results {
             $Result = $Results[$i]
             Write-Output "| $($Artifact.created_at) | $Result |" >> $env:GITHUB_STEP_SUMMARY
         }
-        Write-Output "| $($CurrentArtifact.created_at) | $CurrentResult |" >> $env:GITHUB_STEP_SUMMARY
-
     }
 
     # Check if the current result is more than 2 standard deviations out.
