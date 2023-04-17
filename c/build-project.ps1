@@ -21,7 +21,7 @@ if ($BuildMethod -eq "cmake") {
         Write-Output "Building '$Name'"
         
         cmake .. -DCMAKE_BUILD_TYPE=$Configuration 
-        cmake --build .
+        cmake --build . --config $Configuration
     
     }
     finally {
