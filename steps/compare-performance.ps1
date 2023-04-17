@@ -21,8 +21,14 @@ function Get-Artifact-Result {
     )
     Invoke-WebRequest -Uri $Artifact.archive_download_url -Headers @{"Authorization" = "Bearer $($env:GITHUB_TOKEN)"} -Outfile "$($Artifact.id).zip"
     Expand-Archive -Path "$($Artifact.id).zip" -DestinationPath $Artifact.id -Force
-    $Result = Get-Content $([IO.Path]::Combine($Artifact.id, "results_$Name.json")) | ConvertFrom-Json -AsHashtable
-    $Result.Artifact = $Artifact
+    $TargetFile = [IO.Path]::Combine($Artifact.id, "results_$Name.json")
+    if (Test-Path -Path $TargetFile) {
+        $Result = Get-Content $TargetFile | ConvertFrom-Json -AsHashtable
+        $Result.Artifact = $Artifact
+    }
+    else {
+        $Result = $Null
+    }
     return $Result
 }
 
@@ -186,7 +192,9 @@ $Artifacts = $Artifacts | Sort-Object -Property created_at
 $Results = @()
 foreach ($Artifact in $Artifacts) {
     $Result = Get-Artifact-Result -Artifact $Artifact -Name $Name
-    $Results += $Result
+    if ($Null -ne $Result) {
+        $Results += $Result
+    }
 }
 $Results += $CurrentResult
 
