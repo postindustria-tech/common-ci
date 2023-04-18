@@ -2,7 +2,8 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$VariableName = "Version"
+    [string]$VariableName = "Version",
+    [string]$GitVersionConfigPath = $Null
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -15,7 +16,13 @@ try {
     Write-Output "Installing gitversion"
     dotnet tool install --global GitVersion.Tool --version 5.*
 
-    $GitVersionOutput = dotnet-gitversion
+    if ($Null -ne $GitVersionConfigPath) {
+        $GitVersionOutput = dotnet-gitversion /config $GitVersionConfigPath
+    }
+    else {
+        $GitVersionOutput = dotnet-gitversion
+    }
+    
     Write-Output $GitVersionOutput
 
     Write-Output "Setting gitversion as '$VariableName'"

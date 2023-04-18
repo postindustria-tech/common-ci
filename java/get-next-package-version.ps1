@@ -5,18 +5,11 @@ param (
     [string]$ProjectDir = "."
 )
 
-try{
+$GitVersionConfigPath = [IO.Path]::Combine($pwd, "java", "gitversion.yml")
 
-    ./steps/get-next-package-version.ps1 -RepoName $RepoName -VariableName $VariableName
+./steps/get-next-package-version.ps1 -RepoName $RepoName -VariableName $VariableName -GitVersionConfigPath $GitVersionConfigPath 
 
-    Set-Variable -Name $VariableName -Value $GitVersion.AssemblySemVer -Scope Global
-}
-finally {
-
-    Write-Output "Leaving '$RepoPath'"
-    
-
-}
+Set-Variable -Name $VariableName -Value $GitVersion.AssemblySemVer -Scope Global
 
 exit $LASTEXITCODE
 
