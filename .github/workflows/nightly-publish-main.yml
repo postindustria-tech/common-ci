@@ -49,8 +49,15 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
-          echo version=$Version
-          echo version=$Version | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Output version=$Version
+          # Check that the version is valid
+          $ParseResult = $Null
+          $IsValid = [System.Version]::TryParse($Version, [ref]$ParseResult)
+          if ($IsValid -eq $False) {
+            Write-Error "The package version was not valid: '$Version'"
+            exit 1
+          }
+          Write-Output version=$Version | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           
       - name: Package Update Required
         id: update_required
