@@ -15,7 +15,7 @@ try {
     
     #-Dhttps.protocols=TLSv1.2
     Write-Output "Building '$Name'"
-    mvn compile -f pom.xml -DXmx2048m --no-transfer-progress
+    mvn install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress
 
 }
 finally {

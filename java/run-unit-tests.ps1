@@ -14,8 +14,8 @@ Push-Location $RepoPath
 try {
     
     #-Dhttps.protocols=TLSv1.2
-    Write-Output "Building '$Name'"
-    mvn clean test -Dtest="!**/*Integration*,!**/*PerformanceTest*" -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false
+    Write-Output "Testing '$Name'"
+    mvn surefire:test -Dtest="!**/*Integration*,!**/*PerformanceTest*" -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false
 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
