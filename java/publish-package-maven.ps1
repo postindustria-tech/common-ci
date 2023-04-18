@@ -15,7 +15,7 @@ try {
     mvn versions:set -DnewVersion="$Version"
 
     Write-Output "Deploying to Nexus staging"
-    mvn deploy
+    mvn deploy -DdeployOnly skipTests
 
     if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
