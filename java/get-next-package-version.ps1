@@ -9,7 +9,7 @@ try{
 
     ./steps/get-next-package-version.ps1 -RepoName $RepoName -VariableName $VariableName
 
-    Set-Variable -Name $VariableName -Value $GitVersion.SemVer -Scope Global
+    Set-Variable -Name $VariableName -Value $GitVersion.AssemblySemVer -Scope Global
 }
 finally {
 
