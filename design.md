@@ -43,23 +43,30 @@ Details of the steps can be found in [Readme](./README.md)
 | `clone-repo.ps1` |
 | `checkout-pr.ps1` |
 | `has-changed.ps1` |
+| `configure-git.ps1` |
 | `commit-changes.ps1` |
+| `compare-performance.ps1` |
+| `download-data-file.ps1` |
+| `fetch-csv-assets.ps1` |
+| `fetch-hash-assets.ps1` |
+| `package-update-required.ps1` |
 | `pull-request-to-main.ps1` |
 | `update-sub-modules.ps1` |
 | `update-packages.ps1` |
+| `update-tag.ps1` |
 | `approve-pr.ps1` |
 | `complete-pr.ps1` |
 | `run-repo-script.ps1` |
 | `push-changes.ps1` |
 | `setup-environment-*.yml` |
 | `fetch-device-detection-assets.ps1` |
+| `gunzip-file.ps1`
 
 | scripts in `dotnet`, `java`, `node`, `php`, `python`, `go`, `c`, and `cxx` |
 | -------------------------------------------------------------------------- |
 | `build-project.ps1` |
 | `get-next-package-version.ps1` |
 | `build-package.ps1` |
-| `run-integration-test.ps1` |
 | `package-dependency-update.ps1` |
 | `publish-packages.ps1` |
 | `run-unit-tests.ps1` |
@@ -116,9 +123,16 @@ like:
 
 ### Build Options
 
-Build options are configured in a common way across all repositories. Each repository has an options file in `ci/options.json` which is used by the workflows when calling build and test steps.
+Build options are configured in a common way across all repositories. Each repository has an options file in `ci/options.json` which is used by the workflows when calling build and test steps. Each element in an options item will be passed into the repo specific script as a parameter if the name matches and of the script parameters.
 
 This contains a list of setups to build and test against. Each language may have different requirements for what is in each option, however the `Name` is required in all languages.
+
+The common options available are listed below:
+
+| Option | Mandatory | Type | Purpose |
+| ------ | --------- | ---- | ------- |
+| `Name` | &check;   | string | Identifies the workflow jobs, and any artifacts which are created. |
+| `RunPerformance` | | bool | If present and true, performance tests will be run and reported for this configuration. |
 
 Workflows that build and test a repository will do so for each of the configurations listed in the options file.
 
@@ -146,6 +160,7 @@ Some languages which do not have an overarching solution file for multiple proje
     "Project": "./project1" // the path within the repo to one of the projects.
 }
 ```
+
 ## Entering Directories
 
 Most steps are run from within a repository that has been cloned by the workflow. To ensure that
@@ -187,3 +202,33 @@ To achieve this, the arrangement of integration tests is as follows:
 4. Integrations tests then clone the examples, update the references, and point to the staging source,
 5. Examples are run as tests to confirm that the package works as intended.
 
+## Performance Tests
+
+Performance tests should output their results in a common format. This is then picked up by the workflow to compare with historic results.
+
+The format of results must contain two objects, `HigherIsBetter` and `LowerIsBetter`. These each contain metrics and their values where higher or lower values mean a better metric respectively.
+
+Note that single quotes (`'`) must be used, not double (`"`)
+
+An example of this is:
+```json
+{
+    'HigherIsBetter': {
+        'ResultsPerSecond': 100,
+        'OtherResultsPerSecond': 200
+    },
+    'LowerIsBetter': {
+        'SecondsPerResult': 0.001
+    }
+}
+```
+
+The JSON formatted results should be written to the `test-results/performance-summary/results_[name].json` directory within the cloned repo, where `[name]` is the configuration name.
+
+Results are automatically picked up by the workflow, and written to artifacts. Past artifacts are then downloaded to find ones which match the same configuration name. Each metric is then plotted and written to the summary.
+
+![Plot Example](./images/example-plot.png)
+
+As performance tests in CI can be inconsistent, an absolute value is not tested. Instead, an increase (or decrease depending on the metric) from the mean by more than two standard deviations is considered a failure. An area is added to the plot to show one standard deviation either side of the mean.
+
+Note that if there are less than ten data points, it is not considered a failure, but a warning is logged.

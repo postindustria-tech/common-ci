@@ -27,7 +27,7 @@ try {
     }
 
     Write-Output "Extracting $FileName"
-    & $CommonPath\steps\unzip-file.ps1 -Source $FileName
+    & $CommonPath\steps\gunzip-file.ps1 -Source $FileName
     
 }
 finally {
