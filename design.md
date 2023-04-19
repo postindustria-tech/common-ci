@@ -223,12 +223,14 @@ An example of this is:
 }
 ```
 
-The JSON formatted results should be written to the `test-results/performance-summary/results_[name].json` directory within the cloned repo, where `[name]` is the configuration name.
+The JSON formatted results should be written to the `test-results/performance-summary/results_[name].json` directory within the cloned repo, where `[name]` is the configuration name from `options.json`.
 
 Results are automatically picked up by the workflow, and written to artifacts. Past artifacts are then downloaded to find ones which match the same configuration name. Each metric is then plotted and written to the summary.
 
 ![Plot Example](./images/example-plot.png)
 
 As performance tests in CI can be inconsistent, an absolute value is not tested. Instead, an increase (or decrease depending on the metric) from the mean by more than two standard deviations is considered a failure. An area is added to the plot to show one standard deviation either side of the mean.
+
+If the test passes, then the successful results are written to an artifact. Only successful results are used when getting past results. This prevents a performance degradation from changing the mean and deviation, which in turn could allow future degradations to pass this test.
 
 Note that if there are less than ten data points, it is not considered a failure, but a warning is logged.
