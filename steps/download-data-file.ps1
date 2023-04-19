@@ -51,7 +51,7 @@ DO
     catch
     {
         Write-Host "# ERROR downloading data file:"
-        Write-Host $_
+        Write-Host $_.Exception
     }        
 } While (($complete -eq $false) -and ($tryCount -le 10))
 
