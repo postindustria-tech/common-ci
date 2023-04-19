@@ -16,7 +16,10 @@ try {
     git tag $Tag
 
     Write-Output "Pushing tag"
-    git push origin $Tag   
+    git push origin $Tag
+
+    Write-Output "Creating a GitHub release"
+    hub api /repos/51degrees/$RepoName/releases -X POST -f "tag_name=$Tag" -F "generate_release_notes=true" -f "name=Version $Tag"
 
 }
 finally {
