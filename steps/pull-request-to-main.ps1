@@ -13,8 +13,17 @@ Push-Location $RepoPath
 
 try {
     
-    Write-Output "Creating pull request"
-    hub pull-request --no-edit --message $Message
+    $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
+
+    $Prs = $(hub pr list -b main -h $CurrentBranch)
+
+    if ($Prs.Count -eq 0) {
+        Write-Output "Creating pull request"
+        hub pull-request --no-edit --message $Message
+    }
+    else {
+        Write-Output "A PR already exists for this branch."
+    }
 
 }
 finally {
