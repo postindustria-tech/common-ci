@@ -27,7 +27,7 @@ try {
     mvn versions:set-property -Dproperty="device-detection.version" "-DnewVersion=$PackageVersion"
 
     Write-Output "Testing Examples"
-    mvn clean test -DTestResourceKey=$($Keys.TestResourceKey) -DLicenseKey=$($Keys.DeviceDetection)
+    mvn clean test "-DTestResourceKey=$($Keys.TestResourceKey)" "-DLicenseKey=$($Keys.DeviceDetection)"
 
     Write-Output "Copying test results"
     # Copy the test results into the test-results folder
