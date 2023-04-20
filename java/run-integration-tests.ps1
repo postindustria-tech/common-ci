@@ -20,9 +20,11 @@ try {
 
     Write-Output "Entering device-detection-examples directory"
     Push-Location device-detection-java-examples 
+    
+    $Version = ${{ steps.get_next_version.outputs.version }}
+    Write-Output "Setting examples device-detection package dependency to version" $Version
 
-    Write-Output "Setting examples device-detection package dependency to version" $GitVersion
-    mvn versions:set-property -Dproperty="device-detection.version" -DnewVersion=$GitVersion 
+    mvn versions:set-property -Dproperty="device-detection.version" -DnewVersion=$Version
 
     Write-Output "Testing Examples"
     mvn clean test
