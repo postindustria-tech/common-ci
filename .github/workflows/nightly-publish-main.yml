@@ -58,6 +58,7 @@ jobs:
             exit 1
           }
           Write-Output version=$Version | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Output "GIT_VERSION=$Version" | Out-File -Encoding utf8 -FilePath $env:GITHUB_ENV -Append
           
       - name: Package Update Required
         id: update_required
