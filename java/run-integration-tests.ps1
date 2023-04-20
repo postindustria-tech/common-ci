@@ -14,7 +14,7 @@ try {
     ./steps/clone-repo.ps1 -RepoName "device-detection-java-examples"
     
     Write-Output "Moving TAC file for examples"
-    Move-Item $RepoPath/TAC-HashV41.hash  ../b/device-detection-data/TAC-HashV41.hash
+    Move-Item $RepoPath/TAC-HashV41.hash  ../de-detection-java/device-detection-data/TAC-HashV41.hash
 
     Write-Output "Entering device-detection-examples directory"
     Push-Location device-detection-java-examples 
@@ -32,7 +32,7 @@ try {
 
     ForEach-Object { 
         $targetDir = "$($_.FullName)\target\surefire-reports"
-        $destDir = "..\device-detection-java-test\test-results\integration"
+        $destDir = "..\de-detection-java-test\test-results\integration"
         if(!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir }
         if(Test-Path $targetDir) {
             Get-ChildItem -Path $targetDir |
