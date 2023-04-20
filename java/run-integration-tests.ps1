@@ -4,7 +4,7 @@ param(
     [string]$RepoName,
     [string]$ProjectDir = ".",
     [string]$Name = "Windows_Java_8",
-    [string]$PackageVersion = "0.0.0",
+    [string]$Version = "0.0.0",
     [Hashtable]$Keys
 )
 
@@ -23,8 +23,8 @@ try {
     Write-Output "Entering device-detection-examples directory"
     Push-Location device-detection-java-examples 
 
-    Write-Output "Setting examples device-detection package dependency to version '$PackageVersion'"
-    mvn versions:set-property -Dproperty="device-detection.version" "-DnewVersion=$PackageVersion"
+    Write-Output "Setting examples device-detection package dependency to version '$Version'"
+    mvn versions:set-property -Dproperty="device-detection.version" "-DnewVersion=$Version"
 
     Write-Output "Testing Examples"
     mvn clean test "-DTestResourceKey=$($Keys.TestResourceKey)" "-DLicenseKey=$($Keys.DeviceDetection)"
