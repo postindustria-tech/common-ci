@@ -24,8 +24,7 @@ try {
     $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     Write-Output "Checking out PR $PrTitle"
-    hub am -3 https://github.com/51degrees/$RepoName/pull/$PullRequestId
-
+    hub pr checkout $PullRequestId
     git submodule update --init --recursive
 
 }
