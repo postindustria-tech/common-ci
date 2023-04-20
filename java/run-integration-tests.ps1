@@ -14,7 +14,7 @@ try {
     ./steps/clone-repo.ps1 -RepoName "device-detection-java-examples"
     
     Write-Output "Moving TAC file for examples"
-    Move-Item $RepoPath/TAC-HashV41.hash  ../device-detection-java-examples/device-detection-data/TAC-HashV41.hash
+    Move-Item $RepoPath/TAC-HashV41.hash  ../b/device-detection-data/TAC-HashV41.hash
 
     Write-Output "Entering device-detection-examples directory"
     Push-Location device-detection-java-examples 
