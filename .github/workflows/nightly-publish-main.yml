@@ -144,7 +144,7 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           $IntegrationOptions = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-          $IntegrationOptions | Add-Member -Name "PackageVersion" -Value ${{ steps.get_next_version.outputs.version }} -MemeberType NoteProperty
+          $IntegrationOptions.Add("PackageVersion", ${{ steps.get_next_version.outputs.version }})
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $IntegrationOptions
     
       - name: Integration Test Results
