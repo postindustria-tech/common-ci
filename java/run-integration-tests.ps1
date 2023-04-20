@@ -4,7 +4,8 @@ param(
     [string]$RepoName,
     [string]$ProjectDir = ".",
     [string]$Name = "Windows_Java_8",
-    [string]$PackageVersion = "0.0.0"
+    [string]$PackageVersion = "0.0.0",
+    [Hashtable]$Keys
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -26,7 +27,7 @@ try {
     mvn versions:set-property -Dproperty="device-detection.version" "-DnewVersion=$PackageVersion"
 
     Write-Output "Testing Examples"
-    mvn clean test
+    mvn clean test -DTestResourceKey=$($Keys.TestResourceKey) -DLicenseKey=$($Keys.DeviceDetection)
 
     Write-Output "Copying test results"
     # Copy the test results into the test-results folder
