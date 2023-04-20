@@ -1,6 +1,7 @@
 param (
     [Parameter(Mandatory=$true)]
-    [string]$RepoName
+    [string]$RepoName,
+    [string]$VariableName = "PullRequestIds"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -12,12 +13,11 @@ try {
 
     $Ids = $(hub pr list -f "%I," -b main)
     if ($Null -ne $Ids) {
-        $Ids = $Ids.Trim(",")
+        $Ids = $Ids.Trim(",").Split(",")
 
         $ValidIds = @()
 
         foreach ($Id in $Ids) {
-
             # Only select PRs which are eligeble for automation.
             $Pr = hub api /repos/51degrees/$RepoName/pulls/$Id | ConvertFrom-Json
             if ($Pr.author_association -eq 'OWNER' -or
@@ -30,13 +30,13 @@ try {
 
         }
 
-        Write-Output "Pull request ids are: $ValidIds"
-        Write-Output pull_request_ids="[$ValidIds]" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        Write-Output "Pull request ids are: $([string]::Join(",", $ValidIds))"
+        Set-Variable -Name $VariableName -Value $ValidIds -Scope Global
 
     } else {
 
         Write-Output "No pull requests to be checked."
-        Write-Output pull_request_ids="[0]" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        Set-Variable -Name $VariableName -Value @(0) -Scope Global
 
     }
 }
