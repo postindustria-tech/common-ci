@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$ProjectDir = ".",
-    [string]$Name
+    [string]$Name = "Windows_Java_8"
+    [string]$PackageVersion = "0.0.0"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -20,11 +21,9 @@ try {
 
     Write-Output "Entering device-detection-examples directory"
     Push-Location device-detection-java-examples 
-    
-    $Version = $ENV:GIT_VERSION
-    Write-Output "Setting examples device-detection package dependency to version" $Version
 
-    mvn versions:set-property -Dproperty="device-detection.version" -DnewVersion=$Version
+    Write-Output "Setting examples device-detection package dependency to version '$PackageVersion'"
+    mvn versions:set-property -Dproperty="device-detection.version" -DnewVersion=$PackageVersion
 
     Write-Output "Testing Examples"
     mvn clean test
