@@ -85,6 +85,9 @@ jobs:
           $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
           $Options = Get-Content $OptionsFile -Raw
           $Options = $Options -replace "`r`n", "" -replace "`n", ""
+          $Options = $Options | ConvertFrom-Json
+          $Options | Add-Member -Name "Version" -Value "${{ steps.get_next_version.outputs.version }}" -MemberType NoteProperty
+          $Options = $Options | ConvertTo-Json
           Write-Host $Options
           echo options=$Options | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           
@@ -144,7 +147,6 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           $IntegrationOptions = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-          $IntegrationOptions.Add("PackageVersion", '${{ needs.Configure.outputs.version }}')
           $IntegrationOptions.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $IntegrationOptions
     
