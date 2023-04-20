@@ -23,7 +23,7 @@ try {
     Push-Location device-detection-java-examples 
 
     Write-Output "Setting examples device-detection package dependency to version '$PackageVersion'"
-    mvn versions:set-property -Dproperty="device-detection.version" -DnewVersion=$PackageVersion
+    mvn versions:set-property -Dproperty="device-detection.version" "-DnewVersion=$PackageVersion"
 
     Write-Output "Testing Examples"
     mvn clean test
