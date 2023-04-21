@@ -14,7 +14,7 @@ Push-Location $RepoPath
 
 try {
 
-    Write-Output "Setting package version"
+    Write-Output "Setting package version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
     
     Write-Output "Building '$Name'"
