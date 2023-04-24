@@ -463,6 +463,7 @@ flowchart TD
       K --> L[Build Project]
       L --> M[Run Unit Tests]
       M --> N[Run Integration Tests]
+      N --> O[Run Performance Tests]
     end
     conf-->bat
   end
