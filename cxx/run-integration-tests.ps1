@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$ProjectDir = ".",
-    [string]$Name = "Release_x64",
+    [string]$Name,
     [string]$Configuration = "Release",
     [string]$Arch = "x64"
 )

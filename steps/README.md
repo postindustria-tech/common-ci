@@ -19,26 +19,26 @@ This also makes sure to update any submodules.
 The repository must be clones before calling this.
 
 ## Clone Repo
-**Script `clone-repo.ps1`**
+**Script: `clone-repo.ps1`**
 
 Clones the repo by name into the working directory. Optionally, a branch name can be provided.
 
 All repos are assumed to be in the 51Degrees organization. For example the name `"common-ci"` would be cloned from the URL `https://github.com/51degrees/common-ci`.
 
 ## Commit Changes
-**Script `commit-changes.ps1`**
+**Script: `commit-changes.ps1`**
 
 Stages all changes in the repository, and commits them with the message provided.
 
 ## Compare Performance
-**Script `compare-performance.ps1`**
+**Script: `compare-performance.ps1`**
 
 Compares the performance test results with previous runs, and outputs a graph to the summary.
 
 For a more in depth description of this, see [Performance Tests](/DESIGN.md#performance-tests)
 
 ## Configure Git
-**Script `configure-git.ps1`**
+**Script: `configure-git.ps1`**
 
 Configures the default Git behavior in the following ways:
 - Sets the auth token to use for any Git operations,
@@ -46,61 +46,61 @@ Configures the default Git behavior in the following ways:
 - Disables pulling of Git LFS files by default.
 
 ## Download Data File
-**Script `download-data-file.ps1`**
+**Script: `download-data-file.ps1`**
 
 Attempts to download a data file from the 51Degrees Distributor service. The type of file and license must be provided.
 
 ## Fetch CSV Assets
-**Script `fetch-csv-assets.ps1`**
+**Script: `fetch-csv-assets.ps1`**
 
 Uses the `download-data-file` script to download a 51Degrees CSV data file.
 
 ## Fetch Hash Assets
-**Script `fetch-hash-assets.ps1`**
+**Script: `fetch-hash-assets.ps1`**
 
 Uses the `download-data-file` script to download a 51Degrees Hash V4.1 data file.
 
 ## Get Next Package Version
-**Script `get-next-package-version.ps1`**
+**Script: `get-next-package-version.ps1`**
 
 Runs GitVersion in the repo, and stores the result object under the variable name provided.
 
 This will use the GitVersion config in the repo, or the path to a common config can be supplied.
 
 ## GUnzip File
-**Script `gunzip-file.ps1`**
+**Script: `gunzip-file.ps1`**
 
 Unzips a GZip file.
 
 ## Has Changed?
-**Script `has-changed.ps1`**
+**Script: `has-changed.ps1`**
 
 Checks if there are any changes in the repo. If there are then a non-zero exit code is returned, otherwise zero.
 
 ## Merge PR
-**Script `merge-pr.ps1`**
+**Script: `merge-pr.ps1`**
 
 Completes the pull request with the id provided.
 
 ## Package Update Required?
-**Script `package-update-required.ps1`**
+**Script: `package-update-required.ps1`**
 
 Takes the prospective version for the repo, and compares to the existing tags.
 
 If the version does not already exist, then a non-zero exit code is returned, otherwise zero.
 
 ## PR to Main
-**Script `pull-request-to-main.ps1`**
+**Script: `pull-request-to-main.ps1`**
 
 Creates a pull request to the main branch of the repository.
 
 ## Push Changes
-**Script `push-changes.ps1`**
+**Script: `push-changes.ps1`**
 
 Push any committed changes in the repo to the branch that is currently checked out.
 
 ## Run Repo Script
-**Script `run-repo-script.ps1`**
+**Script: `run-repo-script.ps1`**
 
 Runs a named script from within the `ci` directory of the repo supplied by name.
 Any options are passed to this script as a hashtable. They are then parsed, checked against the parameters
@@ -111,12 +111,12 @@ The parameter `RepoName` will always be available to the repo script, and does n
 For a more detailed description of options usage, see [Options](/DESIGN.md#build-options).
 
 ## Update Sub-Modules
-**Script `update-sub-modules.ps1`**
+**Script: `update-sub-modules.ps1`**
 
 Updates any submodule references in the repo to point to the latest commit in the main branch.
 
 ## Update Tag
-**Script `update-tag.ps1`**
+**Script: `update-tag.ps1`**
 
 Tags the repository with the version supplied, and pushed to GitHub.
 

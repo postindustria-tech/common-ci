@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$ProjectDir = ".",
     [string]$RepoName,
-    [string]$Name = "Release_x64",
+    [string]$Name,
+    [string]$Arch = "x64",
     [string]$Configuration = "Release",
     [string]$BuildMethod = "cmake"
 )
