@@ -391,3 +391,133 @@ To run these PowerShell scripts, either locally, or in a CI/CD pipeline, the fol
 - [Git CLI](https://git-scm.com/downloads)
 - [Hub CLI](https://hub.github.com/)
 - `GITHUB_TOKEN` environment variable (this is automatically set if using GitHub actions)
+
+
+# DIAGRAMS
+
+## Nightly Publish Main
+
+``` mermaid
+flowchart TD;
+subgraph Nightly Publish Main
+conf --> bat
+end
+
+subgraph conf[Configure]
+style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
+A[Checkout_Common]
+B[Configure_Git]
+C[Clone_Repo]
+D[Get_Next_Package_Version]
+E[Package_Update_Required]
+F[Get_Build_Options]
+end
+
+subgraph bat[Build_And_Test]
+style bat fill:#00C5,stroke: #00C9,stroke-width:2px;
+Z[Checkout_Common]
+Y[Configure_Git]
+X[Clone_Repo]
+W[Fetch_Assets]
+V[Setup_Environment]
+U[Build_Package]
+T[Test_Package]
+S[Publish_Package]
+end
+
+A --> B;
+B --> C;
+C --> D;
+D --> E;
+E --> F;
+
+Z --> Y;
+Y --> X;
+X --> W
+W --> V;
+V --> U;
+U --> T;
+T --> S;
+```
+## Nightly PR to Main 
+
+``` mermaid
+flowchart TD
+  subgraph "Nightly PR to Main"
+    subgraph conf[Configure]
+        direction TB
+        style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
+      A[Checkout Common] --> B[Configure Git]
+      B --> C[Clone Repo]
+      C --> D[Checkout Pull Request]
+      D --> E[Get Build Options]
+    end
+    subgraph bat[Build-and-Test]
+        direction TB
+        style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
+      F[Checkout Common] --> G[Configure Git]
+      G --> H[Clone Repo]
+      H --> I[Checkout Pull Request]
+      I --> J[Fetch Assets]
+      J --> K[Setup Environment]
+      K --> L[Build Project]
+      L --> M[Run Unit Tests]
+      M --> N[Run Integration Tests]
+    end
+    conf-->bat
+  end
+  ```
+
+  ## Nightly Submodule Update
+``` mermaid
+  graph TD
+  subgraph "Nightly Submodule Update"
+  direction TB
+    A["Checkout Repository"]
+    B["Checkout reusable workflow dir"]
+    C["Configure Git"]
+    D["Clone Repo"]
+    E["Update Sub Modules"]
+    F["Check for Changes"]
+    G["Commit Changes"]
+    H["Push Changes"]
+    I["Create Pull Request"]
+  end
+  
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> H
+H --> I
+```
+## Nightly Package Update
+
+``` mermaid
+graph TD
+  subgraph "Nightly Package Update"
+  direction TB
+    A["Checkout Repository"]
+    B["Checkout reusable workflow dir"]
+    C["Configure Git"]
+    D["Clone Repo"]
+    E["Update Packages"]
+    F["Check for Changes"]
+    G["Commit Changes"]
+    H["Push Changes"]
+    I["Create Pull Request"]
+  end
+  
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> H
+H --> I
+```
+
+
