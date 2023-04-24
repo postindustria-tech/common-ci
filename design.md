@@ -60,11 +60,13 @@ Details of the steps can be found in [Readme](./README.md)
 | `run-repo-script.ps1` |
 | `update-sub-modules.ps1` |
 | `update-tag.ps1` |
+
 See [Steps Readme](./steps/README.md)
 
 | scripts in `environments` |
 | ------------------------- |
 | `setup-msbuild.ps1` |
+
 See [Environments Readme](./environments/README.md)
 
 | scripts in `dotnet`, `java`, `node`, `php`, `python`, `go`, `c`, and `cxx` |
