@@ -13,9 +13,10 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-
-    Write-Output "Setting package version to '$Version'"
-    mvn versions:set -DnewVersion="$Version"
+    if(![string]::IsNullOrWhitespace($Version)){
+        Write-Output "Setting package version to '$Version'"
+        mvn versions:set -DnewVersion="$Version"
+    }
     
     Write-Output "Building '$Name'"
     mvn install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
