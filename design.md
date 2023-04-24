@@ -121,6 +121,18 @@ like:
 2. That script then calls `dotnet/build-project.ps1` with the build configuration,
 3. If the build succeeds, an exit code of 0 is returned, and this repeats all the way up.
 
+```mermaid
+sequenceDiagram
+    participant WF as Workflow
+    participant Script as Script within Repo
+    participant GS as Generic Script
+
+    WF->>Script: Call with repo name
+    Script->>GS: Call with required configuration
+    GS-->>Script: Return exit code
+
+```
+
 ### Build Options
 
 Build options are configured in a common way across all repositories. Each repository has an options file in `ci/options.json` which is used by the workflows when calling build and test steps. Each element in an options item will be passed into the repo specific script as a parameter if the name matches and of the script parameters.
