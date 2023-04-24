@@ -108,6 +108,8 @@ required by the repo script, and used when calling the repo script.
 
 The parameter `RepoName` will always be available to the repo script, and does not need to be added to the options object.
 
+For a more detialed description of options usage, see [Options](/design.md#build-options).
+
 ## Update Sub-Modules
 **Script `update-sub-modules.ps1`**
 
