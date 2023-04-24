@@ -24,43 +24,48 @@ Details of the steps can be found in [Readme](./README.md)
 
 | root scripts |
 | ------------ |
-| `nightly-submodule-update.ps1` |
+| `nightly-data-file-change.ps1` |
 | `nightly-package-update.ps1` |
 | `nightly-pr-to-main.ps1` |
-| `nightly-package-publish.ps1` |
+| `nightly-publish-main.ps1` |
+| `nightly-submodule-update.ps1` |
 
 | scripts in `.github/workflows` |
 | ------------------------------ |
-| `nightly-submodule-update.yml` |
+| `nightly-data-file-change.yml` |
 | `nightly-package-update.yml` |
 | `nightly-pr-to-main.yml` |
-| `nightly-package-publish.yml` |
+| `nightly-publish-main.yml` |
+| `nightly-submodule-update.yml` |
 
 *NOTE: The scripts above are duplications of the root workflow scripts. The PowerShell scripts can be run locally, the YAML scripts are run on GitHub.*
 
 | scripts in `steps` |
 | ------------------ |
-| `clone-repo.ps1` |
 | `checkout-pr.ps1` |
-| `has-changed.ps1` |
-| `configure-git.ps1` |
+| `clone-repo.ps1` |
 | `commit-changes.ps1` |
 | `compare-performance.ps1` |
+| `configure-git.ps1` |
 | `download-data-file.ps1` |
 | `fetch-csv-assets.ps1` |
 | `fetch-hash-assets.ps1` |
+| `get-next-package-version.ps1` |
+| `gunzip-file.ps1` |
+| `has-changed.ps1` |
+| `merge-pr.ps1` |
 | `package-update-required.ps1` |
 | `pull-request-to-main.ps1` |
-| `update-sub-modules.ps1` |
-| `update-packages.ps1` |
-| `update-tag.ps1` |
-| `approve-pr.ps1` |
-| `complete-pr.ps1` |
-| `run-repo-script.ps1` |
 | `push-changes.ps1` |
-| `setup-environment-*.yml` |
-| `fetch-device-detection-assets.ps1` |
-| `gunzip-file.ps1`
+| `run-repo-script.ps1` |
+| `update-sub-modules.ps1` |
+| `update-tag.ps1` |
+See [Steps Readme](./steps/README.md)
+
+| scripts in `environments` |
+| ------------------------- |
+| `setup-msbuild.ps1` |
+See [Environments Readme](./environments/README.md)
 
 | scripts in `dotnet`, `java`, `node`, `php`, `python`, `go`, `c`, and `cxx` |
 | -------------------------------------------------------------------------- |
@@ -68,22 +73,25 @@ Details of the steps can be found in [Readme](./README.md)
 | `get-next-package-version.ps1` |
 | `build-package.ps1` |
 | `package-dependency-update.ps1` |
-| `publish-packages.ps1` |
+| `publish-package.ps1` |
 | `run-unit-tests.ps1` |
 | `run-integration-tests.ps1` |
 | `run-performance-tests.ps1` |
+
 
 *NOTE: the scripts in the above table are less strict in their naming, and can vary slightly between languages. For example dotnet will have build-project-core.ps1 and build-project-framework.ps1*
 
 | scripts in `[repository]/ci` |
 | ---------------------------- |
 | `build-project.ps1` |
-| `run-unit-tests.ps1` |
-| `run-integration-tests.ps1` |
-| `run-performance-tests.ps1` |
-| `publish-packages.ps1` |
+| `fetch-assets.ps1` |
 | `get-next-package-version.ps1` |
 | `package-dependency-update.ps1` |
+| `publish-package.ps1` |
+| `run-integration-tests.ps1` |
+| `run-performance-tests.ps1` |
+| `run-unit-tests.ps1` |
+| `setup-environment.ps1` |
 | `options.json` |
 
 *NOTE: these files in the table above MUST exist in the repository the workflow is run against, as they are called by the workflow. If a step is not relevant for a repository, then the file should do nothing and return an zero exit code.*
@@ -130,7 +138,7 @@ This contains a list of setups to build and test against. Each language may have
 The common options available are listed below:
 
 | Option | Mandatory | Type | Purpose |
-| ------ | --------- | ---- | ------- |
+| ------ | :-------: | ---- | ------- |
 | `Name` | &check;   | string | Identifies the workflow jobs, and any artifacts which are created. |
 | `RunPerformance` | | bool | If present and true, performance tests will be run and reported for this configuration. |
 
@@ -160,6 +168,17 @@ Some languages which do not have an overarching solution file for multiple proje
     "Project": "./project1" // the path within the repo to one of the projects.
 }
 ```
+
+An example of a repo specific script consuming these options is:
+```powershell
+param (
+    [string]$Name,
+    [string]$Configuration,
+    [string]$Arch
+)
+# Do some building with these options.
+```
+Note that the options object is not passed in "as is". It is parsed by `run-repo-script.ps1`, and the correct parameters populated.
 
 ## Entering Directories
 
@@ -225,7 +244,7 @@ An example of this is:
 
 The JSON formatted results should be written to the `test-results/performance-summary/results_[name].json` directory within the cloned repo, where `[name]` is the configuration name from `options.json`.
 
-Results are automatically picked up by the workflow, and written to artifacts. Past artifacts are then downloaded to find ones which match the same configuration name. Each metric is then plotted and written to the summary.
+Results are automatically picked up by the `nightly-pr-to-main` workflow, and written to artifacts. Past artifacts are then downloaded to find ones which match the same configuration name. Each metric is then plotted and written to the summary.
 
 ![Plot Example](./images/example-plot.png)
 
