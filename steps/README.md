@@ -60,6 +60,17 @@ Uses the `download-data-file` script to download a 51Degrees CSV data file.
 
 Uses the `download-data-file` script to download a 51Degrees Hash V4.1 data file.
 
+## Get PRs
+**Script: `get-pull-requests.ps1`**
+
+Gets the open PRs for the repo, and sets the ids of valid PRs under a variable name provided.
+
+A PR is considered valid if it was created by one of the following roles:
+- `OWNER`
+- `COLLABORATOR`
+- `CONTRIBUTOR`
+- `MEMBER`
+
 ## Get Next Package Version
 **Script: `get-next-package-version.ps1`**
 
