@@ -35,31 +35,33 @@ When implementing changes, see the [Design Document](/DESIGN.md) for detailed de
 ## Nightly Publish Main
 
 ``` mermaid
-flowchart TD;
+flowchart LR;
 subgraph Nightly Publish Main
 conf --> bat
 end
 
 subgraph conf[Configure]
+direction LR
 style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
-A[Checkout_Common]
-B[Configure_Git]
-C[Clone_Repo]
-D[Get_Next_Package_Version]
-E[Package_Update_Required]
-F[Get_Build_Options]
+A[Checkout Common]
+B[Configure Git]
+C[Clone Repo]
+D[Get Next Package Version]
+E[Package Update Required]
+F[Get Build Options]
 end
 
-subgraph bat[Build_And_Test]
+subgraph bat[Build And Test]
+direction LR
 style bat fill:#00C5,stroke: #00C9,stroke-width:2px;
-Z[Checkout_Common]
-Y[Configure_Git]
-X[Clone_Repo]
-W[Fetch_Assets]
-V[Setup_Environment]
-U[Build_Package]
-T[Test_Package]
-S[Publish_Package]
+Z[Checkout Common]
+Y[Configure Git]
+X[Clone Repo]
+W[Fetch Assets]
+V[Setup Environment]
+U[Build Package]
+T[Test Package]
+S[Publish Package]
 end
 
 A --> B;
@@ -79,18 +81,18 @@ T --> S;
 ## Nightly PR to Main 
 
 ``` mermaid
-flowchart TD
+flowchart LR
   subgraph "Nightly PR to Main"
     subgraph conf[Configure]
-        direction TB
+        direction LR
         style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
       A[Checkout Common] --> B[Configure Git]
       B --> C[Clone Repo]
       C --> D[Checkout Pull Request]
       D --> E[Get Build Options]
     end
-    subgraph bat[Build-and-Test]
-        direction TB
+    subgraph bat[Build and Test]
+        direction LR
         style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
       F[Checkout Common] --> G[Configure Git]
       G --> H[Clone Repo]
@@ -108,18 +110,18 @@ flowchart TD
 
   ## Nightly Submodule Update
 ``` mermaid
-  graph TD
+  graph LR
   subgraph "Nightly Submodule Update"
-  direction TB
-    A["Checkout Repository"]
-    B["Checkout reusable workflow dir"]
-    C["Configure Git"]
-    D["Clone Repo"]
-    E["Update Sub Modules"]
-    F["Check for Changes"]
-    G["Commit Changes"]
-    H["Push Changes"]
-    I["Create Pull Request"]
+  direction LR
+    A[Checkout Repository]
+    B[Checkout reusable workflow dir]
+    C[Configure Git]
+    D[Clone Repo]
+    E[Update Sub Modules]
+    F[Check for Changes]
+    G[Commit Changes]
+    H[Push Changes]
+    I[Create Pull Request]
   end
   
 A --> B
@@ -134,18 +136,18 @@ H --> I
 ## Nightly Package Update
 
 ``` mermaid
-graph TD
+graph LR
   subgraph "Nightly Package Update"
-  direction TB
-    A["Checkout Repository"]
-    B["Checkout reusable workflow dir"]
-    C["Configure Git"]
-    D["Clone Repo"]
-    E["Update Packages"]
-    F["Check for Changes"]
-    G["Commit Changes"]
-    H["Push Changes"]
-    I["Create Pull Request"]
+  direction LR
+    A[Checkout Repository]
+    B[Checkout reusable workflow dir]
+    C[Configure Git]
+    D[Clone Repo]
+    E[Update Packages]
+    F[Check for Changes]
+    G[Commit Changes]
+    H[Push Changes]
+    I[Create Pull Request]
   end
   
 A --> B
