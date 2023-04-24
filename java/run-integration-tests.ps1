@@ -8,35 +8,24 @@ param(
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName, $ProjectDir)
 
+Write-Output "Entering '$RepoPath'"
+Push-Location $RepoPath
 
 try {
 
-    Write-Output "Moving TAC file for examples"
-    Move-Item $RepoPath/TAC-HashV41.hash  ../device-detection-java-examples/device-detection-data/TAC-HashV41.hash
+    Write-Output "Testing $Name"
+    mvn test -Dtest=*Integration* -DfailIfNoTests=false 
 
-    Write-Output "Cloning device-detection-java-examples"
-    ./steps/clone-repo.ps1 -RepoName "device-detection-java-examples"
-
-    Write-Output "Entering device-detection-examples directory"
-    Push-Location device-detection-java-examples 
-
-    Write-Output "Setting examples device-detection package dependency to version" $GitVersion
-    mvn versions:set-property -Dproperty="device-detection.version" -DnewVersion=$GitVersion 
-
-    Write-Output "Testing Examples"
-    mvn clean test
-
-    Write-Output "Copying test results"
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
     Where-Object { Test-Path "$($_.FullName)\pom.xml" } | 
-
     ForEach-Object { 
         $targetDir = "$($_.FullName)\target\surefire-reports"
-        $destDir = "..\device-detection-java-test\test-results\integration"
+        $destDir = ".\test-results\integration"
         if(!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir }
         if(Test-Path $targetDir) {
-            Get-ChildItem -Path $targetDir |
+            Get-ChildItem -Path $targetDir | 
+            Where-Object { $_.Name -like "*Integration*" } |
             ForEach-Object {
                 Copy-Item -Path $_.FullName -Destination $destDir
             }
