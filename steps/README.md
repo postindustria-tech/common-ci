@@ -35,7 +35,7 @@ Stages all changes in the repository, and commits them with the message provided
 
 Compares the performance test results with previous runs, and outputs a graph to the summary.
 
-For a more in depth description of this, see [Performance Tests](/design.md#performance-tests)
+For a more in depth description of this, see [Performance Tests](/DESIGN.md#performance-tests)
 
 ## Configure Git
 **Script `configure-git.ps1`**
@@ -108,7 +108,7 @@ required by the repo script, and used when calling the repo script.
 
 The parameter `RepoName` will always be available to the repo script, and does not need to be added to the options object.
 
-For a more detialed description of options usage, see [Options](/design.md#build-options).
+For a more detailed description of options usage, see [Options](/DESIGN.md#build-options).
 
 ## Update Sub-Modules
 **Script `update-sub-modules.ps1`**

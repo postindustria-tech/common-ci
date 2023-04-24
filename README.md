@@ -28,7 +28,7 @@ The following rules are common across the organisation.
 
 # Design
 
-When implementing changes, see the [Design Document](/design.md) for detailed descriptions of how each part works.
+When implementing changes, see the [Design Document](/DESIGN.md) for detailed descriptions of how each part works.
 
 # Matrix
 
