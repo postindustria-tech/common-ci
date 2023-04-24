@@ -130,7 +130,9 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          $IntegrationOptions = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          $IntegrationOptions.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $IntegrationOptions
           
       - name: Run Performance Tests
         if: ${{ steps.build.conclusion == 'success' && matrix.options.runperformance }}
