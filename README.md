@@ -26,6 +26,10 @@ The following rules are common across the organisation.
 -   The package output from a repository in the organisation is used as the input to other packages in the same organisation via the relevant package manager. This ensures that the organisations published packages are treated just like any other dependency and are not given special treatment.
 -   Branching strategy is covered in the relevant CONTRIBUTIONS.md for the repository and not covered here. All organisation repositories must have a `main` branch which can accept pull requests via automated tasks.
 
+# Design
+
+When implementing changes, see the [Design Document](/design.md) for detailed descriptions of how each part works.
+
 # Matrix
 
 The following table provides the common functions that are associated with each of the triggers available to different repositories. The number in the table is the expected order of execution where common function marked 1 is executed first. The headings are the general name of the trigger with the letter prefix a unique identifier for the trigger.
