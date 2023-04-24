@@ -83,28 +83,36 @@ T --> S;
 ``` mermaid
 flowchart LR
   subgraph "Nightly PR to Main"
-    subgraph conf[Configure]
-        direction LR
-        style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
-      A[Checkout Common] --> B[Configure Git]
-      B --> C[Clone Repo]
-      C --> D[Checkout Pull Request]
-      D --> E[Get Build Options]
+    subgraph prs[Get Pull Requests]
+      pA[Checkout Common] --> pB[Configure Git]
+      pB --> pC[Clone Repo]
+      pC --> pD[Get Pull Requests]
     end
-    subgraph bat[Build and Test]
-        direction LR
-        style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
-      F[Checkout Common] --> G[Configure Git]
-      G --> H[Clone Repo]
-      H --> I[Checkout Pull Request]
-      I --> J[Fetch Assets]
-      J --> K[Setup Environment]
-      K --> L[Build Project]
-      L --> M[Run Unit Tests]
-      M --> N[Run Integration Tests]
-      N --> O[Run Performance Tests]
+    subgraph main[PR to Main]
+      subgraph conf[Configure]
+          direction LR
+          style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
+        A[Checkout Common] --> B[Configure Git]
+        B --> C[Clone Repo]
+        C --> D[Checkout Pull Request]
+        D --> E[Get Build Options]
+      end
+      subgraph bat[Build and Test]
+          direction LR
+          style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
+        F[Checkout Common] --> G[Configure Git]
+        G --> H[Clone Repo]
+        H --> I[Checkout Pull Request]
+        I --> J[Fetch Assets]
+        J --> K[Setup Environment]
+        K --> L[Build Project]
+        L --> M[Run Unit Tests]
+        M --> N[Run Integration Tests]
+        N --> O[Run Performance Tests]
+      end
+      conf-- Once Per Config -->bat
     end
-    conf-->bat
+    prs-- Once Per PR -->main
   end
   ```
 
