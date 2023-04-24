@@ -80,8 +80,9 @@ See [Environments Readme](./environments/README.md)
 | `run-integration-tests.ps1` |
 | `run-performance-tests.ps1` |
 
-
 *NOTE: the scripts in the above table are less strict in their naming, and can vary slightly between languages. For example dotnet will have build-project-core.ps1 and build-project-framework.ps1*
+
+See [CXX](./cxx/README.md). **TODO: Add others as they are completed**
 
 | scripts in `[repository]/ci` |
 | ---------------------------- |
@@ -134,12 +135,18 @@ like:
 ```mermaid
 sequenceDiagram
     participant WF as Workflow
+    participant CI as Script within Common
     participant Script as Script within Repo
     participant GS as Generic Script
 
-    WF->>Script: Call with repo name
+    WF->>WF: Read options.json from repo to object
+    WF->>CI: Call with repo name, script name and options
+    CI->>CI: Construct parameters list from options
+    CI->>Script: Call with repo name and parameters from options
     Script->>GS: Call with required configuration
     GS-->>Script: Return exit code
+    Script-->>CI: Return exit code
+    CI-->>WF: Return exit code
 
 ```
 
