@@ -37,46 +37,36 @@ When implementing changes, see the [Design Document](/DESIGN.md) for detailed de
 ``` mermaid
 flowchart LR;
 subgraph Nightly Publish Main
-conf --> bat
+  conf --> bat
 end
 
 subgraph conf[Configure]
-direction LR
-style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
-A[Checkout Common]
-B[Configure Git]
-C[Clone Repo]
-D[Get Next Package Version]
-E[Package Update Required]
-F[Get Build Options]
+  direction LR
+  style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
+  A[Checkout Common]
+  B[Configure Git]
+  C[Clone Repo]
+  D[Get Next Package Version]
+  E[Package Update Required]
+  F[Get Build Options]
+  A-->B-->C-->D-->E-->F
 end
 
 subgraph bat[Build And Test]
-direction LR
-style bat fill:#00C5,stroke: #00C9,stroke-width:2px;
-Z[Checkout Common]
-Y[Configure Git]
-X[Clone Repo]
-W[Fetch Assets]
-V[Setup Environment]
-U[Build Package]
-T[Test Package]
-S[Publish Package]
+  direction LR
+  style bat fill:#00C5,stroke: #00C9,stroke-width:2px;
+  Z[Checkout Common]
+  Y[Configure Git]
+  X[Clone Repo]
+  W[Fetch Assets]
+  V[Setup Environment]
+  U[Build Package]
+  T[Test Package]
+  S[Publish Package]
+  Z-->Y-->X-->W-->V-->U-->T-->S
 end
 
-A --> B;
-B --> C;
-C --> D;
-D --> E;
-E --> F;
 
-Z --> Y;
-Y --> X;
-X --> W
-W --> V;
-V --> U;
-U --> T;
-T --> S;
 ```
 ## Nightly PR to Main 
 
@@ -84,32 +74,39 @@ T --> S;
 flowchart LR
   subgraph "Nightly PR to Main"
     subgraph prs[Get Pull Requests]
-      pA[Checkout Common] --> pB[Configure Git]
-      pB --> pC[Clone Repo]
-      pC --> pD[Get Pull Requests]
+      style prs fill:#00C5,stroke:#00C9,stroke-width:2px;
+      W[Checkout Common]
+      X[Configure Git]
+      Y[Clone Repo]
+      Z[Get Pull Requests]
+      W-->X-->Y-->Z
     end
     subgraph main[PR to Main]
       direction TB
       subgraph conf[Configure]
-          direction LR
-          style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
-        A[Checkout Common] --> B[Configure Git]
-        B --> C[Clone Repo]
-        C --> D[Checkout Pull Request]
-        D --> E[Get Build Options]
+        direction LR
+        style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
+        A[Checkout Common]
+        B[Configure Git]
+        C[Clone Repo]
+        D[Checkout Pull Request]
+        E[Get Build Options]
+        A-->B-->C-->D-->E
       end
       subgraph bat[Build and Test]
-          direction LR
-          style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
-        F[Checkout Common] --> G[Configure Git]
-        G --> H[Clone Repo]
-        H --> I[Checkout Pull Request]
-        I --> J[Fetch Assets]
-        J --> K[Setup Environment]
-        K --> L[Build Project]
-        L --> M[Run Unit Tests]
-        M --> N[Run Integration Tests]
-        N --> O[Run Performance Tests]
+        direction LR
+        style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
+        F[Checkout Common]
+        G[Configure Git]
+        H[Clone Repo]
+        I[Checkout Pull Request]
+        J[Fetch Assets]
+        K[Setup Environment]
+        L[Build Project]
+        M[Run Unit Tests]
+        N[Run Integration Tests]
+        O[Run Performance Tests]
+        F-->G-->H-->I-->J-->K-->L-->M-->N-->O
       end
       conf-- Once Per Config -->bat
     end
@@ -121,7 +118,7 @@ flowchart LR
 ``` mermaid
   graph LR
   subgraph "Nightly Submodule Update"
-  direction LR
+    direction LR
     A[Checkout Repository]
     B[Checkout reusable workflow dir]
     C[Configure Git]
@@ -131,23 +128,16 @@ flowchart LR
     G[Commit Changes]
     H[Push Changes]
     I[Create Pull Request]
+    A-->B-->C-->D-->E-->F-->G-->H-->I
   end
   
-A --> B
-B --> C
-C --> D
-D --> E
-E --> F
-F --> G
-G --> H
-H --> I
 ```
 ## Nightly Package Update
 
 ``` mermaid
 graph LR
   subgraph "Nightly Package Update"
-  direction LR
+    direction LR
     A[Checkout Repository]
     B[Checkout reusable workflow dir]
     C[Configure Git]
@@ -157,16 +147,25 @@ graph LR
     G[Commit Changes]
     H[Push Changes]
     I[Create Pull Request]
+    A-->B-->C-->D-->E-->F-->G-->H-->I
   end
-  
-A --> B
-B --> C
-C --> D
-D --> E
-E --> F
-F --> G
-G --> H
-H --> I
+```
+
+## Nightly Data File Update
+
+``` mermaid
+graph LR
+  subgraph "Nightly Data File Update"
+    direction LR
+    A[Clone Repo]
+    B[Fetch Assets]
+    C[Generate Accessors]
+    D[Check For Changes]
+    E[Commit Changes]
+    F[Push Changes]
+    G[PR to Main]
+    A-->B-->C-->D-->E-->F-->G
+  end
 ```
 
 

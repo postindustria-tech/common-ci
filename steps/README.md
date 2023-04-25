@@ -60,6 +60,13 @@ Uses the `download-data-file` script to download a 51Degrees CSV data file.
 
 Uses the `download-data-file` script to download a 51Degrees Hash V4.1 data file.
 
+## Generate Accessors
+**Script: `generate-accessors.ps1`**
+
+Generates the strongly types accessors from the 51Degrees data file.
+
+This will also copy the generated classes to the directory specified.
+
 ## Get PRs
 **Script: `get-pull-requests.ps1`**
 
