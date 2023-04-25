@@ -107,9 +107,9 @@ jobs:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
     name: Pre Build - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
-    if: ${{ matrix.options.packagerequirement }}
     steps:
       - name: Build Package Requirements
+        if: ${{ success() && matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
@@ -117,7 +117,7 @@ jobs:
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
-        if: ${{ steps.test.conclusion == 'success' }}
+        if: ${{ success() }}
         with:
           name: package_${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package-files
