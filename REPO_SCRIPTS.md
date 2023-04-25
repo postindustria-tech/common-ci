@@ -6,7 +6,25 @@ These are scripts that must be present in the `ci` directory of each repository 
 
 **Script: `build-project.ps1`**
 
-Builds the project. This is passed any build configuration parameters required from the `options.json`, and should call language specific build scripts in `common-ci` where possble.
+Builds the project. This is passed any build configuration parameters required from the `options.json`, and should call language specific build scripts in `common-ci` where possible.
+
+## Build Package
+
+**Script: `build-package.ps1`**
+
+Build a package ready for testing and publishing.
+
+Any requirements from `build-package-requirements` will be downloaded to `[repo]/package-files` before this script is called.
+
+This should output any package files to the `[repo]/package` directory.
+
+## Build Package Requirements
+
+**Script: `build-package-requirements.ps1`**
+
+This should build any config specific requirements for the package. For example, native binaries that need to be built on different platforms before being combined in the final package.
+
+This should output any files required for the package to the `[repo]/package-files` directory.
 
 ## Fetch Assets
 
