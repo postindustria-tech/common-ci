@@ -37,7 +37,10 @@ When implementing changes, see the [Design Document](/DESIGN.md) for detailed de
 ``` mermaid
 flowchart LR;
 subgraph Nightly Publish Main
-  conf --> bat
+  conf -- Once per config where 'PackageRequirement'=true --> pbuild
+  pbuild -- Combine pre-build files --> build
+  build -- Once per config --> test
+  test --> pub
 end
 
 subgraph conf[Configure]
@@ -52,20 +55,52 @@ subgraph conf[Configure]
   A-->B-->C-->D-->E-->F
 end
 
-subgraph bat[Build And Test]
+subgraph pbuild[Pre-Build]
   direction LR
-  style bat fill:#00C5,stroke: #00C9,stroke-width:2px;
-  Z[Checkout Common]
-  Y[Configure Git]
-  X[Clone Repo]
-  W[Fetch Assets]
-  V[Setup Environment]
-  U[Build Package]
-  T[Test Package]
-  S[Publish Package]
-  Z-->Y-->X-->W-->V-->U-->T-->S
+  style pbuild fill:#00C5,stroke: #00C9,stroke-width:2px;
+  PB1[Build Package Requirements]
+  PB2[Upload Package Artifact]
+  PB1-->PB2
 end
 
+subgraph build[Build Package]
+  direction LR
+  style build fill:#00C5,stroke: #00C9,stroke-width:2px;
+  B1[Checkout Common]
+  B2[Configure Git]
+  B3[Clone Repo]
+  B4[Download Package Artifacts]
+  B5[Build Package]
+  B6[Upload Package Artifact]
+  B1-->B2-->B3-->B4-->B5-->B6
+end
+
+subgraph test[Test]
+  direction LR
+  style test fill:#00C5,stroke:#00C9,stroke-width:2px;
+  T1[Checkout Common]
+  T2[Configure Git]
+  T3[Clone Repo]
+  T4[Fetch Assets]
+  T5[Setup Environment]
+  T6[Download Package Artifact]
+  T7[Install Package From Artifact]
+  T8[Run Integration Tests]
+  T1-->T2-->T3-->T4-->T5-->T6-->T7-->T8
+end
+
+subgraph pub[Publish Package]
+  direction LR
+  style pub fill:#00C5,stroke:#00C9,stroke-width:2px;
+  P1[Checkout Common]
+  P2[Configure Git]
+  P3[Clone Repo]
+  P4[Download Package Artifact]
+  P5[Install Package From Artifact]
+  P6[Publish Package]
+  P7[Update Tag]
+  P1-->P2-->P3-->P4-->P5-->P6-->P7
+end
 
 ```
 ## Nightly PR to Main 
