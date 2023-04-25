@@ -108,6 +108,26 @@ jobs:
     name: Pre Build - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
     steps:
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+
+      - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
+          
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+
       - name: Build Package Requirements
         if: ${{ success() && matrix.options.packagerequirement }}
         shell: pwsh
