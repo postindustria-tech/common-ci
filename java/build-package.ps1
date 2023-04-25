@@ -35,7 +35,10 @@ try {
 
     New-Item -Path $PackagePath -ItemType Directory -Force 
     $LocalRepoPackages = Get-ChildItem -Path $MavenLocal51DPath
+    ls $MavenLocal51DPath
+    ls $PackagePath
     Copy-Item -Path $LocalRepoPackages -Destination "$PackagePath"
+    ls $PackagePath
 
 }
 finally {
