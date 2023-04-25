@@ -3,7 +3,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$LicenseKey
+    [string]$LicenseKey,
+    [string]$Url = $Null
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -20,7 +21,7 @@ try {
     $FileName = [IO.Path]::Combine($pwd, "51Degrees-TacV3.4.trie.zip")
     
     Write-Output "Downloading CSV data file"
-    $Result = $(Get-DataFile -licenseKey $LicenseKey -dataType "CSV" -product "TAC" -fullFilePath $FileName)
+    $Result = $(Get-DataFile -licenseKey $LicenseKey -dataType "CSV" -product "TAC" -fullFilePath $FileName -Url $Url)
 
     if ($Result -eq $False) {
 

@@ -1,16 +1,14 @@
 
 param (
     [Parameter(Mandatory=$true)]
-    [string]$licenseKey,
-
+    [string]$LicenseKey,
     [Parameter(Mandatory=$true)]
-    [string]$dataType,
-
+    [string]$DataType,
     [Parameter(Mandatory=$true)]
-    [string]$product,
-
+    [string]$Product,
     [Parameter(Mandatory=$true)]
-    [string]$fullFilePath
+    [string]$FullFilePath,
+    [string]$Url = $Null
 )
 
 
@@ -18,7 +16,17 @@ Add-Type -AssemblyName System.Net.Http
 
 $webClient = New-Object System.Net.Http.HttpClient;
 $webClient.Timeout = New-TimeSpan -Seconds 240
-$url ="https://distributor.51degrees.com/api/v2/download?LicenseKeys=$($licenseKey)&Type=$($dataType)&Download=True&Product=$($product)"
+
+if ($Null -eq $Url) {
+    if ($DataType -ne "HashV41" -and $DataType -ne "CSV") {
+        Write-Error "'$DataType' is not a recognized data type."
+        exit 1
+    }
+        
+    $Url ="https://distributor.51degrees.com/api/v2/download?LicenseKeys=$($LicenseKey)&Type=$($DataType)&Download=True&Product=$($Product)"
+
+}
+
 $start_time = Get-Date
 $complete = $false
 $tryCount = 0
@@ -38,7 +46,7 @@ DO
         # Save stream to path
         try
         {
-            $fileStream = [System.IO.File]::Create($fullFilePath)
+            $fileStream = [System.IO.File]::Create($FullFilePath)
             $stream.Result.CopyTo($fileStream)            
             $complete = $true
         }

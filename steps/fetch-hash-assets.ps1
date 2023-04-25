@@ -3,7 +3,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$LicenseKey
+    [string]$LicenseKey,
+    [string]$Url = $Null
 )
 
 $CommonPath = $pwd
@@ -17,7 +18,7 @@ try {
     $FileName = [IO.Path]::Combine($pwd, "TAC-HashV41.hash.gz")
     
     Write-Output "Downloading Hash data file"
-    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "HashV41" -product "V4TAC" -fullFilePath $FileName)
+    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "HashV41" -product "V4TAC" -fullFilePath $FileName -Url $Url)
 
     if ($Result -eq $False) {
 
