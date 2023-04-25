@@ -73,18 +73,18 @@ function Generate-Performance-Results {
     try {
 
         # Check out the gh-images branch so we're ready to commit images.
-        # $branches = $(git branch -a --format "%(refname)")
-        # $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
-        # $ImagesBranch = "gh-images"
-        # if ($branches.Contains("refs/remotes/origin/$ImagesBranch")) {
-        #     Write-Output "Checking out branch '$ImagesBranch'"
-        #     git checkout $ImagesBranch
-        # }
-        # else {
-        #     Write-Output "Creating new branch '$ImagesBranch'"
-        #     git checkout --orphan $ImagesBranch
-        #     git rm -rf .
-        # }
+        $branches = $(git branch -a --format "%(refname)")
+        $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
+        $ImagesBranch = "gh-images"
+        if ($branches.Contains("refs/remotes/origin/$ImagesBranch")) {
+            Write-Output "Checking out branch '$ImagesBranch'"
+            git checkout $ImagesBranch
+        }
+        else {
+            Write-Output "Creating new branch '$ImagesBranch'"
+            git checkout --orphan $ImagesBranch
+            git rm -rf .
+        }
 
         # Construct all the points on the graph
         $Xs = @()
@@ -119,10 +119,10 @@ function Generate-Performance-Results {
         $Plot.SaveFig("$pwd/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png")
 
         # Commit the image, and change back to the original branch
-        # git add "$pwd/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png"
-        # git commit -m "Added performance graph for for $RunId-$PullRequestId-$Name-$Metric"
-        # git push origin $ImagesBranch
-        # git checkout $CurrentBranch
+        git add "$pwd/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png"
+        git commit -m "Added performance graph for for $RunId-$PullRequestId-$Name-$Metric"
+        git push origin $ImagesBranch
+        git checkout $CurrentBranch
     }
     finally {
         Pop-Location
