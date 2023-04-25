@@ -20,7 +20,7 @@ Push-Location $RepoPath
 try {
     
     if ("" -ne $Branch) {
-
+        # The format %(refname) returns the branches in the format "refs/remotes/[remotename]/[branchname]"
         $branches = $(git branch -a --format "%(refname)")
 
         if ($branches.Contains("refs/remotes/origin/$Branch")) {
