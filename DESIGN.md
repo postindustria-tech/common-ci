@@ -87,8 +87,11 @@ See [CXX](./cxx/README.md). **TODO: Add others as they are completed**
 | scripts in `[repository]/ci` |
 | ---------------------------- |
 | `build-project.ps1` |
+| `build-package.ps1` |
+| `build-package-requirements.ps1` |
 | `fetch-assets.ps1` |
 | `get-next-package-version.ps1` |
+| `install-package.ps1` |
 | `package-dependency-update.ps1` |
 | `publish-package.ps1` |
 | `run-integration-tests.ps1` |
@@ -98,6 +101,8 @@ See [CXX](./cxx/README.md). **TODO: Add others as they are completed**
 | `options.json` |
 
 *NOTE: these files in the table above MUST exist in the repository the workflow is run against, as they are called by the workflow. If a step is not relevant for a repository, then the file should do nothing and return an zero exit code.*
+
+See [Repository Scripts](./REPO_SCRIPTS.md).
 
 ### Passing Variables
 
@@ -162,6 +167,7 @@ The common options available are listed below:
 | ------ | :-------: | ---- | ------- |
 | `Name` | &check;   | string | Identifies the workflow jobs, and any artifacts which are created. |
 | `RunPerformance` | | bool | If present and true, performance tests will be run and reported for this configuration. |
+| `PackageRequirement` | | bool | If present and true, this will be used for the prebuild step in `nightly-publish-main` |
 
 Workflows that build and test a repository will do so for each of the configurations listed in the options file.
 
