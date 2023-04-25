@@ -7,11 +7,14 @@ on:
           required: true
           type: string
     secrets:
+      # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
         required: true
+      # Any secrets needed for retrieving files, signing packages or tests.
       asset-keys:
         required: true
 env:
+  # The default token is overwritten by the organisation scoped PAT.
   GITHUB_TOKEN: ${{ secrets.token }}
 
 jobs:
@@ -47,6 +50,7 @@ jobs:
         id: get_next_version
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        # Obtains the next version from the repo specific script and verifies that the version is valid
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
           Write-Output version=$Version
@@ -81,6 +85,9 @@ jobs:
         if: ${{ success() }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        # Version obtained from the preceding step is added to the options 
+        # for each element of the json array as a new key value pair.
+        # This ensures that the version is availabe to steps that need it for all of the runners. 
         run: |
           $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
           $Options = Get-Content $OptionsFile | ConvertFrom-Json
@@ -147,6 +154,8 @@ jobs:
         if: ${{ steps.build.conclusion == 'success' }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        # Secrets needed for running tests are added to options in the "Keys",
+        # which can then be accessed from within the script like Keys.TestResourceKey
         run: |
           $IntegrationOptions = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $IntegrationOptions.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
