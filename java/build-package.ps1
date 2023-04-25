@@ -35,9 +35,12 @@ try {
 
     New-Item -Path $PackagePath -ItemType Directory -Force 
     $LocalRepoPackages = Get-ChildItem -Path $MavenLocal51DPath
+    Write-Output "Maven Local 51d Repo:"
     ls $MavenLocal51DPath
+    Write-Output "Package before:"
     ls $PackagePath
-    Copy-Item -Path $LocalRepoPackages -Destination "$PackagePath"
+    Copy-Item -Path $MavenLocal51DPath -Destination "$PackagePath"
+    Write-Output "Package after:"
     ls $PackagePath
 
 }
