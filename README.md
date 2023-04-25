@@ -32,10 +32,23 @@ When implementing changes, see the [Design Document](/DESIGN.md) for detailed de
 
 # Workflows
 
+## Common Setup Steps
+``` mermaid
+flowchart
+subgraph com[Common Setup]
+  style com fill:green;
+  C1[Checkout Common]
+  C2[Configure Git]
+  C3[Clone Repo]
+  C1-->C2-->C3
+end
+```
+
 ## Nightly Publish Main
 
 ``` mermaid
 flowchart LR;
+
 subgraph Nightly Publish Main
   conf -- Once per config where 'PackageRequirement'=true --> pbuild
   pbuild -- Combine pre-build files --> build
@@ -46,60 +59,59 @@ end
 subgraph conf[Configure]
   direction LR
   style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
-  A[Checkout Common]
-  B[Configure Git]
-  C[Clone Repo]
-  D[Get Next Package Version]
-  E[Package Update Required]
-  F[Get Build Options]
-  A-->B-->C-->D-->E-->F
+  A([Common Setup])
+  style A fill:green;
+  B[Get Next Package Version]
+  C[Package Update Required]
+  D[Get Build Options]
+  A-->B-->C-->D
+
 end
 
 subgraph pbuild[Pre-Build]
   direction LR
   style pbuild fill:#00C5,stroke: #00C9,stroke-width:2px;
-  PB1[Build Package Requirements]
-  PB2[Upload Package Artifact]
-  PB1-->PB2
+  style PB1 fill:green;
+  PB1([Common Setup])
+  PB2[Build Package Requirements]
+  PB3[Upload Package Artifact]
+  PB1-->PB2-->PB3
 end
 
 subgraph build[Build Package]
   direction LR
   style build fill:#00C5,stroke: #00C9,stroke-width:2px;
-  B1[Checkout Common]
-  B2[Configure Git]
-  B3[Clone Repo]
-  B4[Download Package Artifacts]
-  B5[Build Package]
-  B6[Upload Package Artifact]
-  B1-->B2-->B3-->B4-->B5-->B6
+  style B1 fill:green;
+  B1([Common Setup])
+  B2[Download Package Artifacts]
+  B3[Build Package]
+  B4[Upload Package Artifact]
+  B1-->B2-->B3-->B4
 end
 
 subgraph test[Test]
   direction LR
   style test fill:#00C5,stroke:#00C9,stroke-width:2px;
-  T1[Checkout Common]
-  T2[Configure Git]
-  T3[Clone Repo]
-  T4[Fetch Assets]
-  T5[Setup Environment]
-  T6[Download Package Artifact]
-  T7[Install Package From Artifact]
-  T8[Run Integration Tests]
-  T1-->T2-->T3-->T4-->T5-->T6-->T7-->T8
+  style T1 fill:green;
+  T1([Common Setup])
+  T2[Fetch Assets]
+  T3[Setup Environment]
+  T4[Download Package Artifact]
+  T5[Install Package From Artifact]
+  T6[Run Integration Tests]
+  T1-->T2-->T3-->T4-->T5-->T6
 end
 
 subgraph pub[Publish Package]
   direction LR
   style pub fill:#00C5,stroke:#00C9,stroke-width:2px;
-  P1[Checkout Common]
-  P2[Configure Git]
-  P3[Clone Repo]
-  P4[Download Package Artifact]
-  P5[Install Package From Artifact]
-  P6[Publish Package]
-  P7[Update Tag]
-  P1-->P2-->P3-->P4-->P5-->P6-->P7
+  style P1 fill:green;
+  P1([Common Setup])
+  P2[Download Package Artifact]
+  P3[Install Package From Artifact]
+  P4[Publish Package]
+  P5[Update Tag]
+  P1-->P2-->P3-->P4-->P5
 end
 
 ```
@@ -107,41 +119,36 @@ end
 
 ``` mermaid
 flowchart LR
+  classDef green fill:green;
+
   subgraph "Nightly PR to Main"
     subgraph prs[Get Pull Requests]
       style prs fill:#00C5,stroke:#00C9,stroke-width:2px;
-      W[Checkout Common]
-      X[Configure Git]
-      Y[Clone Repo]
-      Z[Get Pull Requests]
-      W-->X-->Y-->Z
+      X([Common Setup]):::green
+      Y[Get Pull Requests]
+      X-->Y
     end
     subgraph main[PR to Main]
       direction TB
       subgraph conf[Configure]
         direction LR
         style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
-        A[Checkout Common]
-        B[Configure Git]
-        C[Clone Repo]
-        D[Checkout Pull Request]
-        E[Get Build Options]
-        A-->B-->C-->D-->E
+        A([Common Setup]):::green
+        B[Checkout Pull Request]
+        C[Get Build Options]
+        A-->B-->C
       end
       subgraph bat[Build and Test]
         direction LR
-        style bat fill:#00C5,stroke:#00C9,stroke-width:2px;
-        F[Checkout Common]
-        G[Configure Git]
-        H[Clone Repo]
-        I[Checkout Pull Request]
-        J[Fetch Assets]
-        K[Setup Environment]
-        L[Build Project]
-        M[Run Unit Tests]
-        N[Run Integration Tests]
-        O[Run Performance Tests]
-        F-->G-->H-->I-->J-->K-->L-->M-->N-->O
+        F([Common Setup]):::green
+        G[Checkout Pull Request]
+        H[Fetch Assets]
+        I[Setup Environment]
+        J[Build Project]
+        K[Run Unit Tests]
+        L[Run Integration Tests]
+        M[Run Performance Tests]
+        F-->G-->H-->I-->J-->K-->L-->M
       end
       conf-- Once Per Config -->bat
     end
@@ -152,18 +159,16 @@ flowchart LR
   ## Nightly Submodule Update
 ``` mermaid
   graph LR
+  classDef green fill:green;
   subgraph "Nightly Submodule Update"
     direction LR
-    A[Checkout Repository]
-    B[Checkout reusable workflow dir]
-    C[Configure Git]
-    D[Clone Repo]
-    E[Update Sub Modules]
-    F[Check for Changes]
-    G[Commit Changes]
-    H[Push Changes]
-    I[Create Pull Request]
-    A-->B-->C-->D-->E-->F-->G-->H-->I
+    A([Common Setup]):::green
+    B[Update Sub Modules]
+    C[Check for Changes]
+    D[Commit Changes]
+    E[Push Changes]
+    F[Create Pull Request]
+    A-->B-->C-->D-->E-->F
   end
   
 ```
@@ -171,18 +176,16 @@ flowchart LR
 
 ``` mermaid
 graph LR
+classDef green fill:green;
   subgraph "Nightly Package Update"
     direction LR
-    A[Checkout Repository]
-    B[Checkout reusable workflow dir]
-    C[Configure Git]
-    D[Clone Repo]
-    E[Update Packages]
-    F[Check for Changes]
-    G[Commit Changes]
-    H[Push Changes]
-    I[Create Pull Request]
-    A-->B-->C-->D-->E-->F-->G-->H-->I
+    A([Common Setup]):::green
+    B[Update Packages]
+    C[Check for Changes]
+    D[Commit Changes]
+    E[Push Changes]
+    F[Create Pull Request]
+    A-->B-->C-->D-->E-->F
   end
 ```
 
@@ -190,9 +193,10 @@ graph LR
 
 ``` mermaid
 graph LR
+classDef green fill:green;
   subgraph "Nightly Data File Update"
     direction LR
-    A[Clone Repo]
+    A([Common Setup]):::green
     B[Fetch Assets]
     C[Generate Accessors]
     D[Check For Changes]
