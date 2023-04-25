@@ -107,7 +107,7 @@ jobs:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
     name: Pre Build - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
-    if: ${{ matrix.options. }}
+    if: ${{ matrix.options.packagerequirement }}
     steps:
       - name: Build Package Requirements
         shell: pwsh
