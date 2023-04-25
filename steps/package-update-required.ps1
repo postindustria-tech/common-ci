@@ -21,6 +21,8 @@ try {
         if ($Tag -eq $Version) {
 
             Write-Output "Version '$Version' already present, no update needed"
+            # This is not treated as an error, but an indication that the result
+            # is false.
             exit 1
 
         }

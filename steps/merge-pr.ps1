@@ -21,6 +21,7 @@ try {
     
     }
     
+    # For the format argument, see https://hub.github.com/hub-pr.1.html
     $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     $Pr = hub api /repos/51degrees/$RepoName/pulls/$PullRequestId | ConvertFrom-Json
@@ -37,7 +38,7 @@ try {
     }
     else {
 
-        Write-Output "PR creator '$($Pr.user.login)' not permitted. Not merging PR $PrTitle"
+        Write-Error "PR creator '$($Pr.user.login)' not permitted. Not merging PR $PrTitle"
 
     }
 

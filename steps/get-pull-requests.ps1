@@ -11,8 +11,11 @@ Push-Location $RepoPath
 
 try {
 
+    # The format here lists the ids of the PRs with commas
     $Ids = $(hub pr list -f "%I," -b main)
     if ($Null -ne $Ids) {
+        # Because of the format we used above, we need to remove the trailing comma.
+        # Then we convert to an array.
         $Ids = $Ids.Trim(",").Split(",")
 
         $ValidIds = @()
