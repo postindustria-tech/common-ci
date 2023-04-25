@@ -73,9 +73,10 @@ subgraph pbuild[Pre-Build]
   style pbuild fill:#00C5,stroke: #00C9,stroke-width:2px;
   style PB1 fill:green;
   PB1([Common Setup])
-  PB2[Build Package Requirements]
-  PB3[Upload Package Artifact]
-  PB1-->PB2-->PB3
+  PB2[Setup Environment]
+  PB3[Build Package Requirements]
+  PB4[Upload Package Artifact]
+  PB1-->PB2-->PB3-->PB4
 end
 
 subgraph build[Build Package]
@@ -83,10 +84,11 @@ subgraph build[Build Package]
   style build fill:#00C5,stroke: #00C9,stroke-width:2px;
   style B1 fill:green;
   B1([Common Setup])
-  B2[Download Package Artifacts]
-  B3[Build Package]
-  B4[Upload Package Artifact]
-  B1-->B2-->B3-->B4
+  B2[Setup Environment]
+  B3[Download Package Artifacts]
+  B4[Build Package]
+  B5[Upload Package Artifact]
+  B1-->B2-->B3-->B4-->B5
 end
 
 subgraph test[Test]
@@ -107,11 +109,12 @@ subgraph pub[Publish Package]
   style pub fill:#00C5,stroke:#00C9,stroke-width:2px;
   style P1 fill:green;
   P1([Common Setup])
-  P2[Download Package Artifact]
-  P3[Install Package From Artifact]
-  P4[Publish Package]
-  P5[Update Tag]
-  P1-->P2-->P3-->P4-->P5
+  P2[Setup Environment]
+  P3[Download Package Artifact]
+  P4[Install Package From Artifact]
+  P5[Publish Package]
+  P6[Update Tag]
+  P1-->P2-->P3-->P4-->P5-->P6
 end
 
 ```
