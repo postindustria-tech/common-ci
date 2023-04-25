@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         if: ${{ steps.test.conclusion == 'success' }}
         with:
-          name: package_${{ matrix-options.name }}
+          name: package_${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package-files
           if-no-files-found: ignore   
           
