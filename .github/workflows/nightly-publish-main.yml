@@ -128,6 +128,12 @@ jobs:
           . ${{ github.workspace }}/common/constants.ps1
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
 
+      - name: Setup Environment
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+
       - name: Build Package Requirements
         if: ${{ success() && matrix.options.packagerequirement }}
         shell: pwsh
@@ -167,6 +173,12 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/constants.ps1
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+
+      - name: Setup Environment
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options @{}
 
       - name: Download Package Artifacts
         if: ${{ success() }}
@@ -290,7 +302,13 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/constants.ps1
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
-            
+
+      - name: Setup Environment
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options @{}
+
       - name: Download Package Artifact
         if: ${{ success() }}
         uses: actions/download-artifact@v2.1.1
