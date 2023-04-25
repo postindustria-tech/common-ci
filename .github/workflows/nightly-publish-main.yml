@@ -105,7 +105,7 @@ jobs:
     strategy:
       matrix:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
-    name: Build and Test - ${{ matrix.options.name }}
+    name: Pre Build - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
     if: ${{ matrix.options. }}
     steps:
@@ -161,7 +161,7 @@ jobs:
     strategy:
       matrix:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
-    name: Build and Test - ${{ matrix.options.name }}
+    name: Test - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
     
     steps:
