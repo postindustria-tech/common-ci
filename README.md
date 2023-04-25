@@ -89,6 +89,7 @@ flowchart LR
       pC --> pD[Get Pull Requests]
     end
     subgraph main[PR to Main]
+      direction TB
       subgraph conf[Configure]
           direction LR
           style conf fill:#00C5,stroke:#00C9,stroke-width:2px;
