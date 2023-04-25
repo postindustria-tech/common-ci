@@ -9,9 +9,6 @@ param(
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
-# Path for the locally installed packages from which they will be uploaded to artifacts
-$PackagePath = "$RepoPath/package"
-
 $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" -q -DforceStdout
 
 Write-Output $MavenLocalRepoPath
@@ -33,15 +30,15 @@ try {
     Write-Output "Building '$Name'"
     mvn install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
 
-    New-Item -Path $PackagePath -ItemType Directory -Force 
     $LocalRepoPackages = Get-ChildItem -Path $MavenLocal51DPath
     Write-Output "Maven Local 51d Repo:"
     ls $MavenLocal51DPath
-    Write-Output "Package before:"
-    ls $PackagePath
-    Copy-Item -Path $MavenLocal51DPath -Destination "$PackagePath"
+
+    Copy-Item -Path $MavenLocal51DPath -Destination $RepoPath -Recurse
+    Rename-Item -Path $RepoPath/51degrees -NewName "package"
     Write-Output "Package after:"
-    ls $PackagePath
+    ls "$RepoPath/package"
+
 
 }
 finally {
