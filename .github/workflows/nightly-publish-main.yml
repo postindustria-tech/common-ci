@@ -103,12 +103,15 @@ jobs:
             }
           }
           if ($RequiredOptions.Count -eq 0) {
-            $RequiredOptions = '[{"Name": "No Prebuild", "PackageRequirement": false}]'
+            # As there are no prebuild steps, add an empty one to ensure the YAML is still valid.
+            $RequiredOptions += @{
+              "Name" = "No Prebuild"
+              "PackageRequirement": $False
+              "Image": "ubuntu-latest"
+            }
           }
-          else {
-            $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
-            $RequiredOptions = $RequiredOptions -replace "`r`n", "" -replace "`n", ""
-          }
+          $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
+          $RequiredOptions = $RequiredOptions -replace "`r`n", "" -replace "`n", ""
           Write-Host $RequiredOptions
           echo options=$RequiredOptions | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 
