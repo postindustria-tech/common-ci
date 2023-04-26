@@ -20,7 +20,7 @@ if ($BuildMethod -eq "cmake") {
 
         Write-Output "Testing $Name"
 
-        ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex .*Performance.* --exclude-regex .*Integration.*
+        ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex .*Performance|Integration|Example.*
     }
     finally {
 
