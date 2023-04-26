@@ -17,7 +17,7 @@ Add-Type -AssemblyName System.Net.Http
 $webClient = New-Object System.Net.Http.HttpClient;
 $webClient.Timeout = New-TimeSpan -Seconds 240
 
-if ($Null -eq $Url) {
+if ([string]::IsNullOrWhiteSpace($Url)) {
     if ($DataType -ne "HashV41" -and $DataType -ne "CSV") {
         Write-Error "'$DataType' is not a recognized data type."
         exit 1
