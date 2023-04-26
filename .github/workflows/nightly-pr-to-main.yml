@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       options: ${{ steps.get_options.outputs.options }}
+      options-performance: ${{ steps.get_options.outputs.options-performance }}
     steps:
     
       - name: Checkout Common
@@ -61,6 +62,15 @@ jobs:
           $Options = $Options -replace "`r`n", "" -replace "`n", ""
           Write-Host $Options
           echo options=$Options | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $OptionsPerformance = @()
+          foreach ($Element in $($Options | ConvertFrom-Json)) {
+            if ($Element.RunPerformance) {
+              $OptionsPerformance += $Element
+            }
+          }
+          $OptionsPerformance = $OptionsPerformance | ConvertTo-Json -AsArray
+          $OptionsPerformance = $OptionsPerformance -replace "`r`n", "" -replace "`n", ""
+          echo options-performance=$OptionsPerformance | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           
   Build-and-Test:
     needs: Configure
@@ -179,13 +189,14 @@ jobs:
           if-no-files-found: ignore
                 
   Compare-Performance:
+    # This needs to run on Windows to support ScottPlot
     runs-on: windows-latest
     needs: [ Configure, Build-and-Test ]
     strategy:
       # Allow only one at a time so there are no conflicts when committing images
       max-parallel: 1
       matrix:
-        options: ${{ fromJSON(needs.configure.outputs.options ) }}
+        options: ${{ fromJSON(needs.configure.outputs.options-performance ) }}
     name: Compare Performance - ${{ matrix.options.name }}
     steps:
       - name: Checkout Common
