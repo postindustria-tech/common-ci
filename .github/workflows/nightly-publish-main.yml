@@ -6,6 +6,9 @@ on:
         repo-name:
           required: true
           type: string
+        build-platform:
+          required: true
+          type: string
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
@@ -151,7 +154,7 @@ jobs:
           
 
   Build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.build-platform }}
     needs: [ PreBuild, Configure ]
     steps:
       - name: Checkout Common
@@ -278,7 +281,7 @@ jobs:
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.json
           
   Package:      
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.build-platform }}
     needs: [ Test, Configure ]
     if: ${{ success() && needs.configure.outputs.update_required == 'true' }}
     steps:
