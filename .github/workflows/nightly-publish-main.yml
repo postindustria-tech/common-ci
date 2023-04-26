@@ -178,7 +178,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options @{}
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
 
       - name: Download Package Artifacts
         if: ${{ success() }}
@@ -307,7 +307,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options @{}
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
 
       - name: Download Package Artifact
         if: ${{ success() }}
