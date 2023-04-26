@@ -27,7 +27,7 @@ try {
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"
 
     Write-Output "Writing Settings File"
-    Set-Content -Path $settingsFile -Value $MavenSettings
+    [System.IO.File]::WriteAllBytes($settingsFile, [System.Convert]::FromBase64String($MavenSettings))
     Write-Output "Writing PFX File"
     [System.IO.File]::WriteAllBytes($CodeSigningCertFile, [System.Convert]::FromBase64String($CodeSigningCert))
     Write-Output "Writing PGP File"
