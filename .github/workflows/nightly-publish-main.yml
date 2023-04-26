@@ -274,8 +274,8 @@ jobs:
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $IntegrationOptions
     
       - name: Integration Test Results
+        if: ${{ always() }}
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ needs.Build.result == 'success' }}
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
           files: |
