@@ -103,7 +103,7 @@ jobs:
             }
           }
           if ($RequiredOptions.Count -eq 0) {
-            $RequiredOptions = "[]"
+            $RequiredOptions = '[{"Name": "No Prebuild", "PackageRequirement": false}]'
           }
           else {
             $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
@@ -122,18 +122,21 @@ jobs:
     steps:
       - name: Checkout Common
         uses: actions/checkout@v2
+        if: ${{ matrix.options.packagerequirement }}
         with:
           repository: 51degrees/common-ci
           ref: gh-refact
           path: common
 
       - name: Configure Git
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
           
       - name: Clone Repo
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
@@ -141,12 +144,14 @@ jobs:
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
 
       - name: Setup Environment
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
 
       - name: Build Package Requirements
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
@@ -154,7 +159,7 @@ jobs:
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.packagerequirement }}
         with:
           name: package_${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package-files
