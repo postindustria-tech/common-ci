@@ -17,7 +17,7 @@ try {
 
     Write-Output "Testing $($Options.Name)"
 
-    ctest -C $Configuration -T test --no-compress-output --output-junit "../test-results/integration/$Name.xml" --tests-regex .*Integration.*
+    ctest -C $Configuration -T test --no-compress-output --output-junit "../test-results/integration/$Name.xml" --tests-regex ".*Integration|Example.*"
 }
 finally {
 
