@@ -106,8 +106,8 @@ jobs:
             # As there are no prebuild steps, add an empty one to ensure the YAML is still valid.
             $RequiredOptions += @{
               "Name" = "No Prebuild"
-              "PackageRequirement": $False
-              "Image": "ubuntu-latest"
+              "PackageRequirement" = $False
+              "Image" = "ubuntu-latest"
             }
           }
           $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
