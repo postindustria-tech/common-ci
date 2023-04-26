@@ -257,7 +257,7 @@ jobs:
 
       - name: Run Integration Tests
         id: test
-        if: ${{ steps.build.conclusion == 'success' }}
+        if: ${{ needs.Build.result == 'success' }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         # Secrets needed for running tests are added to options in the "Keys",
@@ -269,7 +269,7 @@ jobs:
     
       - name: Integration Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ steps.build.conclusion == 'success' }}
+        if: ${{ needs.Build.result == 'success' }}
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
           files: |
