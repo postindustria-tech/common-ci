@@ -94,14 +94,18 @@ jobs:
         run: |
           $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
           $Options = Get-Content $OptionsFile | ConvertFrom-Json
-          foreach( $element in $Options)
+          $RequiredOptions = @()
+          foreach ($element in $Options)
           {
-            $element | Add-Member -Name "Version" -Value "${{ steps.get_next_version.outputs.version }}" -MemberType NoteProperty
+            if ($element.PackageRequirement) {
+              $element | Add-Member -Name "Version" -Value "${{ steps.get_next_version.outputs.version }}" -MemberType NoteProperty
+              $RequiredOptions += $element
+            }
           }
-          $Options = $Options | ConvertTo-Json -AsArray
-          $Options = $Options -replace "`r`n", "" -replace "`n", ""
-          Write-Host $Options
-          echo options=$Options | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
+          $RequiredOptions = $RequiredOptions -replace "`r`n", "" -replace "`n", ""
+          Write-Host $RequiredOptions
+          echo options=$RequiredOptions | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 
   PreBuild:
     needs: Configure
