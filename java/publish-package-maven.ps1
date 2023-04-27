@@ -11,7 +11,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningCertAlias,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertPassword
+    [string]$CodeSigningCertPassword,
+    $Version
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -21,8 +22,8 @@ Push-Location $RepoPath
 
 try {
 
-    $Version = mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression="project.version" -q -DforceStdout
-    Write-Output "Version: '$Version'"
+    Write-Output "Setting version to '$Version'"
+    mvn versions:set -DnewVersion="$Version"
 
     # Set file names
     $settingsFile = "stagingsettings.xml"
