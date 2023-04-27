@@ -31,6 +31,7 @@ try {
     git submodule update --init --recursive
 
     $Sha = hub pr show $PullRequestId -f "%sm"
+    Write-Output "Setting '$VariableName' to '$Sha'"
     Set-Variable -Name $VariableName -Value $Sha -Scope Global
 
 }
