@@ -103,10 +103,13 @@ jobs:
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
           
       - name: Checkout Pull Request
+        id: checkout_pr
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
+          . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }} -VariableName "PullReqestSha"
+          echo pr-sha=$PullRequestSha | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          
       - name: Fetch Assets
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
@@ -156,6 +159,7 @@ jobs:
         if: ${{ always() }}
         with:
           check_name: Unit Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
           files: |
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
@@ -166,6 +170,7 @@ jobs:
         if: ${{ always() }}
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
           files: |
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
@@ -176,6 +181,7 @@ jobs:
         if: ${{ matrix.options.runperformance }}
         with:
           check_name: Performance Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
           files: |
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
