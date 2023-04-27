@@ -2,7 +2,7 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$VariableName = "Version",
+    [string]$VariableName = "GitVersion",
     [string]$GitVersionConfigPath = $Null
 )
 
