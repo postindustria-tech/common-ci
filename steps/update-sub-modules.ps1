@@ -11,6 +11,9 @@ Push-Location $RepoPath
 
 try {
 
+    Write-Output "Merging any changes from main"
+    git merge origin/main
+
     Write-Output "Cloning Submodules"
     git submodule update --init --recursive
 
