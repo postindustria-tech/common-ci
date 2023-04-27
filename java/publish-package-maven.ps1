@@ -31,7 +31,7 @@ try {
     Write-Output "Writing PFX File"
     [System.IO.File]::WriteAllBytes($CodeSigningCertFile, [System.Convert]::FromBase64String($CodeSigningCert))
     Write-Output "Writing PGP File"
-    Set-Content -Path $JavaPGP -Value $JavaPGPFile
+    Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
 
     echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
