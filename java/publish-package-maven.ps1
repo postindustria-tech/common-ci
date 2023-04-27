@@ -17,6 +17,11 @@ try {
     Write-Output "Setting version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
 
+    $settingsFile = "stagingsettings.xml"
+
+    Write-Output "Writing Settings File"
+    $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
+    Set-Content -Path $settingsFile -Value $SettingsContent
 
     Write-Output "Deploying to Nexus staging"
     

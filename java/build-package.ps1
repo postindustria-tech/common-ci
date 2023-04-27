@@ -38,13 +38,8 @@ try {
     mvn versions:set -DnewVersion="$Version"
 
     # Set file names
-    $settingsFile = "stagingsettings.xml"
     $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"
-
-    Write-Output "Writing Settings File"
-    $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
-    Set-Content -Path $settingsFile -Value $SettingsContent
 
     Write-Output "Writing PFX File"
     $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
