@@ -68,6 +68,14 @@ jobs:
               $OptionsPerformance += $Element
             }
           }
+           if ($OptionsPerformance.Count -eq 0) {
+            # As there are performance tests, add an empty one to ensure the YAML is still valid.
+            $OptionsPerformance += @{
+              "Name" = "No Performance Tests"
+              "RunPerformance" = $False
+              "Image" = "ubuntu-latest"
+            }
+          }
           $OptionsPerformance = $OptionsPerformance | ConvertTo-Json -AsArray
           $OptionsPerformance = $OptionsPerformance -replace "`r`n", "" -replace "`n", ""
           echo options-performance=$OptionsPerformance | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
