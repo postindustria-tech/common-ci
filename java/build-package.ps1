@@ -33,22 +33,18 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-
+      
     Write-Output "Setting package version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
 
     # Set file names
-    $settingsFile = "stagingsettings.xml"
     $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"
-
-    Write-Output "Writing Settings File"
-    $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
-    Set-Content -Path $settingsFile -Value $SettingsContent
 
     Write-Output "Writing PFX File"
     $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
     Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
+    $CertPath = [IO.Path]::Combine($RepoPath, $CodeSigningCertFile)
 
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
@@ -56,7 +52,20 @@ try {
     echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
 
     Write-Output "Building '$Name'"
-    mvn install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false $ExtraArgs -Dskippackagesign=false "-Dgpg.passphrase=$JavaGpgKeyPassphrase" -Dkeystore=$CodeSigningCertFile -Dalias=$CodeSigningCertAlias -Dkeypass=$CodeSigningCertPassword -Dkeystorepass=$CodeSigningCertPassword
+    mvn install `
+        $ExtraArgs `
+        -f pom.xml `
+        -DXmx2048m `
+        -DskipTests `
+        --no-transfer-progress `
+        "-Dhttps.protocols=TLSv1.2" `
+        "-DfailIfNoTests=false" `
+        "-Dskippackagesign=false" `
+        "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
+        "-Dkeystore=$CertPath" `
+        "-Dalias=$CodeSigningCertAlias" `
+        "-Dkeypass=$CodeSigningCertPassword" `
+        "-Dkeystorepass=$CodeSigningCertPassword"
 
     $LocalRepoPackages = Get-ChildItem -Path $MavenLocal51DPath
     Write-Output "Maven Local 51d Repo:"
