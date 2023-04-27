@@ -20,16 +20,23 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
+
     $Version = mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression="project.version" -q -DforceStdout
     Write-Output "Version: '$Version'"
+
+    # Set file names
     $settingsFile = "stagingsettings.xml"
     $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"
 
     Write-Output "Writing Settings File"
-    [System.IO.File]::WriteAllBytes($settingsFile, [System.Convert]::FromBase64String($MavenSettings))
+    $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
+    Set-Content -Path $settingsFile -Value $SettingsContent
+
     Write-Output "Writing PFX File"
-    [System.IO.File]::WriteAllBytes($CodeSigningCertFile, [System.Convert]::FromBase64String($CodeSigningCert))
+    $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
+    Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
+
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
