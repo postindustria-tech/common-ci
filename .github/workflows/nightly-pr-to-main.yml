@@ -107,8 +107,8 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }} -VariableName "PullReqestSha"
-          echo pr-sha=$PullRequestSha | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }} -VariableName "PullRequestSha"
+          echo pr-sha="$PullRequestSha" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           
       - name: Fetch Assets
         shell: pwsh
