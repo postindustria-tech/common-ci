@@ -157,10 +157,9 @@ jobs:
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: ${{ always() }}
-        env:
-          COMMIT: ${{ steps.checkout_pr.outputs.pr-sha }}
         with:
           check_name: Unit Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
           files: |
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
             ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
@@ -169,8 +168,6 @@ jobs:
       - name: Integration Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: ${{ always() }}
-        env:
-          COMMIT: ${{ steps.checkout_pr.outputs.pr-sha }}
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
           commit: ${{ steps.checkout_pr.outputs.pr-sha }}
@@ -181,9 +178,7 @@ jobs:
             
       - name: Performance Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ matrix.options.runperformance }}
-        env:
-          COMMIT: ${{ steps.checkout_pr.outputs.pr-sha }}
+        if: ${{ always() && matrix.options.runperformance }}
         with:
           check_name: Performance Tests - ${{ matrix.options.name }}
           commit: ${{ steps.checkout_pr.outputs.pr-sha }}
