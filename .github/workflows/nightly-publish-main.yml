@@ -209,7 +209,9 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-package.ps1" -Options @{Version = "${{ needs.configure.outputs.version }}" }
+          $Options = $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
+          $Options.Add("Version", "${{ needs.configure.outputs.version }}")
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-package.ps1" -Options $Options
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
