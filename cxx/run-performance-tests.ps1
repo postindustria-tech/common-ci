@@ -17,7 +17,7 @@ try {
 
     Write-Output "Testing $($Options.Name)"
 
-    ctest -C $Configuration -T test --no-compress-output --output-junit "../test-results/performance/$Name.xml" --tests-regex ".*(?:(?!High))*Perf.*"
+    ctest -C $Configuration -T test --no-compress-output --output-junit "../test-results/performance/$Name.xml" --tests-regex .*Perf.*
 }
 finally {
 
