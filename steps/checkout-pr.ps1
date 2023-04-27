@@ -2,7 +2,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [int]$PullRequestId
+    [int]$PullRequestId,
+    [string]$VariableName = "PullRequestSha"
 )
 
 . ./constants.ps1
@@ -28,6 +29,9 @@ try {
     hub pr checkout $PullRequestId
     # Any submodules may not have updated, so do this manually.
     git submodule update --init --recursive
+
+    $Sha = hub pr show $PullRequestId -f "%sm"
+    Set-Variable -Name $VariableName -Value $Sha -Scope Global
 
 }
 finally {
