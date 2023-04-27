@@ -150,9 +150,10 @@ jobs:
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ steps.build.conclusion == 'success' }}
+        if: ${{ always() }}
         with:
           check_name: Unit Tests - ${{ matrix.options.name }}
           files: |
@@ -162,7 +163,7 @@ jobs:
             
       - name: Integration Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ steps.build.conclusion == 'success' }}
+        if: ${{ always() }}
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
           files: |
@@ -172,7 +173,7 @@ jobs:
             
       - name: Performance Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ steps.build.conclusion == 'success' && matrix.options.runperformance }}
+        if: ${{ matrix.options.runperformance }}
         with:
           check_name: Performance Tests - ${{ matrix.options.name }}
           files: |
