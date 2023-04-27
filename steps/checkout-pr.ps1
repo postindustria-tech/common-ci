@@ -30,7 +30,7 @@ try {
     # Any submodules may not have updated, so do this manually.
     git submodule update --init --recursive
 
-    $Sha = hub pr show $PullRequestId -f "%sm"
+    $Sha = hub pr show $PullRequestId -f "%sH"
     Set-Variable -Name $VariableName -Value $Sha -Scope Global
 
 }
