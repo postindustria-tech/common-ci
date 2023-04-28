@@ -4,7 +4,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$MavenSettings,
     [Parameter(Mandatory=$true)]
-    $Version
+    [string]$Version
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -23,9 +23,30 @@ try {
     $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
     Set-Content -Path $settingsFile -Value $SettingsContent
 
+    # Set file names
+    $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
+    $JavaPGPFile = "Java Maven GPG Key Private.pgp"
+
+    Write-Output "Writing PFX File"
+    $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
+    Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
+    $CertPath = [IO.Path]::Combine($RepoPath, $CodeSigningCertFile)
+
+    Write-Output "Writing PGP File"
+    Set-Content -Path $JavaPGPFile -Value $JavaPGP
+
+    echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
+
     Write-Output "Deploying to Nexus staging"
     
-    mvn deploy -DdeployOnly "-Dmaven.install.skip=true" -DskipTests -s $settingsFile --no-transfer-progress "-Dhttps.protocols=TLSv1.2" 
+    mvn nexus-staging:deploy-staged
+        -s $settingsFile  `
+        -f pom.xml `
+        -DXmx2048m `
+        -DskipTests `
+        --no-transfer-progress `
+        "-Dhttps.protocols=TLSv1.2" `
+        "-DfailIfNoTests=false" 
 
     if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 

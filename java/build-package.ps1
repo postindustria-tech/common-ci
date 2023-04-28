@@ -27,6 +27,9 @@ Write-Output $MavenLocalRepoPath
 
 $MavenLocal51DPath = [IO.Path]::Combine($MavenLocalRepoPath, "com", "51degrees")
 
+$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) "deferred"
+
+
 Write-Output $MavenLocal51DPath
 
 Write-Output "Entering '$RepoPath'"
@@ -52,7 +55,7 @@ try {
     echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
 
     Write-Output "Building '$Name'"
-    mvn install `
+    mvn deploy `
         $ExtraArgs `
         -f pom.xml `
         -DXmx2048m `
@@ -65,17 +68,31 @@ try {
         "-Dkeystore=$CertPath" `
         "-Dalias=$CodeSigningCertAlias" `
         "-Dkeypass=$CodeSigningCertPassword" `
-        "-Dkeystorepass=$CodeSigningCertPassword"
+        "-Dkeystorepass=$CodeSigningCertPassword", `
+        "-DskipRemoteStaging=true"
 
-    $LocalRepoPackages = Get-ChildItem -Path $MavenLocal51DPath
     Write-Output "Maven Local 51d Repo:"
     ls $MavenLocal51DPath
 
-    Copy-Item -Path $MavenLocal51DPath -Destination $RepoPath -Recurse
-    Rename-Item -Path $RepoPath/51degrees -NewName "package"
-    Write-Output "Package after:"
-    ls "$RepoPath/package"
+    $PackagePath = "$RepoPath/package"
+    
+    # Create the "package" folder if it doesn't exist
+    New-Item -ItemType Directory -Path $PackagePath -Force
 
+    Copy-Item -Path $MavenLocal51DPath -Destination $RepoPath -Recurse
+    Rename-Item -Path $RepoPath/51degrees -NewName "local"
+
+
+    Copy-Item -Path $NexusLocalStaging51DPath -Destination $RepoPath -Recurse
+    Rename-Item -Path "$RepoPath/deferred" -NewName "nexus"
+
+    # Move the "local" folder to the "package" folder
+    Move-Item -Path "$RepoPath/local"  -Destination $PackagePath
+
+    # Move the "nexus" folder to the "package" folder
+    Move-Item -Path "$RepoPath/nexus" -Destination $PackagePath
+
+    ls "$RepoPath/package"
 
 }
 finally {

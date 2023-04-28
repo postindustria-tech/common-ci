@@ -18,16 +18,25 @@ $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" 
 # Define the path for the local 51degrees Maven repository
 $MavenLocal51DPath = Join-Path -Path $MavenLocalRepoPath -ChildPath "com\51degrees"
 
+# Define the path for the local Nexus staging repository
+$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) "deferred"
+
 # Display the repository path and enter it
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
+
+    Write-Output "Copying packages to the local repository"
     # Copy the content of the package path to the Maven local repository
-    Copy-Item -Path $PackagePath -Destination (Join-Path -Path $MavenLocalRepoPath -ChildPath "com") -Recurse
+    Copy-Item -Path "$PackagePath/local" -Destination (Join-Path -Path $MavenLocalRepoPath -ChildPath "com") -Recurse
+
+    Write-Output "Copying packages to the local staging repository"
+    # Copy the content of the package path to the Nexus local staging repository
+    Copy-Item -Path "$PackagePath/nexus" -Destination $NexusLocalStaging51DPath -Recurse
 
     # Rename the folder in the Maven local repository
-    Rename-Item -Path (Join-Path -Path $MavenLocalRepoPath -ChildPath "com\package") -NewName "51degrees"
+    Rename-Item -Path (Join-Path -Path $MavenLocalRepoPath -ChildPath "com\local") -NewName "51degrees"
 
     # Display the content of the local 51degrees Maven repository
     Write-Output "Content of the local 51d Maven Repository: "
