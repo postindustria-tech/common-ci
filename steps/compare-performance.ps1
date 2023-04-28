@@ -143,7 +143,7 @@ function Generate-Performance-Results {
 
     # Check if the current result is more than 2 standard deviations out.
     $Passed = $False
-    if ($HigerIsBetter) {
+    if ($HigerIsBetter -eq $True) {
         Write-Output "Checking '$CurrentResult' > '$($Mean - ($Deviation * 2))'"
         $Passed = $CurrentResult -gt ($Mean - ($Deviation * 2))
     }
@@ -231,6 +231,7 @@ if ($PlotReady -eq $False) {
 }
 # Generate the performance results for all metrics
 foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
+    Write-Output "Checking '$Metric' (HigherIsBetter)"
     $MetricResults = @()
     $MetricArtifacts = @()
     foreach ($Result in $Results) {
@@ -242,6 +243,7 @@ foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
     Generate-Performance-Results -Results $MetricResults -CurrentResult $CurrentResult.HigherIsBetter[$Metric] -Artifacts $MetricArtifacts -CurrentArtifact $CurrentResult.Artifact -Metric $Metric -HigherIsBetter $True
 }
 foreach ($Metric in $CurrentResult.LowerIsBetter.Keys) {
+    Write-Output "Checking '$Metric' (LowerIsBetter)"
     $MetricResults = @()
     $MetricArtifacts = @()
     foreach ($Result in $Results) {
