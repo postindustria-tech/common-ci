@@ -58,8 +58,9 @@ jobs:
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
           Write-Output version=$Version
           # Check that the version is valid
-          $ParseResult = $Null
-          $IsValid = [System.Version]::TryParse($Version, [ref]$ParseResult)
+          # $ParseResult = $Null
+          # [System.Version]::TryParse($Version, [ref]$ParseResult)
+          $IsValid = [bool]([regex]::Match($Version, '^(\d+)\.(\d+)\.(\d+)(-SNAPSHOT)?$')) 
           if ($IsValid -eq $False) {
             Write-Error "The package version was not valid: '$Version'"
             exit 1
