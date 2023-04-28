@@ -14,7 +14,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Testing $Name"
-    mvn test -Dtest=*Integration* -DfailIfNoTests=false 
+    mvn test -Dtest=ExampleTests -DfailIfNoTests=false
 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
@@ -25,7 +25,7 @@ try {
         if(!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir }
         if(Test-Path $targetDir) {
             Get-ChildItem -Path $targetDir | 
-            Where-Object { $_.Name -like "*Integration*" } |
+            Where-Object { $_.Name -like "*ExampleTests*" } |
             ForEach-Object {
                 Copy-Item -Path $_.FullName -Destination $destDir
             }
