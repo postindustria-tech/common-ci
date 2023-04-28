@@ -144,9 +144,11 @@ function Generate-Performance-Results {
     # Check if the current result is more than 2 standard deviations out.
     $Passed = $False
     if ($HigerIsBetter) {
+        Write-Output "Checking '$CurrentResult' > '$($Mean - ($Deviation * 2))'"
         $Passed = $CurrentResult -gt ($Mean - ($Deviation * 2))
     }
     else {
+        Write-Output "Checking '$CurrentResult' < '$($Mean + ($Deviation * 2))'"
         $Passed = $CurrentResult -lt ($Mean + ($Deviation * 2))
     }
     if ($Passed -eq $False) {
