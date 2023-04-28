@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$ProjectDir = ".",
-    [string]$Name
+    [string]$Name,
+    [string]$TestName
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName, $ProjectDir)
@@ -14,23 +15,27 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Testing $Name"
-    mvn test -Dtest=*Performance* -DfailIfNoTests=false 
-
+    mvn test -Dtest="*$TestName*" -DfailIfNoTests=false 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
     Where-Object { Test-Path "$($_.FullName)\pom.xml" } | 
     ForEach-Object { 
         $targetDir = "$($_.FullName)\target\surefire-reports"
-        $destDir = ".\test-results\performance"
+        $destDir = "..\$RepoName\test-results\performance"
+        $destDirSummary = "..\$RepoName\test-results\performance-summary"
+
         if(!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir }
         if(Test-Path $targetDir) {
             Get-ChildItem -Path $targetDir | 
-            Where-Object { $_.Name -like "*Performance*" } |
+            Where-Object { $_.Name -like "*$TestName*" } |
             ForEach-Object {
                 Copy-Item -Path $_.FullName -Destination $destDir
             }
         }
     }
+
+    Copy-Item -Path $destDir -Destination $destDirSummary -Recurse
+
 }
 
 finally {
