@@ -13,9 +13,8 @@ Push-Location $RepoPath
 
 try {
     
-    #-Dhttps.protocols=TLSv1.2
     Write-Output "Testing '$Name'"
-    mvn surefire:test -Dtest="!**/*Integration*,!**/*PerformanceTest*" -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false
+    mvn surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2"
 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
@@ -26,7 +25,7 @@ try {
         if(!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir }
         if(Test-Path $targetDir) {
             Get-ChildItem -Path $targetDir | 
-            Where-Object { $_.Name -notlike "*Integration*" -and $_.Name -notlike "*Performance*"  } |
+            Where-Object { $_.Name -notlike "*ExampleTests*"} |
             ForEach-Object {
                 Copy-Item -Path $_.FullName -Destination $destDir
             }
