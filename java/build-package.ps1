@@ -68,7 +68,7 @@ try {
         "-Dkeystore=$CertPath" `
         "-Dalias=$CodeSigningCertAlias" `
         "-Dkeypass=$CodeSigningCertPassword" `
-        "-Dkeystorepass=$CodeSigningCertPassword", `
+        "-Dkeystorepass=$CodeSigningCertPassword" `
         "-DskipRemoteStaging=true"
 
     Write-Output "Maven Local 51d Repo:"
