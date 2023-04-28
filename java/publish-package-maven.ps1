@@ -39,7 +39,7 @@ try {
 
     Write-Output "Deploying to Nexus staging"
     
-    mvn nexus-staging:deploy-staged
+    mvn nexus-staging:deploy-staged `
         -s $settingsFile  `
         -f pom.xml `
         -DXmx2048m `
