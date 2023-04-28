@@ -25,7 +25,7 @@ try {
 
     Write-Output "Deploying to Nexus staging"
     
-    mvn deploy -DdeployOnly -DskipTests -s $settingsFile --no-transfer-progress "-Dhttps.protocols=TLSv1.2" 
+    mvn deploy -DdeployOnly "-Dmaven.install.skip=true" -DskipTests -s $settingsFile --no-transfer-progress "-Dhttps.protocols=TLSv1.2" 
 
     if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
