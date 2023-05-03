@@ -1,3 +1,20 @@
+# JAVA SPECIFIC CI/CD Approach
+
+The CI/CD pipeline in this project adheres to the principles outlined in the common-ci project, with the following exceptions:
+
+## Environment
+
+In Java Projects, we utilise a custom PowerShell script (setup-environment.ps1) to change Java JDK version instead of relying on the actions/setup-java within the YAML workflow file. This approach grants us more flexibility in terms of local testing, where we can switch between different java versions using the same approach. 
+The Java SDK Versions that are pre-installed on the available runners are available here in the relevant READMEs: 
+
+https://github.com/actions/runner-images/tree/main/images
+
+The options.json file in java project repositories contains the environmental variable for the specified Java version e.g. "JAVA_HOME_8_X64". This option is then used as an input for the setup-environment script, which overwrites the JAVA_HOME variable and sets the desired Java version on the runner.
+
+
+
+----------------------------------------------------------------------------------- OLD -------------------------------------------------
+
 # Java Specific CI/CD Approach
 This API complies with the `common-ci` approach.
 
