@@ -27,6 +27,9 @@ try {
 
     Write-Output "Checking out PR $PrTitle"
     hub pr checkout $PullRequestId
+    Write-Output "Merging in any changes from main"
+    git merge origin/main
+    
     # Any submodules may not have updated, so do this manually.
     git submodule update --init --recursive
 
