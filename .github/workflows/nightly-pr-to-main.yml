@@ -1,0 +1,292 @@
+name: Nightly PR to Main
+
+on:
+  workflow_call:
+    inputs:
+        repo-name:
+          required: true
+          type: string
+        pull-request-id:
+          required: true
+          type: number
+    secrets:
+      token:
+        required: true
+      asset-keys:
+        required: false
+env:
+  GITHUB_TOKEN: ${{ secrets.token }}
+
+jobs:
+  Configure:
+    runs-on: ubuntu-latest
+    outputs:
+      options: ${{ steps.get_options.outputs.options }}
+      options-performance: ${{ steps.get_options.outputs.options-performance }}
+    steps:
+    
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+        
+      - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
+          
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+          
+      - name: Checkout Pull Request
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
+          
+      - name: Get Build Options
+        id: get_options
+        if: ${{ success() }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
+          $Options = Get-Content $OptionsFile -Raw
+          $Options = $Options -replace "`r`n", "" -replace "`n", ""
+          Write-Host $Options
+          echo options=$Options | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $OptionsPerformance = @()
+          foreach ($Element in $($Options | ConvertFrom-Json)) {
+            if ($Element.RunPerformance) {
+              $OptionsPerformance += $Element
+            }
+          }
+           if ($OptionsPerformance.Count -eq 0) {
+            # As there are performance tests, add an empty one to ensure the YAML is still valid.
+            $OptionsPerformance += @{
+              "Name" = "No Performance Tests"
+              "RunPerformance" = $False
+              "Image" = "ubuntu-latest"
+            }
+          }
+          $OptionsPerformance = $OptionsPerformance | ConvertTo-Json -AsArray
+          $OptionsPerformance = $OptionsPerformance -replace "`r`n", "" -replace "`n", ""
+          echo options-performance=$OptionsPerformance | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          
+  Build-and-Test:
+    needs: Configure
+    strategy:
+      matrix:
+        options: ${{ fromJSON(needs.configure.outputs.options ) }}
+    name: Build and Test - ${{ matrix.options.name }}
+    runs-on: ${{ matrix.options.image }}
+    
+    steps:
+
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+
+      - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
+          
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+          
+      - name: Checkout Pull Request
+        id: checkout_pr
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/checkout-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }} -VariableName "PullRequestSha"
+          echo pr-sha="$PullRequestSha" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          
+      - name: Fetch Assets
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
+          
+      - name: Setup Environment
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+                      
+      - name: Build Project
+        id: build
+        if: ${{ success() }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          Write-Output ${{ matrix.options }}
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-project.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          
+      - name: Run Unit Tests
+        if: ${{ steps.build.conclusion == 'success' }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-unit-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          
+      - name: Run Integration Tests
+        if: ${{ steps.build.conclusion == 'success' }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          $IntegrationOptions = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          $IntegrationOptions.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $IntegrationOptions
+          
+      - name: Run Performance Tests
+        if: ${{ steps.build.conclusion == 'success' && matrix.options.runperformance }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-performance-tests.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+
+      - name: Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: ${{ always() }}
+        with:
+          check_name: Unit Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
+          files: |
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.json
+            
+      - name: Integration Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: ${{ always() }}
+        with:
+          check_name: Integration Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
+          files: |
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.json
+            
+      - name: Performance Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: ${{ always() && matrix.options.runperformance }}
+        with:
+          check_name: Performance Tests - ${{ matrix.options.name }}
+          commit: ${{ steps.checkout_pr.outputs.pr-sha }}
+          files: |
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.json
+            
+      - name: Upload Performance Results Artifact
+        uses: actions/upload-artifact@v3.1.2
+        if: ${{ matrix.options.runperformance }}
+        with:
+          name: performance_results_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
+          if-no-files-found: ignore
+                
+  Compare-Performance:
+    # This needs to run on Windows to support ScottPlot
+    runs-on: windows-latest
+    needs: [ Configure, Build-and-Test ]
+    strategy:
+      # Allow only one at a time so there are no conflicts when committing images
+      max-parallel: 1
+      matrix:
+        options: ${{ fromJSON(needs.configure.outputs.options-performance ) }}
+    name: Compare Performance - ${{ matrix.options.name }}
+    steps:
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+
+      - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
+          
+      - name: Clone Repo
+        shell: pwsh
+        if: ${{ matrix.options.runperformance }}
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+      
+      - name: Download Performance Artifact
+        if: ${{ success() && matrix.options.runperformance }}
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: performance_results_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common
+
+      - name: Compare Performance Results
+        shell: pwsh
+        if: ${{ success() && matrix.options.runperformance }}
+        working-directory: ${{ github.workspace }}/common/
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}
+        run: |
+          . ${{ github.workspace }}/common/steps/compare-performance.ps1 -RepoName ${{ inputs.repo-name }} -Name ${{ matrix.options.name }} -RunId ${{ github.run_id }} -PullRequestId ${{ inputs.pull-request-id }} -ResultsPath ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
+          
+      - name: Upload Successful Performance Results Artifact
+        if: ${{ success() && matrix.options.runperformance }}
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: performance_results_passed_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
+          if-no-files-found: ignore
+
+  Complete:      
+    runs-on: ubuntu-latest
+    needs: [ Build-and-Test, Compare-Performance ]
+    steps:
+
+      - name: Checkout Common
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          ref: gh-refact
+          path: common
+
+      - name: Configure Git
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
+          
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/constants.ps1
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+          
+      - name: Merge Pull Request
+        if: ${{ success() }}
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/merge-pr.ps1 -RepoName ${{ inputs.repo-name }} -PullRequestId ${{ inputs.pull-request-id }}
