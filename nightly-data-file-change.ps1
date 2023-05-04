@@ -2,7 +2,7 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$DeviceDetection,
+    [string]$DeviceDetectionKey,
     [string]$DeviceDetectionUrl,
     [string]$GitHubToken
 )
@@ -16,7 +16,7 @@ param (
 ./steps/clone-repo.ps1 -RepoName "tools"
 
 $Options = @{
-    DeviceDetection = $DeviceDetection
+    DeviceDetectionKey = $DeviceDetectionKey
     DeviceDetectionUrl = $DeviceDetectionUrl
     TargetRepo = $RepoName
 }
