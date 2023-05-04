@@ -1,48 +1,45 @@
 
 param (
     [Parameter(Mandatory=$true)]
-    [string]$RepoName
+    [string]$RepoName,
+    [string]$DeviceDetection,
+    [string]$DeviceDetectionUrl,
+    [string]$GitHubToken
 )
 
 . ./constants.ps1
 
-./steps/clone-repo.ps1 -RepoName $RepoName -Branch $BranchName
+./steps/configure-git.ps1 -GitHubToken $GitHubToken
 
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "fetch-assets.ps1"
+./steps/clone-repo.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
 
-# TODO for now we are assuming the file exists. This needs to be defined in docs.
-$OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
+./steps/clone-repo.ps1 -RepoName "tools"
 
-$Success = $True;
+$Options = @{
+    DeviceDetection = $DeviceDetection
+    DeviceDetectionUrl = $DeviceDetectionUrl
+    TargetRepo = $RepoName
+}
 
-foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "fetch-assets.ps1" -Options $Options
 
-    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "generate-accessors.ps1" -Options $Options
 
-    if ($LASTEXITCODE -eq 0) {
+./steps/has-changed.ps1 -RepoName $RepoName
 
-        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-unit-tests.ps1" -Options $Options
+if ($LASTEXITCODE -eq 0) {
+    
+    ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated properties."
 
-    }
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $BranchName
 
-    if ($LASTEXITCODE -eq 0) {
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties."
+    
+}
+else {
 
-        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Options $Options
-
-    }
-
-    if ($LASTEXITCODE -eq 0) {
-
-        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-performance-tests.ps1" -Options $Options
-
-    }
-
-    $Success = $Success -and $($LASTEXITCODE -eq 0)
+    Write-Host "No property changes, so not creating a pull request."
 
 }
 
-if ($Success -eq $False) {
-
-    exit 1
-
-}
+exit 0
