@@ -1,0 +1,41 @@
+name: Nightly Data File Change
+
+on:
+  workflow_call:
+    inputs:
+        repo-name:
+          required: true
+          type: string
+    secrets:
+      token:
+        required: true
+      device-detection:
+        required: true
+      device-detection-url:
+env:
+  GITHUB_TOKEN: ${{ secrets.token }}
+
+jobs:
+  nightly-data-file-change:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
+      - name: Checkout reusable workflow dir
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          path: common
+        
+      - name: Generate Accessors
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/nightly-data-file-change.ps1 `
+          -GitHubToken ${{ secrets.token }} `
+          -RepoName ${{ inputs.repo-name }} `
+          -DeviceDetection ${{ secrets.device-detection }} `
+          -DeviceDetectionUrl ${{ secrets.device-detection-url }} `
+          -RunId ${{ github.run_id }}
