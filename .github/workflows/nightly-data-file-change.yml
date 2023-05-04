@@ -9,9 +9,11 @@ on:
     secrets:
       token:
         required: true
-      device-detection:
+      device-detection-key:
         required: true
       device-detection-url:
+        required: false
+        
 env:
   GITHUB_TOKEN: ${{ secrets.token }}
 
@@ -36,6 +38,6 @@ jobs:
           . ${{ github.workspace }}/common/nightly-data-file-change.ps1 `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
-          -DeviceDetection ${{ secrets.device-detection }} `
+          -DeviceDetection ${{ secrets.device-detection-key }} `
           -DeviceDetectionUrl ${{ secrets.device-detection-url }} `
           -RunId ${{ github.run_id }}
