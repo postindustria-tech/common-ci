@@ -38,6 +38,6 @@ jobs:
           . ${{ github.workspace }}/common/nightly-data-file-change.ps1 `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
-          -DeviceDetection ${{ secrets.device-detection-key }} `
+          -DeviceDetectionKey ${{ secrets.device-detection-key }} `
           -DeviceDetectionUrl ${{ secrets.device-detection-url }} `
           -RunId ${{ github.run_id }}
