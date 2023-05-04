@@ -31,7 +31,7 @@ if ($LASTEXITCODE -eq 0) {
     
     ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated properties."
 
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $BranchName
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
 
     ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties."
     
