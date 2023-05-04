@@ -1,48 +1,40 @@
 
 param (
     [Parameter(Mandatory=$true)]
-    [string]$RepoName
+    [string]$RepoName,
+    [string]$DeviceDetection,
+    [string]$DeviceDetectionUrl
 )
 
 . ./constants.ps1
 
-./steps/clone-repo.ps1 -RepoName $RepoName -Branch $BranchName
+./steps/clone-repo.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
 
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "fetch-assets.ps1"
+./steps/clone-repo.ps1 -RepoName "tools"
 
-# TODO for now we are assuming the file exists. This needs to be defined in docs.
-$OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
-
-$Success = $True;
-
-foreach ($Options in $(Get-Content $OptionsFile | ConvertFrom-Json)) {
-
-    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Options $Options
-
-    if ($LASTEXITCODE -eq 0) {
-
-        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-unit-tests.ps1" -Options $Options
-
-    }
-
-    if ($LASTEXITCODE -eq 0) {
-
-        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Options $Options
-
-    }
-
-    if ($LASTEXITCODE -eq 0) {
-
-        ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-performance-tests.ps1" -Options $Options
-
-    }
-
-    $Success = $Success -and $($LASTEXITCODE -eq 0)
-
+$Options = @{
+    DeviceDetection = $DeviceDetection
+    DeviceDetectionUrl = $DeviceDetectionUrl
+    TargetRepo = $RepoName
 }
 
-if ($Success -eq $False) {
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "fetch-assets.ps1" -Options $Options
 
-    exit 1
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "generate-accessors.ps1" -Options $Options
+
+./steps/has-changed.ps1 -RepoName $RepoName
+
+if ($LASTEXITCODE -eq 0) {
+    
+    ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated properties."
+
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $BranchName
+
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties."
+    
+}
+else {
+
+    Write-Host "No property changes, so not creating a pull request."
 
 }
