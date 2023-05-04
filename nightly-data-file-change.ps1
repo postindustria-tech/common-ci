@@ -3,10 +3,13 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$DeviceDetection,
-    [string]$DeviceDetectionUrl
+    [string]$DeviceDetectionUrl,
+    [string]$GitHubToken
 )
 
 . ./constants.ps1
+
+./steps/configure-git.ps1 -GitHubToken $GitHubToken
 
 ./steps/clone-repo.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
 
@@ -38,3 +41,5 @@ else {
     Write-Host "No property changes, so not creating a pull request."
 
 }
+
+exit 0
