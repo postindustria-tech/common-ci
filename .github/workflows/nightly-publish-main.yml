@@ -149,6 +149,7 @@ jobs:
 
       - name: Fetch Assets
         shell: pwsh
+        if: ${{ matrix.options.packagerequirement }}
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
