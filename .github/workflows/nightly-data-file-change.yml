@@ -39,5 +39,4 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
           -DeviceDetectionKey ${{ secrets.device-detection-key }} `
-          -DeviceDetectionUrl ${{ secrets.device-detection-url }} `
-          -RunId ${{ github.run_id }}
+          -DeviceDetectionUrl ${{ secrets.device-detection-url }}
