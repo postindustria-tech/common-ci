@@ -1,0 +1,36 @@
+name: Monthly Copyright Update
+
+on:
+  workflow_call:
+    inputs:
+        repo-name:
+          required: true
+          type: string
+    secrets:
+      token:
+        required: true
+        
+env:
+  GITHUB_TOKEN: ${{ secrets.token }}
+
+jobs:
+  monthly-copyright-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
+      - name: Checkout reusable workflow dir
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          path: common
+        
+      - name: Update Copyrighnt
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/monthly-copyright-update.ps1 `
+          -GitHubToken ${{ secrets.token }} `
+          -RepoName ${{ inputs.repo-name }}
