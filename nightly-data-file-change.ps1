@@ -13,7 +13,7 @@ Write-Output "::group::Configure Git"
 ./steps/configure-git.ps1 -GitHubToken $GitHubToken
 Write-Output "::endgroup::"
 
-Write-Output "::group::Clone $Repo Name - $PropertiesUpdateBranch"
+Write-Output "::group::Clone $RepoName - $PropertiesUpdateBranch"
 ./steps/clone-repo.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
 Write-Output "::endgroup::"
 
