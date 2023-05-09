@@ -67,6 +67,7 @@ try {
     if ($(Test-Path -Path ".nojekyll") -eq $False) {
         Write-Output "Creating a .nojekyll file"
         Write-Output "" > .nojekyll
+        git add .nojekyll
     }
 
     Move-Item "$($VersionPath.FullName)-new" $VersionPath.FullName
