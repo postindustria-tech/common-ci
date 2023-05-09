@@ -65,7 +65,7 @@ try {
         Remove-Item -Recurse -Path $VersionPath.FullName
     }
     if ($(Test-Path -Path ".nojekyll") -eq $False) {
-        Write-Ouput "Creating a .nojekyll file"
+        Write-Output "Creating a .nojekyll file"
         Write-Output "" > .nojekyll
     }
 
