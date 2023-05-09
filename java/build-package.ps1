@@ -23,13 +23,19 @@ param(
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
+if ($($Version.EndsWith("SNAPSHOT"))) {
+    $NexusSubFolder = "deferred"
+}
+else{
+    $NexusSubFolder = "staging"
+}
 $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" -q -DforceStdout
 
 Write-Output $MavenLocalRepoPath
 
 $MavenLocal51DPath = [IO.Path]::Combine($MavenLocalRepoPath, "com", "51degrees")
 
-$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) "deferred"
+$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) $NexusSubFolder
 
 
 Write-Output $MavenLocal51DPath
@@ -94,7 +100,7 @@ try {
 
 
     Copy-Item -Path $NexusLocalStaging51DPath -Destination $RepoPath -Recurse
-    Rename-Item -Path "$RepoPath/deferred" -NewName "nexus"
+    Rename-Item -Path "$RepoPath/$NexusSubFolder" -NewName "nexus"
 
     # Move the "local" folder to the "package" folder
     Move-Item -Path "$RepoPath/local"  -Destination $PackagePath
