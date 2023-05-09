@@ -24,6 +24,9 @@ finally {
     Pop-Location
 }
 
+Write-Output "Marking '$DoxyGen' as executable"
+chmod +x $DoxyGen
+
 Write-Output "Entering '$DocsPath'"
 Push-Location $DocsPath
 try {
