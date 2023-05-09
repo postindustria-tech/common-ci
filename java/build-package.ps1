@@ -16,7 +16,9 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningCertAlias,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertPassword
+    [string]$CodeSigningCertPassword,
+    [Parameter(Mandatory=$true)]
+    [string]$MavenSettings
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -42,7 +44,14 @@ try {
 
     # Set file names
     $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
-    $JavaPGPFile = "Java Maven GPG Key Private.pgp"
+    $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
+    $SettingsFile = "stagingsettings.xml"
+
+    Write-Output "Writing Settings File"
+    $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
+    Set-Content -Path $SettingsFile -Value $SettingsContent
+    $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
+
 
     Write-Output "Writing PFX File"
     $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
@@ -56,6 +65,7 @@ try {
 
     Write-Output "Building '$Name'"
     mvn deploy `
+        -s $SettingsPath `
         $ExtraArgs `
         -f pom.xml `
         -DXmx2048m `
