@@ -50,7 +50,7 @@ try {
     $PagesBranch = "gh-pages"
     if ($branches.Contains("refs/remotes/origin/$PagesBranch")) {
         Write-Output "Checking out branch '$PagesBranch'"
-        git checkout $PagesBranch
+        git checkout $PagesBranch -f --recurse-submodules
     }
     else {
         Write-Output "Creating new branch '$PagesBranch'"
@@ -58,7 +58,9 @@ try {
         git rm -rf .
     }
 
-    Remove-Item -Recurse -Path $VersionPath.FullName
+    if ($(Test-Path -Path $VersionPath.FullName)) {
+        Remove-Item -Recurse -Path $VersionPath.FullName
+    }
     Move-Item "$($VersionPath.FullName)-new" $VersionPath.FullName
 }
 finally {
