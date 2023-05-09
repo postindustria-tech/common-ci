@@ -78,7 +78,7 @@ function Generate-Performance-Results {
         $ImagesBranch = "gh-images"
         if ($branches.Contains("refs/remotes/origin/$ImagesBranch")) {
             Write-Output "Checking out branch '$ImagesBranch'"
-            git checkout $ImagesBranch
+            git checkout $ImagesBranch -f --recurse-submodules
         }
         else {
             Write-Output "Creating new branch '$ImagesBranch'"

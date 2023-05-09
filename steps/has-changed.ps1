@@ -12,7 +12,7 @@ Push-Location $RepoPath
 try {
     
     Write-Output "Checking Changes"
-    $changes = $(git diff --name-only)
+    $changes = $(git status -s)
 
     Write-Output "There are '$($changes.count)' changes:"
     foreach ($change in $changes) {
