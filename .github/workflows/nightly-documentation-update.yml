@@ -8,12 +8,7 @@ on:
           type: string
     secrets:
       token:
-        required: true
-      device-detection-key:
-        required: true
-      device-detection-url:
-        required: false
-        
+        required: true        
 env:
   GITHUB_TOKEN: ${{ secrets.token }}
 
