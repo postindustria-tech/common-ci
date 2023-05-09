@@ -64,6 +64,11 @@ try {
     if ($(Test-Path -Path $VersionPath.FullName)) {
         Remove-Item -Recurse -Path $VersionPath.FullName
     }
+    if ($(Test-Path -Path ".nojekyll") -eq $False) {
+        Write-Ouput "Creating a .nojekyll file"
+        Write-Output "" > .nojekyll
+    }
+
     Move-Item "$($VersionPath.FullName)-new" $VersionPath.FullName
 }
 finally {
