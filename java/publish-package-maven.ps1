@@ -14,6 +14,8 @@ Push-Location $RepoPath
 
 try {
 
+    # We need to set the version here again even though the packages are already built using the next version
+    # as this script will run in a new job and the repo will be cloned again.
     Write-Output "Setting version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
 

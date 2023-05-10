@@ -11,29 +11,31 @@ https://github.com/actions/runner-images/tree/main/images
 
 The options.json file in java project repositories contains the environmental variable for the specified Java version e.g. "JAVA_HOME_8_X64". This option is then used as an input for the setup-environment script, which overwrites the JAVA_HOME variable and sets the desired Java version on the runner.
 
-
-
------------------------------------------------------------------------------------ OLD -------------------------------------------------
-
-# Java Specific CI/CD Approach
-This API complies with the `common-ci` approach.
-
 ## Code Signing
-We use Maven to package our Java APIs. The process of signing the result packages for Maven is different from Dotnet signing process.
-1. The signing process for Java uses `PGP ASCII Armored File` with file extension `.asc` instead of `.pfx` as in Dotnet.
-2. The process requires the `.asc` file to be imported using `gpg`.
-3. Then the result package will be signed as part of Maven `install` process using `maven-gpg-plugin`.
+Our Java APIs are packaged using Maven, and we sign the resulting packages as part of the build-package.ps1 script. The necessary files for signing are generated in the build-packages.ps1 script, which receives its content from GitHub secrets passed as parameters. Java package signing uses a PGP ASCII Armored File with the file extension .asc, instead of the .pfx format used in Dotnet. The gpg tool is used to import the .asc file as part of the signing process, after which the package is signed using the maven-gpg-plugin during the Maven deploy process.
 
-## Deploy External
-The deployment to external of Java Maven packages must be done in the following order:
+## Deployment
 
-1. `pipeline-java`
-2. `device-detection-java`
-3. `location-java`
+In our projects, we've replaced the Maven Deploy Plugin with the Nexus Staging Maven Plugin for deploying packages. The plugin is configured in the parent pom.xml file. You can find more information on how to configure the project for deployment using this plugin [here](https://help.sonatype.com/repomanager2/staging-releases/configuring-your-project-for-deployment). 
 
-Steps for each java repo:
-1. Deploy packages to Nexus staging area - automatic.
-2. Deploy from Nexus staging to Maven Central - requires approval.
-3. Deploy to GitHub - requires approval.
+Because the packages are built and tested in different jobs, the packages are uploaded as artifacts in the build job and downloaded in the test job.
+The packages are then copied to and from two locations on the local machine: the local Maven repository in `{$user.home}/.m2/repository`, and the local Nexus staging repository in `{$user.home}/.m2/staging`. The location of the latter is specified in the altStagingDirectory element in the parent pom.xml file, as shown in the following snippet:
 
-All Java APIs share a staging area, so occasionally repositories are left in the staging area as a results of a possible cancellation or an unwanted pipeline termination, etc. This sometimes causes the deployment to staging to fail. In this case, it is the best to login to the Nexus staging area and manually drop all unwanted repositories and rerun the deployment process.
+```
+<plugin>
+  <groupId>org.sonatype.plugins</groupId>
+  <artifactId>nexus-staging-maven-plugin</artifactId>
+  <version>${nexus-staging-maven-plugin.version}</version>
+  <extensions>true</extensions>
+  <configuration>
+    <serverId>${publishrepository.id}</serverId>
+    <nexusUrl>${ossrh.baseurl}</nexusUrl>
+    <altStagingDirectory>${user.home}/.m2</altStagingDirectory>
+  </configuration>
+</plugin>
+```
+To build packages locally, we use the mvn deploy command with the -DskipRemoteStaging=true option, which ensures that packages are not deployed to a remote repository. Once the packages are built, the `publish-package-maven.ps1` script uses the `mvn nexus-staging:deploy-staged` command to stage the packages to the remote Nexus staging repository.
+
+## SNAPSHOTS
+The snapshot repository is configured in the parent pom.xml file. We use gitversion.yml to append the "-SNAPSHOT" string to the version number when the pipeline runs from a develop branch. 
+The deployment process for snapshot versions is the same as that for release versions. We follow the same steps for testing and deploying both types of packages. 

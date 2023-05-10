@@ -53,6 +53,7 @@ try {
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
     $SettingsFile = "stagingsettings.xml"
 
+    # Write the content to the files.
     Write-Output "Writing Settings File"
     $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
     Set-Content -Path $SettingsFile -Value $SettingsContent
@@ -67,9 +68,10 @@ try {
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
+    # Import the pgp key 
     echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
 
-    Write-Output "Building '$Name'"
+    Write-Output "Deploying '$Name' Locally"
     mvn deploy `
         -s $SettingsPath `
         $ExtraArgs `
