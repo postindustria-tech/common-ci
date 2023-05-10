@@ -1,5 +1,3 @@
-#  build package
-#  copy binaries to package-files/
 
 param(
     [Parameter(Mandatory=$true)]
