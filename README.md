@@ -16,7 +16,8 @@ The following rules are common across the organisation.
 -   PowerShell scripts contain all the necessary documentation at the top of the script.
 -   PowerShell scripts have defined input parameters and outputs following PowerShell conventions.
 -   All parameters are GitHub secrets, or options defined in the repo, and passed by the YAML script as parameters to the PowerShell script.
--   YAML scripts orchestrate the PowerShell scripts within the GitHub actions. Each YAML script will have a corresponding PowerShell script which can be used to test all the steps on any environment. These scripts must have the same name with only the file extension being different. The two scripts must be kept in sync.
+-   YAML scripts simply call the top level PowerShell scripts within the GitHub actions. Each YAML script will have a corresponding PowerShell script which can be used to test all the steps on any environment. These scripts must have the same name with only the file extension being different.
+-   Orchestration of the PowerShell step scripts is handled by the top level PowerShell scripts as much as possible. There are some exceptions to this, e.g. running on multiple VM images needs to be handled in YAML.
 -   GitHub triggers initiate the stages.
 -   Use of GitHub actions and other platform specific features are minimised to enable portability of CI/CD. For example, cloning a repository is performed in PowerShell via a generic command line that works on Linux, Windows, and Mac rather than in a GitHub action. This ensures the PowerShell script can be tested outside a CI/CD deployment environment.
 -   C/C++ is compiled using CMake on all platforms.
@@ -210,6 +211,40 @@ classDef green fill:green;
   end
 ```
 
+## Nightly Documentation Update
+
+``` mermaid
+graph LR
+classDef green fill:green;
+  subgraph "Nightly Documentation Update"
+    direction LR
+    A([Common Setup]):::green
+    B[Clone Tools Repo]
+    C[Clone Documentation Repo]
+    D[Generate Documentation]
+    E[Check For Changes]
+    F[Commit Changes]
+    G[Push Changes]
+    A-->B-->C-->D-->E-->F-->G
+  end
+```
+
+## Monthly Copyright Update
+
+``` mermaid
+graph LR
+classDef green fill:green;
+  subgraph "Monthly Copyright Update"
+    direction LR
+    A([Common Setup]):::green
+    B[Clone Tools Repo]
+    C[Update Copyright Messages]
+    D[Check For Changes]
+    E[Commit Changes]
+    F[PR To Main]
+    A-->B-->C-->D-->E-->F
+  end
+```
 
 # Triggers
 
@@ -234,6 +269,16 @@ PRs to `main` can only be initiated by a project Contributor, Administrator, or 
 **This job should only be run once all the other nightly jobs have completed.**
 
 Any changes to the `main` branch are published automatically on a nightly basis as a new package at the target package manager environment.
+
+### Nightly Documentation Update
+
+Any changes to the `main` branch are used to generate the latest documentation. This is then published to the `gh-pages` branch of the reposiory.
+
+### Monthly Copyright Update
+
+If the copyright is updated, the source code files are all updated with the latest copyright in the header of the file.
+
+This does no happen often, so the workflow can be run monthly rather than nightly.
 
 ### Common Scenarios
 

@@ -29,6 +29,8 @@ Details of the steps can be found in [Readme](./README.md)
 | `nightly-pr-to-main.ps1` |
 | `nightly-publish-main.ps1` |
 | `nightly-submodule-update.ps1` |
+| `nightly-documentation-update.ps1` |
+| `monthly-copyright-update.ps1` |
 
 | scripts in `.github/workflows` |
 | ------------------------------ |
@@ -37,8 +39,10 @@ Details of the steps can be found in [Readme](./README.md)
 | `nightly-pr-to-main.yml` |
 | `nightly-publish-main.yml` |
 | `nightly-submodule-update.yml` |
+| `nightly-documentation-update.yml` |
+| `monthly-copyright-update.yml` |
 
-*NOTE: The scripts above are duplications of the root workflow scripts. The PowerShell scripts can be run locally, the YAML scripts are run on GitHub.*
+*NOTE: The scripts above call the root PowerShell workflow scripts.*
 
 | scripts in `steps` |
 | ------------------ |
@@ -100,7 +104,7 @@ See [CXX](./cxx/README.md). **TODO: Add others as they are completed**
 | `setup-environment.ps1` |
 | `options.json` |
 
-*NOTE: these files in the table above MUST exist in the repository the workflow is run against, as they are called by the workflow. If a step is not relevant for a repository, then the file should do nothing and return an zero exit code.*
+*NOTE: these files in the table above MUST exist in the repository the workflow is run against, as they are called by the workflow. If a step is not relevant for a repository, then the file should do nothing and return a zero exit code.*
 
 See [Repository Scripts](./REPO_SCRIPTS.md).
 
@@ -230,9 +234,109 @@ finally {
 exit $LASTEXITCODE
 ```
 
+## Orchestration
+
+Workflow PowerShell scripts should be in control of as much of the orchestration of steps as possible.
+The basic format of this is along the lines of:
+
+```pwsh
+Write-Output "::group::Configure Git"
+./steps/configure-git.ps1 -GitHubToken $GitHubToken
+Write-Output "::endgroup::"
+
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
+
+Write-Output "::group::Clone $RepoName"
+./steps/clone-repo.ps1 -RepoName $RepoName
+Write-Output "::endgroup::"
+
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
+
+## The rest of the steps...
+
+exit 0
+```
+
+The YAML scripts then call these scripts, filling in the parameters from either constants or GitHub secrets:
+
+```yml
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v2
+    
+  - name: Checkout reusable workflow dir
+    uses: actions/checkout@v2
+    with:
+      repository: 51degrees/common-ci
+      path: common
+    
+  - name: Some PowerShell Workflow
+    shell: pwsh
+    working-directory: ${{ github.workspace }}/common/
+    run: |
+      . ${{ github.workspace }}/common/some-powershell-workflow.ps1 `
+      -GitHubToken ${{ secrets.token }} `
+      -RepoName ${{ inputs.repo-name }}
+```
+
+There are cases where PowerShell workflows need to be broken up in order to use some logic specific to GitHub actions.
+For example, testing on multiple platforms is carried out by separating jobs and passing variables:
+
+```yml
+jobs:
+  Configure:
+    runs-on: ubuntu-latest
+    outputs:
+      # Output from this job
+      options: ${{ steps.get_options.outputs.options }}
+    steps:
+      # Common steps are omitted here for brevity
+      - name: Get Build Options
+        id: get_options
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
+          $Options = Get-Content $OptionsFile -Raw
+          $Options = $Options -replace "`r`n", "" -replace "`n", ""
+          # Output the options from options.json
+          Write-Output options=$Options | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          
+  Test:
+    needs: Configure
+    strategy:
+      matrix:
+        # Input from the previous job
+        options: ${{ fromJSON(needs.configure.outputs.options ) }}
+    name: Test - ${{ matrix.options.name }}
+    runs-on: ${{ matrix.options.image }}
+    
+    steps:
+      # Common steps are omitted here for brevity
+      - name: Some Test Workflow
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/some-powershell-workflow.ps1 `
+          -GitHubToken ${{ secrets.token }} `
+          -RepoName ${{ inputs.repo-name }} `
+          -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+```
+
 ## Logging
 
 Logging should be carried out using `Write-Output`, unless it is a warning or an error, in which case `Write-Warning` and `Write-Error` are used respectively.
+
+When calling steps from a workflow scripts, each script should be surrounded by the following format logs to separate them in GitHub actions output:
+```sh
+::group::Name of Step
+## Output from step...
+::endgroup::
+```
 
 ## Testing
 
