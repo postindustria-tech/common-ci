@@ -39,7 +39,7 @@ It should also show the steps needed to recreate the issue.
 
 ## Branching Strategy
 
-In general, branches should be taken from `main`, and PRs created back to `main` for each feature. Known as "mainline".
+In general, branches should be taken from `main`, and PRs created back to `main` for each feature. For a more in depth descriptions, see [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow").
 
 There are some exceptions to this, which will be stated per repository.
 
