@@ -31,6 +31,10 @@ The following rules are common across the organisation.
 
 When implementing changes, see the [Design Document](/DESIGN.md) for detailed descriptions of how each part works.
 
+# Contributing
+
+For info on contributing to this, and other 51Degrees projects, see [Contributing](/CONTRIBUTING.md).
+
 # Workflows
 
 ## Common Setup Steps
