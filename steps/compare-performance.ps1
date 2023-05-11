@@ -73,6 +73,7 @@ function Generate-Performance-Results {
     try {
 
         # Check out the gh-images branch so we're ready to commit images.
+        git fetch origin
         $branches = $(git branch -a --format "%(refname)")
         $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
         $ImagesBranch = "gh-images"
