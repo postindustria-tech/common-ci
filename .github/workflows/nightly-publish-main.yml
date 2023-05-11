@@ -242,6 +242,7 @@ jobs:
     
     steps:
       - name: Checkout Common
+        if: ${{ matrix.options.packagerequirement }}
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
@@ -249,12 +250,14 @@ jobs:
           path: common
 
       - name: Configure Git
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
           
       - name: Clone Repo
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
@@ -262,25 +265,28 @@ jobs:
           . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
           
       - name: Fetch Assets
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
           
       - name: Setup Environment
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
 
       - name: Download Package Artifact
-        if: ${{ success() }}
+        if: ${{ success() }} && ${{ matrix.options.packagerequirement }}
         uses: actions/download-artifact@v2.1.1
         with:
           name: package
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package
 
       - name: Install Package From Artifact
+        if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
@@ -288,7 +294,7 @@ jobs:
 
       - name: Run Integration Tests
         id: test
-        if: ${{ needs.Build.result == 'success' }}
+        if: ${{ needs.Build.result == 'success' }} && ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         # Secrets needed for running tests are added to options in the "Keys",
