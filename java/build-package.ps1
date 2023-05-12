@@ -22,6 +22,7 @@ param(
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
+$PackagePath = [IO.Path]::Combine($pwd, "package")
 
 if ($($Version.EndsWith("SNAPSHOT"))) {
     $NexusSubFolder = "deferred"
@@ -91,8 +92,6 @@ try {
 
     Write-Output "Maven Local 51d Repo:"
     ls $MavenLocal51DPath
-
-    $PackagePath = "$RepoPath/package"
     
     # Create the "package" folder if it doesn't exist
     New-Item -ItemType Directory -Path $PackagePath -Force
