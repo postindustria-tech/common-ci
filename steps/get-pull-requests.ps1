@@ -1,8 +1,13 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$VariableName = "PullRequestIds"
+    [string]$VariableName = "PullRequestIds",
+    [string]$GitHubToken
 )
+
+# This token is used by the hub command.
+Write-Output "Setting GITHUB_TOKEN"
+$env:GITHUB_TOKEN="$GitHubToken"
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
