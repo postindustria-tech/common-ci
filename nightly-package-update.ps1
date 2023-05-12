@@ -1,30 +1,71 @@
 
 param (
     [Parameter(Mandatory=$true)]
-    [string]$RepoName
+    [string]$RepoName,
+    [Parameter(Mandatory=$true)]
+    [string]$GitHubToken,
+    [int]$RunId = 0
 )
 
 . ./constants.ps1
 
-$BranchName = $SubModuleUpdateBranch
+Write-Output "::group::Configure Git"
+./steps/configure-git.ps1 -GitHubToken $GitHubToken
+Write-Output "::endgroup::"
 
-./steps/clone-repo.ps1 -RepoName $RepoName -Branch $BranchName
+Write-Output "::group::Clone $RepoName"
+./steps/clone-repo.ps1 -RepoName $RepoName -Branch $PackageUpdateBranch
+Write-Output "::endgroup::"
 
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "package-dependency-update.ps1"
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
 
+Write-Output "::group::Update Package Dependencies"
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "update-packages.ps1"
+Write-Output "::endgroup::"
+
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
+
+Write-Output "::group::Check for Changes"
 ./steps/has-changed.ps1 -RepoName $RepoName
+Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -eq 0) {
     
+    Write-Output "::group::Commit Changes"
     ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated packages."
+    Write-Output "::endgroup::"
 
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $BranchName
-
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages."
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
     
+    Write-Output "::group::Push Changes"
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PackageUpdateBranch
+    Write-Output "::endgroup::"
+
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+    
+    Write-Output "::group::Create Pull Request"
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages."
+    Write-Output "::endgroup::"
+
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+        
 }
 else {
 
-    Write-Host "No package changes, so not creating a pull request."
+    Write-Output "No package changes, so not creating a pull request."
 
+    if ($RunId -gt 0) {
+        Write-Output "Cancelling Run"
+        hub api /repos/51Degrees/$RepoName/actions/runs/$RunId/cancel -X POST
+    }
 }

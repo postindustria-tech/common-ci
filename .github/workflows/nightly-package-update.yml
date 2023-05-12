@@ -9,70 +9,26 @@ on:
     secrets:
       token:
         required: true
-env:
-  GITHUB_TOKEN: ${{ secrets.token }}
 
 jobs:
-  nightly-submodule-update:
+  nightly-package-update:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
         
-          
       - name: Checkout reusable workflow dir
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
-          ref: gh-refact
           path: common
         
-      - name: Configure Git
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
-      
-      - name: Clone Repo
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }} -Branch $PackageUpdateBranch
-      
       - name: Update Packages
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "update-packages.ps1" 
-          
-      - name: Check for Changes
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/has-changed.ps1 -RepoName ${{ inputs.repo-name }}
-          if ($LASTEXITCODE -ne 0) {
-            hub api /repos/51Degrees/${{ inputs.repo-name }}/actions/runs/${{ github.run_id }}/cancel -X POST
-          }
-      - name: Commit Changes
-        if: ${{ success() }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/commit-changes.ps1 -RepoName ${{ inputs.repo-name }} -Message "REF: Updated packages."
-          
-      - name: Push Changes
-        if: ${{ success() }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/push-changes.ps1 -RepoName ${{ inputs.repo-name}} -Branch $PackageUpdateBranch
-          
-      - name: Create Pull Request
-        if: ${{ success() }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/pull-request-to-main.ps1 -RepoName ${{ inputs.repo-name }} -Message "Updated packages."
+          . ${{ github.workspace }}/common/nightly-package-update.ps1 `
+          -GitHubToken ${{ secrets.token }} `
+          -RepoName ${{ inputs.repo-name }} `
+          -RunId ${{ github.run_id }}
