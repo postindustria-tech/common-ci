@@ -5,7 +5,7 @@ param(
 )
 
 $BuildPath = [IO.Path]::Combine($pwd, $RepoName, "build")
-$OutPath = [IO.Path]::Combine($pwd, $RepoName, "package")
+$OutPath = [IO.Path]::Combine($pwd, "package")
 mkdir $BuildPath
 mkdir $OutPath
 
