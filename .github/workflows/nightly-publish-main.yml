@@ -98,7 +98,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          $Options = @{}
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
           . ${{ github.workspace }}/common/nightly-publish-main_build.ps1 `
