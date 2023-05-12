@@ -8,6 +8,10 @@ param (
     [string]$GitHubOutput
 )
 
+# This token is used by the hub command.
+Write-Output "Setting GITHUB_TOKEN"
+$env:GITHUB_TOKEN="$GitHubToken"
+
 . ./constants.ps1
 
 Write-Output "::group::Configure Git"

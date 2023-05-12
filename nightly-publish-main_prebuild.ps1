@@ -10,6 +10,10 @@ param (
 
 . ./constants.ps1
 
+# This token is used by the hub command.
+Write-Output "Setting GITHUB_TOKEN"
+$env:GITHUB_TOKEN="$GitHubToken"
+
 Write-Output "::group::Configure Git"
 ./steps/configure-git.ps1 -GitHubToken $GitHubToken
 Write-Output "::endgroup::"

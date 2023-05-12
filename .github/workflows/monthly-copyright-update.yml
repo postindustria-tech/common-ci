@@ -10,9 +10,6 @@ on:
       token:
         required: true
         
-env:
-  GITHUB_TOKEN: ${{ secrets.token }}
-
 jobs:
   monthly-copyright-update:
     runs-on: ubuntu-latest

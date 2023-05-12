@@ -14,9 +14,6 @@ on:
       device-detection-url:
         required: false
         
-env:
-  GITHUB_TOKEN: ${{ secrets.token }}
-
 jobs:
   nightly-data-file-change:
     runs-on: ubuntu-latest
