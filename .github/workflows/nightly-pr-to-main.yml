@@ -6,6 +6,9 @@ on:
         repo-name:
           required: true
           type: string
+        pull-request-id:
+          required: true
+          type: number        
     secrets:
       token:
         required: true
