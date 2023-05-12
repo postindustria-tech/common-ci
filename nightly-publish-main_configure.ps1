@@ -49,9 +49,9 @@ try {
       Write-Output update_required=true | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
     } else {
       Write-Output update_required=false | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
+      # Exit with a zero exit code as we don't want to fail just because an update is not required.
+      exit 0
     }
-    # Exit with a zero exit code as we don't want to fail just because an update is not required.
-    exit 0
   }
 Write-Output "::endgroup::"
 
