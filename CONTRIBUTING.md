@@ -2,11 +2,12 @@
 
 If there is a bugfix or feature you'd like to see implemented, the best place to start is with a GitHub issue. First check there is not an issue raised already. If the issue has not yet been raised, it is worth raising one before making any changes yourself. That way, we can let you know whether or not this is something we are already working on.
 
-As an opensource project, 51Degrees accepts changes from the community. To propose a change:
-1. Commit your change locally to a branch based off `main`,
-2. Push to GitHub,
-3. Open a pull request to the `main` branch in the 51Degrees GitHub,
-4. 51Degrees will assess and update.
+As an open source project, 51Degrees accepts changes from the community. To propose a change:
+1. Create a new branch from `main` (see [Branching Strategy](#branching-strategy)),
+2. Make changes to your new branch locally,
+3. Push to GitHub,
+4. Open a pull request to the `main` branch in the 51Degrees GitHub,
+5. 51Degrees will assess and update.
 
 The rest of this document goes into more details of what is required.
 
@@ -39,9 +40,12 @@ It should also show the steps needed to recreate the issue.
 
 ## Branching Strategy
 
-In general, branches should be taken from `main`, and PRs created back to `main` for each feature. For a more in depth descriptions, see [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow").
+In general, branches should be taken from `main`, and PRs created back to `main` for each feature.
+For a more in depth descriptions, see [Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow").
 
 There are some exceptions to this, which will be stated per repository.
+
+Branch naming should be brief but descriptive, under either `feature/` or `bug/`, and kebab-case is prefered e.g. `feature/ui-example`.
 
 ## Commenting
 
@@ -88,6 +92,7 @@ Commits should also be prefixed with a useful tag. Common tags are:
 | REF    | Update to a package or submodule reference |
 | BUILD  | Change to a build method |
 
+If the commit relates to an issue, the issue should be linked in the commit.
 
 An example of a good commit message is:
 ```
@@ -97,6 +102,7 @@ subsequent calls to strlen had undefined behavior, and could read past the
 end of the allocated memory.
 The first byte of the string is now set to null, so all calls to strlen return
 zero.
+See issue #1
 ```
 
 # Making a Pull Request

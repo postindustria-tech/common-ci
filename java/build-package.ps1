@@ -16,18 +16,26 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningCertAlias,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertPassword
+    [string]$CodeSigningCertPassword,
+    [Parameter(Mandatory=$true)]
+    [string]$MavenSettings
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
+if ($($Version.EndsWith("SNAPSHOT"))) {
+    $NexusSubFolder = "deferred"
+}
+else{
+    $NexusSubFolder = "staging"
+}
 $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" -q -DforceStdout
 
 Write-Output $MavenLocalRepoPath
 
 $MavenLocal51DPath = [IO.Path]::Combine($MavenLocalRepoPath, "com", "51degrees")
 
-$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) "deferred"
+$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) $NexusSubFolder
 
 
 Write-Output $MavenLocal51DPath
@@ -42,7 +50,15 @@ try {
 
     # Set file names
     $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
-    $JavaPGPFile = "Java Maven GPG Key Private.pgp"
+    $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
+    $SettingsFile = "stagingsettings.xml"
+
+    # Write the content to the files.
+    Write-Output "Writing Settings File"
+    $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
+    Set-Content -Path $SettingsFile -Value $SettingsContent
+    $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
+
 
     Write-Output "Writing PFX File"
     $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
@@ -52,10 +68,12 @@ try {
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
+    # Import the pgp key 
     echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
 
-    Write-Output "Building '$Name'"
+    Write-Output "Deploying '$Name' Locally"
     mvn deploy `
+        -s $SettingsPath `
         $ExtraArgs `
         -f pom.xml `
         -DXmx2048m `
@@ -84,7 +102,7 @@ try {
 
 
     Copy-Item -Path $NexusLocalStaging51DPath -Destination $RepoPath -Recurse
-    Rename-Item -Path "$RepoPath/deferred" -NewName "nexus"
+    Rename-Item -Path "$RepoPath/$NexusSubFolder" -NewName "nexus"
 
     # Move the "local" folder to the "package" folder
     Move-Item -Path "$RepoPath/local"  -Destination $PackagePath

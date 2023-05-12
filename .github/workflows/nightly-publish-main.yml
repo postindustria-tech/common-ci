@@ -125,6 +125,7 @@ jobs:
     
     steps:
       - name: Checkout Common
+        if: ${{ matrix.options.packagerequirement }}
         uses: actions/checkout@v2
         if: ${{ matrix.options.packagerequirement }}
         with:
@@ -152,7 +153,7 @@ jobs:
           -Options $Options
           
       - name: Integration Test Results
-        if: ${{ always() }}
+        if: ${{ matrix.options.packagerequirement }}
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
