@@ -8,6 +8,7 @@ param(
 
 # Combine the current working directory with the repository name
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
+$PackagePath = [IO.Path]::Combine($pwd, "package")
 
 # Get version of the package 
 $Version = mvn help:evaluate "-Dexpression=project.version" -q -DforceStdout
@@ -18,10 +19,6 @@ if ($($Version.EndsWith("SNAPSHOT"))) {
 else{
     $NexusSubFolder = "staging"
 }
-
-
-# Define the path for locally installed packages to be uploaded to artifacts
-$PackagePath = Join-Path -Path $RepoPath -ChildPath "package"
 
 # Get the Maven local repository path
 $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" -q -DforceStdout
