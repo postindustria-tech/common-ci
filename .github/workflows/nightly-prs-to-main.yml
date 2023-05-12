@@ -46,6 +46,7 @@ jobs:
   # Run the common workflow on each pull request
   Nightly_PR_to_Main:
     needs: Get_Pull_Requests
+    name: Nightly PR to Main - ${{ matrix.id }}
     strategy:
       fail-fast: false
       matrix:
