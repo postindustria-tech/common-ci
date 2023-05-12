@@ -127,7 +127,6 @@ jobs:
       - name: Checkout Common
         if: ${{ matrix.options.packagerequirement }}
         uses: actions/checkout@v2
-        if: ${{ matrix.options.packagerequirement }}
         with:
           repository: 51degrees/common-ci
           path: common
