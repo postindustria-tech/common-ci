@@ -23,6 +23,15 @@ foreach ($Option in $Options.GetEnumerator()) {
     }
 }
 
+# If there are keys required, add these too.
+if ($Null -ne $Options.Keys) {
+    foreach ($Key in $Options.Keys.GetEnumerator()) {
+        if ($ScriptParameters.ContainsKey($Key.Key)) {
+            Write-Output "Adding parameter '$($Key.Key)'"
+            $Parameters.Add($Key.Key, $Key.Value)
+        }
+    }
+}
 # If the repo name is required, then add that too.
 if ($ScriptParameters.ContainsKey("RepoName")) {
     Write-Output "Adding parameter RepoName"

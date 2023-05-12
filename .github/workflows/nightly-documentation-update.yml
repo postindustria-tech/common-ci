@@ -9,8 +9,6 @@ on:
     secrets:
       token:
         required: true        
-env:
-  GITHUB_TOKEN: ${{ secrets.token }}
 
 jobs:
   nightly-documentation-update:

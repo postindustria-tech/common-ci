@@ -27,12 +27,22 @@ try {
 
     Write-Output "Checking out PR $PrTitle"
     hub pr checkout $PullRequestId
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+
     Write-Output "Merging in any changes from main"
     git merge origin/main
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
     
     # Any submodules may not have updated, so do this manually.
     git submodule update --init --recursive
-
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+    
     $Sha = hub pr show $PullRequestId -f "%sH"
     Write-Output "Setting '$VariableName' to '$Sha'"
     Set-Variable -Name $VariableName -Value $Sha -Scope Global

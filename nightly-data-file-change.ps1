@@ -33,9 +33,17 @@ Write-Output "::group::Fetch Assets"
 ./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "fetch-assets.ps1" -Options $Options
 Write-Output "::endgroup::"
 
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
+
 Write-Output "::group::Generate Accessors"
 ./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "generate-accessors.ps1" -Options $Options
 Write-Output "::endgroup::"
+
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}
 
 Write-Output "::group::Has Changed"
 ./steps/has-changed.ps1 -RepoName $RepoName
@@ -47,10 +55,18 @@ if ($LASTEXITCODE -eq 0) {
     ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated properties."
     Write-Output "::endgroup::"
 
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+    
     Write-Output "::group::Push Changes"
     ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
     Write-Output "::endgroup::"
 
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+    
     Write-Output "::group::PR To Main"
     ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties."
     Write-Output "::endgroup::"
