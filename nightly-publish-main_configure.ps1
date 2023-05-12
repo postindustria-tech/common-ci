@@ -19,7 +19,7 @@ Write-Output "::group::Configure Git"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone $RepoName"
-#./steps/clone-repo.ps1 -RepoName $RepoName
+./steps/clone-repo.ps1 -RepoName $RepoName
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
