@@ -56,12 +56,11 @@ try {
   }
 Write-Output "::endgroup::"
 
-
 if ($LASTEXITCODE -ne 0) {
   exit $LASTEXITCODE
 }
 
-Write-Output "::group::Package Update Required"
+Write-Output "::group::Get Options"
 $OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
 
 $Options = Get-Content $OptionsFile | ConvertFrom-Json
