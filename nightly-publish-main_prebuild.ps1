@@ -43,7 +43,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Build Package Requirements"
-./steps/run-repo-script.ps1 -RepoName $Options -ScriptName "build-package-requirements.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-package-requirements.ps1" -Options $Options
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
