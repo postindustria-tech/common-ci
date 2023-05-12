@@ -1,0 +1,54 @@
+name: Nightly PRs to Main
+
+on:
+  workflow_call:
+    inputs:
+        repo-name:
+          required: true
+          type: string
+    secrets:
+      token:
+        required: true
+      asset-keys:
+        required: false
+
+jobs:
+  # Get all the pull requests that are going to main
+  Get_Pull_Requests:
+    outputs:
+      pull_request_ids: ${{ steps.get_pull_requests.outputs.pull_request_ids }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
+      - name: Checkout reusable workflow dir
+        uses: actions/checkout@v2
+        with:
+          repository: 51degrees/common-ci
+          path: common
+
+      # Get all the pull requests into main, and output the ids
+      - name: Get Pull Requests
+        id: get_pull_requests
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/get-pull-requests.ps1 -RepoName ${{ inputs.repo-name }} -VariableName PullRequestIds -GitHubToken ${{ secrets.token }}
+          Write-Output pull_request_ids="[$([string]::Join(",", $PullRequestIds))]" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+  # Run the common workflow on each pull request
+  Nightly_PR_to_Main:
+    needs: Get_Pull_Requests
+    strategy:
+      fail-fast: false
+      matrix:
+        id: ${{ fromJSON(needs.Get_Pull_Requests.outputs.pull_request_ids) }}
+
+    uses: 51Degrees/common-ci/.github/workflows/nightly-pr-to-main.yml@main
+    with:
+      repo-name: ${{ inputs.repo-name }}
+      pull-request-id: ${{ matrix.id }}
+    secrets: 
+      token: ${{ secrets.token }}
+      asset-keys: ${{ secrets.asset-keys }}
