@@ -4,7 +4,8 @@ param(
     [string]$RepoName,
     [string]$ProjectDir = ".",
     [string]$Name = "Release_x64",
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [string]$Arch = "x64"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -15,7 +16,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Building '$Name'"
-    dotnet build -c $Configuration $ProjectDir
+    dotnet build -c $Configuration /p:Platform=$Arch $ProjectDir
 
 }
 finally {

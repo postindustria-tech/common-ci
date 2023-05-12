@@ -19,7 +19,7 @@ Write-Output "::group::Configure Git"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone $RepoName"
-./steps/clone-repo.ps1 -RepoName $RepoName
+#./steps/clone-repo.ps1 -RepoName $RepoName
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -49,11 +49,13 @@ try {
       Write-Output update_required=true | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
     } else {
       Write-Output update_required=false | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
+      # Exit with a zero exit code as we don't want to fail just because an update is not required.
+      exit 0
     }
-    # Exit with a zero exit code as we don't want to fail just because an update is not required.
-    exit 0
+    
   }
 Write-Output "::endgroup::"
+
 
 if ($LASTEXITCODE -ne 0) {
   exit $LASTEXITCODE
@@ -61,7 +63,11 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Output "::group::Package Update Required"
 $OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
+
 $Options = Get-Content $OptionsFile | ConvertFrom-Json
+
+Write-Output $Options
+
 $RequiredOptions = @()
 foreach ($element in $Options)
 {
@@ -82,6 +88,7 @@ $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
 $RequiredOptions = $RequiredOptions -replace "`r`n", "" -replace "`n", ""
 Write-Host $RequiredOptions
 Write-Output options=$RequiredOptions | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
+Write-Output $RequiredOptions
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
