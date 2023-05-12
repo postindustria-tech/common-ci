@@ -21,13 +21,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-        
+      
       - name: Checkout reusable workflow dir
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
           path: common
 
+      - name: Clone Repo
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
+      
       # Get all the pull requests into main, and output the ids
       - name: Get Pull Requests
         id: get_pull_requests
