@@ -4,7 +4,7 @@ param(
     [string]$RepoName,
     [string]$ProjectDir = ".",
     [string]$Name = "Release_x64",
-    [Parameter(Mandatory=$true)]
+    #[Parameter(Mandatory=$true)]
     [string]$ApiKey
 )
 
