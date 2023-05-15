@@ -145,7 +145,6 @@ jobs:
         run: |
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
-          $Options.Add("Version", "${{ needs.configure.outputs.version }}")
           . ${{ github.workspace }}/common/nightly-publish-main_build.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -GitHubToken ${{ secrets.token }} `
