@@ -27,6 +27,12 @@ jobs:
         with:
           repository: 51degrees/common-ci
           path: common
+          
+      - name: Git Config
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
 
       - name: Clone Repo
         shell: pwsh
