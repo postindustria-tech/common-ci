@@ -27,7 +27,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Get Pull Requests"
-./steps/get-pull-requests.ps1 -RepoName $RepoName -VariableName PullRequestIds
+./steps/get-pull-requests.ps1 -RepoName $RepoName -VariableName PullRequestIds -GitHubToken $GitHubToken
 Write-Output pull_request_ids="[$([string]::Join(",", $PullRequestIds))]" | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
 Write-Output "::endgroup::"
 
