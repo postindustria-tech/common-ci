@@ -3,7 +3,13 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$GitHubOutput
+    [string]$GitHubOutput,
+    [Parameter(Mandatory=$true)]
+    [string]$GitHubToken,
+    [Parameter(Mandatory=$true)]
+    [Hashtable]$Options
+    
+    
 )
 
 . ./constants.ps1
