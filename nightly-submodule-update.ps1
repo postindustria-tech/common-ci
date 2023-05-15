@@ -4,7 +4,7 @@ param (
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
     [string]$GitHubToken,
-    [int]$RunId = 0
+    [string]$RunId = $Null
 )
 
 . ./constants.ps1
@@ -72,7 +72,7 @@ else {
 
     Write-Output "No submodule changes, so not creating a pull request."
 
-    if ($RunId -gt 0) {
+    if ($Null -ne $RunId) {
         Write-Output "Cancelling Run"
         hub api /repos/51Degrees/$RepoName/actions/runs/$RunId/cancel -X POST
     }
