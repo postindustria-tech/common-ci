@@ -67,7 +67,7 @@ try {
 
         }
 
-        if ($ValieIds.Count -gt 0) {
+        if ($ValidIds.Count -gt 0) {
             Write-Output "Pull request ids are: $([string]::Join(",", $ValidIds))"
             Set-Variable -Name $VariableName -Value $ValidIds -Scope Global
         }
