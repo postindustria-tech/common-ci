@@ -41,7 +41,7 @@ try {
     if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
         Write-Output "Releasing from Nexus to Maven central"
-        #mvn nexus-staging:release
+        mvn nexus-staging:release
     
     }
 
