@@ -109,8 +109,6 @@ try {
     # Move the "nexus" folder to the "package" folder
     Move-Item -Path "$RepoPath/nexus" -Destination $PackagePath
 
-    ls "$RepoPath/package"
-
 }
 finally {
 
