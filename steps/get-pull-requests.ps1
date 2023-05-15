@@ -67,8 +67,14 @@ try {
 
         }
 
-        Write-Output "Pull request ids are: $([string]::Join(",", $ValidIds))"
-        Set-Variable -Name $VariableName -Value $ValidIds -Scope Global
+        if ($ValieIds.Count -gt 0) {
+            Write-Output "Pull request ids are: $([string]::Join(",", $ValidIds))"
+            Set-Variable -Name $VariableName -Value $ValidIds -Scope Global
+        }
+        else {
+            Write-Output "No pull requests to be checked."
+            Set-Variable -Name $VariableName -Value @(0) -Scope Global
+        }
 
     } else {
 

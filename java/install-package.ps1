@@ -8,9 +8,17 @@ param(
 
 # Combine the current working directory with the repository name
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
+$PackagePath = [IO.Path]::Combine($pwd, "package")
 
-# Define the path for locally installed packages to be uploaded to artifacts
-$PackagePath = Join-Path -Path $RepoPath -ChildPath "package"
+# Get version of the package 
+$Version = mvn help:evaluate "-Dexpression=project.version" -q -DforceStdout
+
+if ($($Version.EndsWith("SNAPSHOT"))) {
+    $NexusSubFolder = "deferred"
+}
+else{
+    $NexusSubFolder = "staging"
+}
 
 # Get the Maven local repository path
 $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" -q -DforceStdout
@@ -19,7 +27,7 @@ $MavenLocalRepoPath = mvn help:evaluate -Dexpression="settings.localRepository" 
 $MavenLocal51DPath = Join-Path -Path $MavenLocalRepoPath -ChildPath "com\51degrees"
 
 # Define the path for the local Nexus staging repository
-$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) "deferred"
+$NexusLocalStaging51DPath = Join-Path (Split-Path $MavenLocalRepoPath -Parent) $NexusSubFolder
 
 # Display the repository path and enter it
 Write-Output "Entering '$RepoPath'"

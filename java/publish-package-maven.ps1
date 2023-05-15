@@ -14,6 +14,8 @@ Push-Location $RepoPath
 
 try {
 
+    # We need to set the version here again even though the packages are already built using the next version
+    # as this script will run in a new job and the repo will be cloned again.
     Write-Output "Setting version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
 
@@ -21,26 +23,14 @@ try {
 
     Write-Output "Writing Settings File"
     $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
-    Set-Content -Path $settingsFile -Value $SettingsContent
-
-    # Set file names
-    $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
-    $JavaPGPFile = "Java Maven GPG Key Private.pgp"
-
-    Write-Output "Writing PFX File"
-    $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
-    Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
-    $CertPath = [IO.Path]::Combine($RepoPath, $CodeSigningCertFile)
-
-    Write-Output "Writing PGP File"
-    Set-Content -Path $JavaPGPFile -Value $JavaPGP
-
-    echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
+    Set-Content -Path $SettingsFile -Value $SettingsContent
+    $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
+    
 
     Write-Output "Deploying to Nexus staging"
     
     mvn nexus-staging:deploy-staged `
-        -s $settingsFile  `
+        -s $SettingsPath  `
         -f pom.xml `
         -DXmx2048m `
         -DskipTests `

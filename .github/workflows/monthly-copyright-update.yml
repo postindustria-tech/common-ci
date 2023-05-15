@@ -10,9 +10,6 @@ on:
       token:
         required: true
         
-env:
-  GITHUB_TOKEN: ${{ secrets.token }}
-
 jobs:
   monthly-copyright-update:
     runs-on: ubuntu-latest
@@ -27,7 +24,7 @@ jobs:
           repository: 51degrees/common-ci
           path: common
         
-      - name: Update Copyrighnt
+      - name: Update Copyright
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |

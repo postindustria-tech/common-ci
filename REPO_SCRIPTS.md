@@ -14,9 +14,9 @@ Builds the project. This is passed any build configuration parameters required f
 
 Build a package ready for testing and publishing.
 
-Any requirements from `build-package-requirements` will be downloaded to `[repo]/package-files` before this script is called.
+Any requirements from `build-package-requirements` will be downloaded to `package-files` before this script is called.
 
-This should output any package files to the `[repo]/package` directory.
+This should output any package files to the `package` directory.
 
 ## Build Package Requirements
 
@@ -24,7 +24,7 @@ This should output any package files to the `[repo]/package` directory.
 
 This should build any config specific requirements for the package. For example, native binaries that need to be built on different platforms before being combined in the final package.
 
-This should output any files required for the package to the `[repo]/package-files` directory.
+This should output any files required for the package to the `package-files` directory.
 
 ## Fetch Assets
 
@@ -44,7 +44,7 @@ This should make use of the common version which returns the versions from GitVe
 
 **Script: `install-package.ps1`**
 
-Install a prebuilt package locally from the `[repo]/package` directory.
+Install a prebuilt package locally from the `package` directory.
 
 As an example, if a NuGet package is downloaded to the `package` directory. This script would install it using NuGet.
 
@@ -76,7 +76,7 @@ Run any performance tests for the project. For implementation guidelines, see [I
 
 Results should be written to the `[repo]/test-results/performance` directory. Supported formats can be found on the [publish-unit-test-result](https://github.com/EnricoMi/publish-unit-test-result-action#generating-test-result-files) action readme.
 
-Performance figures are different from test results. These should be written to the `[repo]test-results/performance-summary/` directory in a specific format. See the [Performance Tests](/DESIGN.md#performance-tests) section for details.
+Performance figures are different from test results. These should be written to the `[repo]/test-results/performance-summary/` directory in a specific format. See the [Performance Tests](/DESIGN.md#performance-tests) section for details.
 
 ## Run Unit Tests
 

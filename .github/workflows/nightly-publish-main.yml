@@ -16,105 +16,31 @@ on:
       # Any secrets needed for retrieving files, signing packages or tests.
       asset-keys:
         required: true
-env:
-  # The default token is overwritten by the organisation scoped PAT.
-  GITHUB_TOKEN: ${{ secrets.token }}
 
 jobs:
   Configure:
     runs-on: ubuntu-latest
     outputs:
-      options: ${{ steps.get_options.outputs.options }}
-      version: ${{ steps.get_next_version.outputs.version }}
-      update_required: ${{ steps.update_required.outputs.update_required }}
+      options: ${{ steps.configure.outputs.options }}
+      version: ${{ steps.configure.outputs.version }}
+      update_required: ${{ steps.configure.outputs.update_required }}
     steps:
     
       - name: Checkout Common
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
-          ref: gh-refact
           path: common
         
-      - name: Configure Git
+      - name: Configure
+        id: configure
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
-          
-      - name: Clone Repo
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
-          
-      - name: Get Next Package Version
-        id: get_next_version
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        # Obtains the next version from the repo specific script and verifies that the version is valid
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"}
-          Write-Output version=$Version
-          # Check that the version is valid
-          # $ParseResult = $Null
-          # [System.Version]::TryParse($Version, [ref]$ParseResult)
-          $IsValid = [bool]([regex]::Match($Version, '^(\d+)\.(\d+)\.(\d+)(-SNAPSHOT)?$')) 
-          if ($IsValid -eq $False) {
-            Write-Error "The package version was not valid: '$Version'"
-            exit 1
-          }
-          Write-Output version=$Version | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-          
-      - name: Package Update Required
-        id: update_required
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          try {
-            . ${{ github.workspace }}/common/steps/package-update-required.ps1 -RepoName ${{ inputs.repo-name }} -Version ${{ steps.get_next_version.outputs.version }}
-          } finally {
-            if ($LASTEXITCODE -eq 0) {
-              echo update_required=true | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-            } else {
-              echo update_required=false | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-            }
-            # Exit with a zero exit code as we don't want to fail just because an update is not required.
-            exit 0
-          }
-          
-      - name: Get Build Options
-        id: get_options
-        if: ${{ success() }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        # Version obtained from the preceding step is added to the options 
-        # for each element of the json array as a new key value pair.
-        # This ensures that the version is availabe to steps that need it for all of the runners. 
-        run: |
-          $OptionsFile = [IO.Path]::Combine($pwd, "${{ inputs.repo-name }}", "ci", "options.json")
-          $Options = Get-Content $OptionsFile | ConvertFrom-Json
-          $RequiredOptions = @()
-          foreach ($element in $Options)
-          {
-            if ($element.PackageRequirement) {
-              $element | Add-Member -Name "Version" -Value "${{ steps.get_next_version.outputs.version }}" -MemberType NoteProperty
-              $RequiredOptions += $element
-            }
-          }
-          if ($RequiredOptions.Count -eq 0) {
-            # As there are no prebuild steps, add an empty one to ensure the YAML is still valid.
-            $RequiredOptions += @{
-              "Name" = "No Prebuild"
-              "PackageRequirement" = $False
-              "Image" = "ubuntu-latest"
-            }
-          }
-          $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
-          $RequiredOptions = $RequiredOptions -replace "`r`n", "" -replace "`n", ""
-          Write-Host $RequiredOptions
-          echo options=$RequiredOptions | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          . ${{ github.workspace }}/common/nightly-publish-main_configure.ps1 `
+          -RepoName ${{ inputs.repo-name }} `
+          -GitHubToken ${{ secrets.token }} `
+          -GitHubOutput $Env:GITHUB_OUTPUT
 
   PreBuild:
     needs: Configure
@@ -129,53 +55,26 @@ jobs:
         if: ${{ matrix.options.packagerequirement }}
         with:
           repository: 51degrees/common-ci
-          ref: gh-refact
           path: common
 
-      - name: Configure Git
-        if: ${{ matrix.options.packagerequirement }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
-          
-      - name: Clone Repo
-        if: ${{ matrix.options.packagerequirement }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
-
-      - name: Fetch Assets
-        shell: pwsh
-        if: ${{ matrix.options.packagerequirement }}
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
-
-      - name: Setup Environment
-        if: ${{ matrix.options.packagerequirement }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-
-      - name: Build Package Requirements
+      - name: PreBuild
         if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-package-requirements.ps1" -Options $Options
-
+          . ${{ github.workspace }}/common/nightly-publish-main_prebuild.ps1 `
+          -RepoName ${{ inputs.repo-name }} `
+          -GitHubToken ${{ secrets.token }} `
+          -Options $Options
+          
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
         if: ${{ success() && matrix.options.packagerequirement }}
         with:
           name: package_${{ matrix.options.name }}
-          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package-files
+          path: ${{ github.workspace }}/common/package-files
           if-no-files-found: ignore   
           
 
@@ -187,48 +86,32 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
-          ref: gh-refact
           path: common
-
-      - name: Configure Git
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
-          
-      - name: Clone Repo
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
-
-     #- name: Setup Environment
-     #  shell: pwsh
-     #  working-directory: ${{ github.workspace }}/common/
-     #  run: |
-     #    . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(needs.configure.outputs.options) }}')
 
       - name: Download Package Artifacts
         if: ${{ success() }}
         uses: actions/download-artifact@v2.1.1
         with:
-          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package-files
+          path: ${{ github.workspace }}/common/package-files
 
-      - name: Build Package
+      - name: Build
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $Options = $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
+          $Options = @{}
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "build-package.ps1" -Options $Options
+          . ${{ github.workspace }}/common/nightly-publish-main_build.ps1 `
+          -RepoName ${{ inputs.repo-name }} `
+          -GitHubToken ${{ secrets.token }} `
+          -Options $Options
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
         if: ${{ success() }}
         with:
           name: package
-          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package
+          path: ${{ github.workspace }}/common/package
           if-no-files-found: ignore   
 
 
@@ -242,64 +125,33 @@ jobs:
     
     steps:
       - name: Checkout Common
+        if: ${{ matrix.options.packagerequirement }}
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
-          ref: gh-refact
           path: common
 
-      - name: Configure Git
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
-          
-      - name: Clone Repo
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
-          
-      - name: Fetch Assets
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "fetch-assets.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
-          
-      - name: Setup Environment
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-
       - name: Download Package Artifact
-        if: ${{ success() }}
+        if: ${{ success() && matrix.options.packagerequirement }}
         uses: actions/download-artifact@v2.1.1
         with:
           name: package
-          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package
+          path: ${{ github.workspace }}/common/package
 
-      - name: Install Package From Artifact
+      - name: Test
         shell: pwsh
+        if: ${{ success() && matrix.options.packagerequirement }}
         working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "install-package.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-
-      - name: Run Integration Tests
-        id: test
-        if: ${{ needs.Build.result == 'success' }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        # Secrets needed for running tests are added to options in the "Keys",
-        # which can then be accessed from within the script like Keys.TestResourceKey
-        run: |
-          $IntegrationOptions = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-          $IntegrationOptions.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "run-integration-tests.ps1" -Options $IntegrationOptions
-    
+          $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          . ${{ github.workspace }}/common/nightly-publish-main_test.ps1 `
+          -RepoName ${{ inputs.repo-name }} `
+          -GitHubToken ${{ secrets.token }} `
+          -Options $Options
+          
       - name: Integration Test Results
-        if: ${{ always() }}
+        if: ${{ matrix.options.packagerequirement }}
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         with:
           check_name: Integration Tests - ${{ matrix.options.name }}
@@ -318,53 +170,24 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 51degrees/common-ci
-          ref: gh-refact
           path: common
-
-      - name: Configure Git
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/configure-git.ps1 -GitHubToken ${{ secrets.token }}
-          
-      - name: Clone Repo
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/constants.ps1
-          . ${{ github.workspace }}/common/steps/clone-repo.ps1 -RepoName ${{ inputs.repo-name }}
-
-     #- name: Setup Environment
-     #  shell: pwsh
-     #  working-directory: ${{ github.workspace }}/common/
-     #  run: |
-     #    . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "setup-environment.ps1" -Options $(ConvertFrom-Json -AsHashtable '${{ toJSON(needs.configure.outputs.options) }}')
 
       - name: Download Package Artifact
         if: ${{ success() }}
         uses: actions/download-artifact@v2.1.1
         with:
           name: package
-          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/package
+          path: ${{ github.workspace }}/common/package
 
-      - name: Install Package From Artifact
+      - name: Package
         shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "install-package.ps1" -Options @{Version = "${{ needs.configure.outputs.version }}" }
-
-      - name: Publish Packages
         if: ${{ success() }}
-        shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $Options = $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}')
+          $Options = @{}
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
-          . ${{ github.workspace }}/common/steps/run-repo-script.ps1 -RepoName ${{ inputs.repo-name }} -ScriptName "publish-package.ps1" -Options $Options
-          
-      - name: Update Tag
-        if: ${{ success() }}
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
-        run: |
-          . ${{ github.workspace }}/common/steps/update-tag.ps1 -RepoName ${{ inputs.repo-name }} -Tag ${{ needs.configure.outputs.version }}
+          . ${{ github.workspace }}/common/nightly-publish-main_package.ps1 `
+          -RepoName ${{ inputs.repo-name }} `
+          -GitHubToken ${{ secrets.token }} `
+          -Options $Options
