@@ -5,7 +5,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$GitHubToken,
     [Parameter(Mandatory=$true)]
-    $Options
+    [Hashtable]$Options
 )
 
 . ./constants.ps1
