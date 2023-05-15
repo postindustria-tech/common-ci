@@ -58,7 +58,6 @@ try {
         $ValidIds = @()
 
         foreach ($Id in $Ids) {
-            Write-Output "checking"
             # Only select PRs which are eligeble for automation.
             if (ShouldRun -RepoName $RepoName -Id $Id)
             {
