@@ -24,7 +24,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Clone Tools"
-./steps/clone-rep  o.ps1 -RepoName "tools"
+./steps/clone-repo.ps1 -RepoName "tools"
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
