@@ -3,8 +3,6 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$GitHubOutput,
-    [Parameter(Mandatory=$true)]
     [string]$GitHubToken,
     [Parameter(Mandatory=$true)]
     [Hashtable]$Options
