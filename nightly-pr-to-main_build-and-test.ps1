@@ -9,7 +9,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$PullRequestId,
     [Parameter(Mandatory=$true)]
-    $Options
+    [Hashtable]$Options
 )
 
 . ./constants.ps1
