@@ -9,7 +9,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$PullRequestId,
     [Parameter(Mandatory=$true)]
-    [Hashtable]$Options,
+    $Options,
     $RunId = 0
 )
 
@@ -32,8 +32,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Compare Performance Results"
-$ResultsPath = [IO.Path]::Combine($pwd, "results_$($Options.Name).json")
-./steps/compare-performance.ps1 -RepoName $RepoName -Name $Options.Name -RunId $RunId -PullRequestId $PullRequestId -ResultsPath $ResultsPath
+./steps/compare-performance.ps1 -RepoName $RepoName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
