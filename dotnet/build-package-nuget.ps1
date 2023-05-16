@@ -17,7 +17,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Building package for '$Name'"
-    dotnet pack -o "./packages" -c $Configuration /p:Platform=$Arch $ProjectDir /p:PackageVersion=$Version
+    dotnet pack -o "../package" -c $Configuration /p:Platform=$Arch $ProjectDir /p:PackageVersion=$Version
 
 }
 finally {
