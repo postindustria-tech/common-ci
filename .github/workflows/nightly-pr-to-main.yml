@@ -139,7 +139,7 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
-          -AllOptions $Options `
+          -Options $Options `
           -RunId ${{ github.run_id }}
 
       - name: Upload Successful Performance Results Artifact
