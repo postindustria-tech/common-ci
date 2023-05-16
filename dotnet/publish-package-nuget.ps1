@@ -17,7 +17,7 @@ try {
 
     Write-Output "Releasing package for '$Name'"
 
-    $packageDirectory = [IO.Path]::Combine(Get-Item $RepoPath).Parent.FullName, "package")
+    $packageDirectory = [IO.Path]::Combine((Get-Item $RepoPath).Parent.FullName, "package")
     $packagePaths = Get-ChildItem -Path $packageDirectory -Filter "*.nupkg" -File | ForEach-Object { $_.FullName }
     $packageString = $packagePaths -join ' '
 
