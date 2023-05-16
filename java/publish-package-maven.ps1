@@ -41,7 +41,15 @@ try {
     if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
         Write-Output "Releasing from Nexus to Maven central"
-        #mvn nexus-staging:release
+        mvn nexus-staging:release `
+        -s $SettingsPath  `
+        -f pom.xml `
+        -DXmx2048m `
+        -DskipTests `
+        --no-transfer-progress `
+        "-Dhttps.protocols=TLSv1.2" `
+        "-DfailIfNoTests=false" 
+        
     
     }
 
