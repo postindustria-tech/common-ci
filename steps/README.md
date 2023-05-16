@@ -77,10 +77,6 @@ A PR is considered valid if it was created by one of the following roles:
 - `COLLABORATOR`
 - `CONTRIBUTOR`
 - `MEMBER`
-or was approved by a member of the 51Degrees Github organisation.
-
-If one or more reviewers have been assigned to the PR, then the PR will only
-be included if all reviewers have approved.
 
 ## Get Next Package Version
 **Script: `get-next-package-version.ps1`**
