@@ -14,8 +14,11 @@ Push-Location $RepoPath
 try {
     
     $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
-
+    
+    Write-Output "Getting PRs from '$CurrentBranch' to 'main'"
     $Prs = $(hub pr list -b main -h $CurrentBranch)
+
+    Write-Output "There are '$($Prs.Count)' PRs"
 
     if ($Prs.Count -eq 0) {
         Write-Output "Creating pull request"
