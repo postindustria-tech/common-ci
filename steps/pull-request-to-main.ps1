@@ -16,7 +16,7 @@ try {
     $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
     
     Write-Output "Getting PRs from '$CurrentBranch' to 'main'"
-    $Prs = $(hub pr list -b main -h $CurrentBranch)
+    $Prs = $(hub pr list -b main -h $CurrentBranch --format "%I%n")
 
     Write-Output "There are '$($Prs.Count)' PRs"
 
