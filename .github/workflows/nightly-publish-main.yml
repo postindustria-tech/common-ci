@@ -27,7 +27,7 @@ jobs:
     steps:
     
       - name: Checkout Common
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 51degrees/common-ci
           path: common
@@ -126,7 +126,7 @@ jobs:
     steps:
       - name: Checkout Common
         if: ${{ matrix.options.packagerequirement }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 51degrees/common-ci
           path: common
@@ -167,7 +167,7 @@ jobs:
     steps:
 
       - name: Checkout Common
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 51degrees/common-ci
           path: common
