@@ -58,12 +58,16 @@ function ShouldRun {
     else {
         # The author is not one of the above, so check that
         # the PR has been approved
+        Write-Information "The creator is '$($Pr.author_association)', so need to check for approval"
         foreach ($Review in $Reviews) {
             if ($Review.state -eq 'APPROVED') {
                 if (IsOrgUser -UserId $Review.user.id) {
                     Write-Information "The creator is external, but has been approved by '$($Review.user.id)', so allow automation"
                     $Allowed = $True
                 }
+            }
+            if ($Allowed -eq $False) {
+                Write-Information "The creator is external, and has not been approved, so no automation"
             }
         }
     }
@@ -96,11 +100,15 @@ try {
         foreach ($Id in $Ids) {
             # Only select PRs which are eligeble for automation.
             Write-Output "Checking PR #$Id"
+            # Set the info preference so that we can see logging from within
+            # the function.
+            $OldPreference = $InformationPreference
+            $InformationPreference = 'Continue'
             if (ShouldRun -RepoName $RepoName -Id $Id)
             {
                 $ValidIds += $Id
             }
-
+            $InformationPreference = $OldPreference
         }
 
         if ($ValidIds.Count -gt 0) {
