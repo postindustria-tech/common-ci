@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
       - name: Checkout reusable workflow dir
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 51degrees/common-ci
           path: common
