@@ -18,7 +18,7 @@ try {
     if ($PullRequestId -eq 0) {
 
         Write-Output "Not running for a PR"
-        exit 1
+        exit 0
     
     }
 
