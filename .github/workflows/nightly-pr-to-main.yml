@@ -3,12 +3,12 @@ name: Nightly PR to Main
 on:
   workflow_call:
     inputs:
-        repo-name:
-          required: true
-          type: string
-        pull-request-id:
-          required: true
-          type: number        
+      repo-name:
+        required: true
+        type: string
+      pull-request-id:
+        required: true
+        type: number        
     secrets:
       token:
         required: true
@@ -17,6 +17,7 @@ on:
 
 jobs:
   Configure:
+    name : Configure - ${{ inputs.pull-request-id }} 
     runs-on: ubuntu-latest
     outputs:
       options: ${{ steps.configure.outputs.options }}
@@ -44,7 +45,7 @@ jobs:
     strategy:
       matrix:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
-    name: Build and Test - ${{ matrix.options.name }}
+    name: Build and Test - ${{ inputs.pull-request-id }} - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
     
     steps:
@@ -114,7 +115,7 @@ jobs:
     # This needs to run on Windows to support ScottPlot
     runs-on: windows-latest
     needs: [ Configure, Build-and-Test ]
-    name: Compare Performance
+    name: Compare Performance - ${{ inputs.pull-request-id }} 
     steps:
       - name: Checkout Common
         uses: actions/checkout@v2
@@ -151,6 +152,7 @@ jobs:
 
   Complete:      
     runs-on: ubuntu-latest
+    name: Complete ${{ inputs.pull-request-id }} 
     needs: [ Build-and-Test, Compare-Performance ]
     steps:
 
