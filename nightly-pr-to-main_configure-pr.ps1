@@ -42,23 +42,6 @@ $Options = Get-Content $OptionsFile -Raw
 $Options = $Options -replace "`r`n", "" -replace "`n", ""
 Write-Output $Options
 Write-Output options=$Options | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
-$OptionsPerformance = @()
-foreach ($Element in $($Options | ConvertFrom-Json)) {
-  if ($Element.RunPerformance) {
-    $OptionsPerformance += $Element
-  }
-}
- if ($OptionsPerformance.Count -eq 0) {
-  # As there are performance tests, add an empty one to ensure the YAML is still valid.
-  $OptionsPerformance += @{
-    "Name" = "No Performance Tests"
-    "RunPerformance" = $False
-    "Image" = "ubuntu-latest"
-  }
-}
-$OptionsPerformance = $OptionsPerformance | ConvertTo-Json -AsArray
-$OptionsPerformance = $OptionsPerformance -replace "`r`n", "" -replace "`n", ""
-Write-Output options-performance=$OptionsPerformance | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {

@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       options: ${{ steps.configure.outputs.options }}
-      options-performance: ${{ steps.configure.outputs.options-performance }}
     steps:
     
       - name: Checkout Common
@@ -115,12 +114,7 @@ jobs:
     # This needs to run on Windows to support ScottPlot
     runs-on: windows-latest
     needs: [ Configure, Build-and-Test ]
-    strategy:
-      # Allow only one at a time so there are no conflicts when committing images
-      max-parallel: 1
-      matrix:
-        options: ${{ fromJSON(needs.configure.outputs.options-performance ) }}
-    name: Compare Performance - ${{ matrix.options.name }}
+    name: Compare Performance
     steps:
       - name: Checkout Common
         uses: actions/checkout@v2
@@ -129,7 +123,6 @@ jobs:
           path: common
 
       - name: Download Performance Artifact
-        if: ${{ success() && matrix.options.runperformance }}
         uses: actions/download-artifact@v2.1.1
         with:
           name: performance_results_${{ inputs.pull-request-id }}
@@ -139,13 +132,13 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
+          $Options = $(ConvertFrom-Json -AsHashtable '${{ needs.configure.outputs.options }}')
           . ${{ github.workspace }}/common/nightly-pr-to-main_compare-performance.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
-          -Options $Options `
+          -AllOptions $Options `
           -RunId ${{ github.run_id }}
 
       - name: Upload Successful Performance Results Artifact
@@ -153,7 +146,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: performance_results_passed_${{ inputs.pull-request-id }}
-          path: ${{ github.workspace }}/common/results_${{ matrix.options.name }}.json
+          path: ${{ github.workspace }}/common/results_*.json
           if-no-files-found: ignore
 
   Complete:      
@@ -171,7 +164,6 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           . ${{ github.workspace }}/common/nightly-pr-to-main_complete.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -GitHubToken ${{ secrets.token }} `

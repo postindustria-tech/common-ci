@@ -3,10 +3,9 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$Name,
+    $AllOptions,
     [string]$RunId,
-    [string]$PullRequestId,
-    [string]$ResultsPath = ""
+    [string]$PullRequestId
 )
 
 # Disable progress bars
@@ -39,7 +38,8 @@ function Generate-Performance-Results {
         $Artifacts,
         $CurrentArtifact,
         [string]$Metric,
-        [bool]$HigherIsBetter
+        [bool]$HigherIsBetter,
+        $Options
     )
 
     # Calculate the mean and standard deviation
@@ -104,7 +104,7 @@ function Generate-Performance-Results {
         $Plot.AxisAuto(0.2, 0.5)
         #$Plot.AxisZoom(0.5, 1)
         $Plot.Legend($True, [ScottPlot.Alignment]::UpperLeft)
-        $Plot.Title("Config : '$Name'", $Null, $Null, $Null, $Null)
+        $Plot.Title("Config : '$($Options.Name)'", $Null, $Null, $Null, $Null)
         $Plot.XLabel("Date of Performance Test")
         $Plot.YLabel($Metric)
         $Plot.XAxis.DateTimeFormat($True)
@@ -117,11 +117,11 @@ function Generate-Performance-Results {
         $Plot.AddVerticalSpan($($Mean - $Deviation), $($Mean + $Deviation))
 
         # Output the graph
-        $Plot.SaveFig("$pwd/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png")
+        $Plot.SaveFig("$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png")
 
         # Commit the image, and change back to the original branch
-        git add "$pwd/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png"
-        git commit -m "Added performance graph for for $RunId-$PullRequestId-$Name-$Metric"
+        git add "$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png"
+        git commit -m "Added performance graph for for $RunId-$PullRequestId-$($Options.Name)-$Metric"
         git push origin $ImagesBranch
         git checkout $CurrentBranch
     }
@@ -131,8 +131,8 @@ function Generate-Performance-Results {
 
     # Write out the summary for GitHub actions
     if ($Null -ne $env:GITHUB_STEP_SUMMARY) {
-        Write-Output "## Performance Figures - $Name - $Metric" >> $env:GITHUB_STEP_SUMMARY
-        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/51Degrees/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$Name-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "## Performance Figures - $($Options.Name) - $Metric" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/51Degrees/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| Date | $Metric |" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| ---- | ---------------- |" >> $env:GITHUB_STEP_SUMMARY
         foreach ($i in 0..$($Results.Length - 1)) {
@@ -155,59 +155,18 @@ function Generate-Performance-Results {
     if ($Passed -eq $False) {
         
         if ($Results.Length -lt 10) {
-            Write-Warning "The performance of '$Metric' is more than 2 standard deviations from the mean for '$Name'. 
+            Write-Warning "The performance of '$Metric' is more than 2 standard deviations from the mean for '$($Options.Name)'. 
             There are only '$($Results.Length)' historic results, so this will not be considered a failure"
         }
         else {
-            Write-Warning "The performance of '$Metric' is more than 2 standard deviations from the mean for '$Name'."
+            Write-Warning "The performance of '$Metric' is more than 2 standard deviations from the mean for '$($Options.Name)'."
             exit 1
         }
     }
 }
 
-# Get all the artifactrs
-$Artifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
 
-# Get the artifact for the current run
-if ($ResultsPath -ne "") {
-    if ($(Test-Path -Path $ResultsPath) -eq $False) {
-        Write-Warning "The file '$ResultsPath' did not exist"
-        exit 0
-    }
-    $CurrentResult = Get-Content $ResultsPath | ConvertFrom-Json -AsHashtable
-    $CurrentResult.Artifact = @{}
-    $CurrentResult.Artifact.created_at = Get-Date
-}
-else {
-    $CurrentArtifact = $Artifacts | Where-Object { $_.workflow_run.id -eq $RunId -and $_.name -eq "performance_results_$PullRequestId" }
-    $CurrentResult = Get-Artifact-Result -Artifact $CurrentArtifact -Name $Name
-}
-
-# Get the result for the current artifact
-
-# Filter the artifacts so we only have ones that have passed the performance tests
-$Artifacts = $Artifacts | Where-Object { $_.name.StartsWith("performance_results_passed") }
-
-# Sort by date
-$Artifacts = $Artifacts | Sort-Object -Property created_at
-
-
-# Get the performance results from the artifacts
-$Results = @()
-foreach ($Artifact in $Artifacts) {
-    $Result = Get-Artifact-Result -Artifact $Artifact -Name $Name
-    if ($Null -ne $Result) {
-        $Results += $Result
-    }
-}
-$Results += $CurrentResult
-
-if ($CurrentResult -eq 0) {
-    Write-Error "Results for the workflow run '$RunId' were not found"
-    exit 1
-}
-
-# Install ScottPlot
+# Install ScottPlot if it is not already installed
 $PlotReady = $False
 try {
     $Plot = [ScottPlot.Plot]::new(400, 300)
@@ -230,28 +189,92 @@ if ($PlotReady -eq $False) {
     }
     Add-Type -Path $([IO.Path]::Combine($PlotPath, "bin", "ScottPlot.dll"))
 }
-# Generate the performance results for all metrics
-foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
-    Write-Output "Checking '$Metric' (HigherIsBetter)"
-    $MetricResults = @()
-    $MetricArtifacts = @()
-    foreach ($Result in $Results) {
-        if ($Null -ne $Result.HigherIsBetter -and $Null -ne $Result.HigherIsBetter[$Metric]) {
-            $MetricResults += $Result.HigherIsBetter[$Metric]
-            $MetricArtifacts += $Result.Artifact
+
+# Get all the artifactrs
+$AllArtifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
+
+foreach ($Options in $AllOptions) {
+    if ($Options.RunPerformance -eq $True) {
+        Write-Output "Running for ''$($Options.Name)'"
+
+        # Get the artifact for the current run
+        $ResultsPath = [IO.Path]::Combine($pwd, "results_$($Options.Name).json")
+        if ($ResultsPath -ne "") {
+            if ($(Test-Path -Path $ResultsPath) -eq $False) {
+                Write-Warning "The file '$ResultsPath' did not exist"
+                exit 0
+            }
+            $CurrentResult = Get-Content $ResultsPath | ConvertFrom-Json -AsHashtable
+            $CurrentResult.Artifact = @{}
+            $CurrentResult.Artifact.created_at = Get-Date
+        }
+        else {
+            $CurrentArtifact = $AllArtifacts | Where-Object { $_.workflow_run.id -eq $RunId -and $_.name -eq "performance_results_$PullRequestId" }
+            $CurrentResult = Get-Artifact-Result -Artifact $CurrentArtifact -Name $Options.Name
+        }
+
+        # Get the result for the current artifact
+
+        # Filter the artifacts so we only have ones that have passed the performance tests
+        $Artifacts = $AllArtifacts | Where-Object { $_.name.StartsWith("performance_results_passed") }
+
+        # Sort by date
+        $Artifacts = $Artifacts | Sort-Object -Property created_at
+
+
+        # Get the performance results from the artifacts
+        $Results = @()
+        foreach ($Artifact in $Artifacts) {
+            $Result = Get-Artifact-Result -Artifact $Artifact -Name $Options.Name
+            if ($Null -ne $Result) {
+                $Results += $Result
+            }
+        }
+        $Results += $CurrentResult
+
+        if ($CurrentResult -eq 0) {
+            Write-Error "Results for the workflow run '$RunId' were not found"
+            exit 1
+        }
+
+        # Generate the performance results for all metrics
+        foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
+            Write-Output "Checking '$Metric' (HigherIsBetter)"
+            $MetricResults = @()
+            $MetricArtifacts = @()
+            foreach ($Result in $Results) {
+                if ($Null -ne $Result.HigherIsBetter -and $Null -ne $Result.HigherIsBetter[$Metric]) {
+                    $MetricResults += $Result.HigherIsBetter[$Metric]
+                    $MetricArtifacts += $Result.Artifact
+                }
+            }
+            Generate-Performance-Results `
+                -Results $MetricResults `
+                -CurrentResult $CurrentResult.HigherIsBetter[$Metric] `
+                -Artifacts $MetricArtifacts `
+                -CurrentArtifact $CurrentResult.Artifact `
+                -Metric $Metric `
+                -Options $Options `
+                -HigherIsBetter $True
+        }
+        foreach ($Metric in $CurrentResult.LowerIsBetter.Keys) {
+            Write-Output "Checking '$Metric' (LowerIsBetter)"
+            $MetricResults = @()
+            $MetricArtifacts = @()
+            foreach ($Result in $Results) {
+                if ($Null -ne $Result.LowerIsBetter -and $Null -ne $Result.LowerIsBetter[$Metric]) {
+                    $MetricResults += $Result.LowerIsBetter[$Metric]
+                    $MetricArtifacts += $Result.Artifact
+                }
+            }
+            Generate-Performance-Results `
+                -Results $MetricResults `
+                -CurrentResult $CurrentResult.LowerIsBetter[$Metric] `
+                -Artifacts $MetricArtifacts `
+                -CurrentArtifact $CurrentResult.Artifact `
+                -Metric $Metric `
+                -Options $Options `
+                -HigherIsBetter $False
         }
     }
-    Generate-Performance-Results -Results $MetricResults -CurrentResult $CurrentResult.HigherIsBetter[$Metric] -Artifacts $MetricArtifacts -CurrentArtifact $CurrentResult.Artifact -Metric $Metric -HigherIsBetter $True
-}
-foreach ($Metric in $CurrentResult.LowerIsBetter.Keys) {
-    Write-Output "Checking '$Metric' (LowerIsBetter)"
-    $MetricResults = @()
-    $MetricArtifacts = @()
-    foreach ($Result in $Results) {
-        if ($Null -ne $Result.LowerIsBetter -and $Null -ne $Result.LowerIsBetter[$Metric]) {
-            $MetricResults += $Result.LowerIsBetter[$Metric]
-            $MetricArtifacts += $Result.Artifact
-        }
-    }
-    Generate-Performance-Results -Results $MetricResults -CurrentResult $CurrentResult.LowerIsBetter[$Metric] -Artifacts $MetricArtifacts -CurrentArtifact $CurrentResult.Artifact -Metric $Metric -HigherIsBetter $False
 }
