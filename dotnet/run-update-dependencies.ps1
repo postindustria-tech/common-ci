@@ -13,13 +13,15 @@ Push-Location $RepoPath
 
 try {
 
+    dotnet restore 
+    
     foreach ($Project in $(Get-ChildItem -Path $pwd -Filter *.csproj -Recurse -ErrorAction SilentlyContinue -Force)) {
         foreach ($Package in $(dotnet list $Project.FullName package --outdated | Select-String -Pattern "^\s*>")) {
             $PackageName = $Package -replace '^ *> ([a-zA-Z0-9\.]*) .*$', '$1' 
             $MajorVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$1' 
             $MinorVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$2' 
             $PatchVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$3' 
-            
+
             $Available = $(Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json | Where-Object {$_.Version -Match "$MajorVersion.$MinorVersion.*"})
             $HighestPatch = $Available[0].Version
 
