@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Download Performance Artifact"
-./steps/download-artifact.ps1 -RepoName $RepoName -RunId $RunId -ArtifactName "performance_results_$PullRequestId"
+./steps/download-artifact.ps1 -RepoName $RepoName -RunId $RunId -ArtifactName "performance_results_$PullRequestId" -GitHubToken $GitHubToken
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
