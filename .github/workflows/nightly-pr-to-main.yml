@@ -123,12 +123,6 @@ jobs:
           repository: 51degrees/common-ci
           path: common
 
-      - name: Download Performance Artifact
-        uses: actions/download-artifact@v2.1.1
-        with:
-          name: performance_results_${{ inputs.pull-request-id }}
-          path: ${{ github.workspace }}/common
-
       - name: Compare Performance
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/

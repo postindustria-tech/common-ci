@@ -31,10 +31,18 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Output "::group::Compare Performance Results"
-./steps/compare-performance.ps1 -RepoName $RepoName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options
+Write-Output "::group::Download Performance Artifact"
+./steps/download-artifact.ps1 -RepoName $RepoName -RunId $RunId -ArtifactName "performance_results_$PullRequestId"
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+    Write-Output "::group::Compare Performance Results"
+    ./steps/compare-performance.ps1 -RepoName $RepoName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options
+    Write-Output "::endgroup::"
+
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
 }
+
+exit 0
