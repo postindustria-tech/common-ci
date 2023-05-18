@@ -14,8 +14,8 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-
-    msbuild $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true
+    msbuild /p:Platform=$Arch /p:Configuration=$Configuration /t:Restore
+    msbuild $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true /t:Restore
 
 }
 finally {
