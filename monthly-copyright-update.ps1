@@ -2,6 +2,12 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
+    [Parameter(Mandatory=$true)]
+    [string]$OrgName,
+    [Parameter(Mandatory=$true)]
+    [string]$GitHubUser,
+    [Parameter(Mandatory=$true)]
+    [string]$GitHubEmail,
     [string]$GitHubToken
 )
 
@@ -12,15 +18,15 @@ Write-Output "Setting GITHUB_TOKEN"
 $env:GITHUB_TOKEN="$GitHubToken"
 
 Write-Output "::group::Configure Git"
-./steps/configure-git.ps1 -GitHubToken $GitHubToken
+./steps/configure-git.ps1 -GitHubToken $GitHubToken -GitHubUser $GitHubUser -GitHubEmail $GitHubEmail
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone $RepoName - $CopyrightUpdateBranch"
-./steps/clone-repo.ps1 -RepoName $RepoName -Branch $CopyrightUpdateBranch
+./steps/clone-repo.ps1 -RepoName $RepoName -OrgName $OrgName -Branch $CopyrightUpdateBranch
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone Tools"
-./steps/clone-repo.ps1 -RepoName "tools"
+./steps/clone-repo.ps1 -RepoName "tools" -OrgName $OrgName
 Write-Output "::endgroup::"
 
 Write-Output "::group::Options"
@@ -48,7 +54,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Output "::endgroup::"
 
     Write-Output "::group::PR To Main"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated copyright."
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated copyright." -GitHubToken $GitHubToken
     Write-Output "::endgroup::"
 
 }

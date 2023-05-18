@@ -4,6 +4,8 @@ param (
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
     $AllOptions,
+    [Parameter(Mandatory=$true)]
+    [string]$OrgName,
     [string]$RunId,
     [string]$PullRequestId
 )
@@ -132,7 +134,7 @@ function Generate-Performance-Results {
     # Write out the summary for GitHub actions
     if ($Null -ne $env:GITHUB_STEP_SUMMARY) {
         Write-Output "## Performance Figures - $($Options.Name) - $Metric" >> $env:GITHUB_STEP_SUMMARY
-        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/51Degrees/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
+        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/$OrgName/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| Date | $Metric |" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| ---- | ---------------- |" >> $env:GITHUB_STEP_SUMMARY
         foreach ($i in 0..$($Results.Length - 1)) {
@@ -191,7 +193,7 @@ if ($PlotReady -eq $False) {
 }
 
 # Get all the artifactrs
-$AllArtifacts = $(hub api /repos/51degrees/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
+$AllArtifacts = $(hub api /repos/$OrgName/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
 
 foreach ($Options in $AllOptions) {
     if ($Options.RunPerformance -eq $True) {

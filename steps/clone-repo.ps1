@@ -1,13 +1,15 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
+    [Parameter(Mandatory=$true)]
+    [string]$OrgName,
     [string]$Branch
 )
 
 . ./constants.ps1
 
 $TemporaryRepoName = "b"
-$Url = "$BaseGitUrl$RepoName"
+$Url = "https://github.com/$OrgName/$RepoName"
 $RepoPath = [IO.Path]::Combine($pwd, $TemporaryRepoName)
 
 Write-Output "Cloning '$Url'"

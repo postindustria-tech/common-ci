@@ -3,9 +3,21 @@ name: Nightly Submodule Update
 on:
   workflow_call:
     inputs:
-        repo-name:
-          required: true
-          type: string
+      repo-name:
+        required: true
+        type: string
+      org-name:
+        required: false
+        type: string
+        default: 51degrees
+      user:
+        required: false
+        type: string
+        default: Automation51D
+      email:
+        required: false
+        type: string
+        default: "51DCI@51Degrees.com"
     secrets:
       token:
         required: true
@@ -21,7 +33,7 @@ jobs:
       - name: Checkout reusable workflow dir
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
         
       - name: Update Submodules
@@ -31,4 +43,7 @@ jobs:
           . ${{ github.workspace }}/common/nightly-submodule-update.ps1 `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
-          -RunId ${{ github.run_id }}
+          -OrgName ${{ inputs.org-name }} `
+          -RunId ${{ github.run_id }} `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}

@@ -2,6 +2,10 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
+    [Parameter(Mandatory=$true)]
+    [string]$OrgName,
+    [string]$GitHubUser = "",
+    [string]$GitHubEmail = "",
     [string]$DeviceDetectionKey,
     [string]$DeviceDetectionUrl,
     [string]$GitHubToken
@@ -9,20 +13,27 @@ param (
 
 . ./constants.ps1
 
+if ($GitHubUser -eq "") {
+    $GitHubUser = $DefaultGitUser
+}
+if ($GitHubEmail -eq "") {
+    $GitHubEmail = $DefaultGitEmail
+}
+
 # This token is used by the hub command.
 Write-Output "Setting GITHUB_TOKEN"
 $env:GITHUB_TOKEN="$GitHubToken"
 
 Write-Output "::group::Configure Git"
-./steps/configure-git.ps1 -GitHubToken $GitHubToken
+./steps/configure-git.ps1 -GitHubToken $GitHubToken -GitHubUser $GitHubUser -GitHubEmail $GitHubEmail
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone $RepoName - $PropertiesUpdateBranch"
-./steps/clone-repo.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
+./steps/clone-repo.ps1 -RepoName $RepoName -OrgName $OrgName -Branch $PropertiesUpdateBranch
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone Tools"
-./steps/clone-repo.ps1 -RepoName "tools"
+./steps/clone-repo.ps1 -RepoName "tools" -OrgName $OrgName
 Write-Output "::endgroup::"
 
 Write-Output "::group::Options"
@@ -72,7 +83,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::PR To Main"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties."
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties." -GitHubToken $GitHubToken
     Write-Output "::endgroup::"
 
 }

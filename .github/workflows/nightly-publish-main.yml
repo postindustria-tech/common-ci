@@ -3,12 +3,24 @@ name: Nightly Publish Main
 on:
   workflow_call:
     inputs:
-        repo-name:
-          required: true
-          type: string
-        build-platform:
-          required: true
-          type: string
+      repo-name:
+        required: true
+        type: string
+      build-platform:
+        required: true
+        type: string
+      org-name:
+        required: false
+        type: string
+        default: 51degrees
+      user:
+        required: false
+        type: string
+        default: Automation51D
+      email:
+        required: false
+        type: string
+        default: "51DCI@51Degrees.com"
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
@@ -29,7 +41,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org.name }}/common-ci
           path: common
         
       - name: Configure
@@ -39,8 +51,11 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/nightly-publish-main_configure.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
-          -GitHubOutput $Env:GITHUB_OUTPUT
+          -GitHubOutput $Env:GITHUB_OUTPUT `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
 
   PreBuild:
     needs: Configure
@@ -54,7 +69,7 @@ jobs:
         uses: actions/checkout@v2
         if: ${{ matrix.options.packagerequirement }}
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: PreBuild
@@ -66,8 +81,11 @@ jobs:
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/nightly-publish-main_prebuild.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
-          -Options $Options
+          -Options $Options `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
           
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -85,7 +103,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v2
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Download Package Artifacts
@@ -103,8 +121,11 @@ jobs:
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
           . ${{ github.workspace }}/common/nightly-publish-main_build.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
-          -Options $Options
+          -Options $Options `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -128,7 +149,7 @@ jobs:
         if: ${{ matrix.options.packagerequirement }}
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Download Package Artifact
@@ -147,8 +168,11 @@ jobs:
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/nightly-publish-main_test.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
-          -Options $Options
+          -Options $Options `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
           
       - name: Integration Test Results
         if: ${{ matrix.options.packagerequirement }}
@@ -169,7 +193,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Download Package Artifact
@@ -189,5 +213,8 @@ jobs:
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
           . ${{ github.workspace }}/common/nightly-publish-main_package.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
-          -Options $Options
+          -Options $Options `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}

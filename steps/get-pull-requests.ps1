@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
+    [Parameter(Mandatory=$true)]
+    [string]$OrgName,
     [string]$VariableName = "PullRequestIds",
     [string]$GitHubToken
 )
@@ -11,7 +13,7 @@ $env:GITHUB_TOKEN="$GitHubToken"
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
-$OrgUsers = hub api /orgs/51degrees/members | ConvertFrom-JSON
+$OrgUsers = hub api /orgs/$OrgName/members | ConvertFrom-JSON
 
 function IsOrgUser {
     param (
@@ -45,8 +47,8 @@ function ShouldRun {
         [string]$Id
     )
     $Allowed = $False
-    $Reviews = hub api /repos/51degrees/$RepoName/pulls/$Id/reviews | ConvertFrom-JSON
-    $Pr = hub api /repos/51degrees/$RepoName/pulls/$Id | ConvertFrom-Json
+    $Reviews = hub api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-JSON
+    $Pr = hub api /repos/$OrgName/$RepoName/pulls/$Id | ConvertFrom-Json
     if ($Pr.author_association -eq 'OWNER' -or
         $Pr.author_association -eq 'COLLABORATOR' -or
         $Pr.author_association -eq 'CONTRIBUTOR' -or
