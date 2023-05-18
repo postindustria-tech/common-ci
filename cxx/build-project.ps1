@@ -6,7 +6,8 @@ param(
     [string]$Name,
     [string]$Arch = "x64",
     [string]$Configuration = "Release",
-    [string]$BuildMethod = "cmake"
+    [string]$BuildMethod = "cmake",
+    [string]$ExtraArgs
 )
 
 if ($BuildMethod -eq "cmake") {
@@ -21,7 +22,7 @@ if ($BuildMethod -eq "cmake") {
     
         Write-Output "Building '$Name'"
         
-        cmake .. -DCMAKE_BUILD_TYPE=$Configuration 
+        cmake .. -DCMAKE_BUILD_TYPE=$Configuration $ExtraArgs
         cmake --build . --config $Configuration
     
     }
