@@ -17,7 +17,7 @@ try {
 
     Write-Output "Building '$Name'"
     dotnet build $ProjectDir -c $Configuration /p:Platform=$Arch /p:BuiltOnCI=true
-    Get-ChildItem -Recurse
+    Get-ChildItem -Recurse -Name
 
 }
 finally {
