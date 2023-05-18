@@ -1,4 +1,3 @@
-
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
@@ -22,14 +21,14 @@ try {
             $MinorVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$2' 
             $PatchVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$3' 
 
-            $Available = $(Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json | Where-Object {$_.Version -Match "$MajorVersion.$MinorVersion.*"})
-            $HighestPatch = $Available[0].Version
+            $Available = $(Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json | Where-Object {$_.Version -Match "^$MajorVersion\.$MinorVersion\..*$"})
+            $HighestPatch = $Available | Sort-Object {[int]($_.Version.Split('.')[2])} | Select-Object -Last 1
 
-            if ("$MajorVersion.$MinorVersion.$PatchVersion" -ne $HighestPatch) {
+            if ($HighestPatch.Version -ne "$MajorVersion.$MinorVersion.$PatchVersion") {
 
-                Write-Output "Updating '$PackageName' from '$MajorVersion.$MinorVersion.$PatchVersion' to $HighestPatch"
+                Write-Output "Updating '$PackageName' from '$MajorVersion.$MinorVersion.$PatchVersion' to $($HighestPatch.Version)"
 
-                dotnet add $Project.FullName package $PackageName -v $HighestPatch
+                dotnet add $Project.FullName package $PackageName -v $HighestPatch.Version
                 
             }
         }
