@@ -18,8 +18,8 @@ try {
 
     Write-Output "Testing '$Name'"
     if ($BuildMethod -eq "dotnet"){
-
-        dotnet test $ProjectDir --results-directory "test-results/unit/$Name"--filter "FullyQualifiedName!~Performance&FullyQualifiedName!~Integration" --blame-crash -l "trx" -c $Configuration -a $Arch --no-build
+        
+        dotnet test $ProjectDir --results-directory "test-results/unit/$Name"--filter "FullyQualifiedName!~Performance&FullyQualifiedName!~Integration" --blame-crash -l "trx" -c $Configuration --no-build /p:Platform=$Arch
 
     }
     else{
