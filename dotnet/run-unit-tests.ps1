@@ -6,7 +6,7 @@ param(
     [string]$Name = "Release_x64",
     [string]$Configuration = "Release",
     [string]$Arch = "x64",
-    [string]$BuildMethod="msbuild"
+    [string]$BuildMethod="dotnet"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -19,7 +19,7 @@ try {
     Write-Output "Testing '$Name'"
     if ($BuildMethod -eq "dotnet"){
 
-        dotnet test $ProjectDir --results-directory "test-results/unit/$Name"--filter "FullyQualifiedName!~Performance&FullyQualifiedName!~Integration" --blame-crash -l "trx" -c $Configuration -a $Arch
+        dotnet test $ProjectDir --results-directory "test-results/unit/$Name"--filter "FullyQualifiedName!~Performance&FullyQualifiedName!~Integration" --blame-crash -l "trx" -c $Configuration -a $Arch --no-build
 
     }
     else{
