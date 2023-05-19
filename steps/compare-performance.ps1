@@ -144,7 +144,7 @@ function Generate-Performance-Results {
     }
 
     # Write out the summary for GitHub actions
-    if ($Null -ne $env:GITHUB_STEP_SUMMARY) {
+    if ($env:CI) {
         Write-Output "## Performance Figures - $($Options.Name) - $Metric" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/51Degrees/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| Date | $Metric |" >> $env:GITHUB_STEP_SUMMARY
