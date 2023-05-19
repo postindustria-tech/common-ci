@@ -23,7 +23,7 @@ on:
         default: "51DCI@51Degrees.com"
       dryrun:
         required: false
-        type: boolean
+        type: string
         default: false
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
@@ -81,6 +81,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/nightly-publish-main_prebuild.ps1 `
@@ -90,7 +91,7 @@ jobs:
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun $DryRun
           
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -121,6 +122,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = @{}
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
@@ -131,7 +133,7 @@ jobs:
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun $DryRun
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -170,6 +172,7 @@ jobs:
         if: ${{ success() && matrix.options.packagerequirement }}
         working-directory: ${{ github.workspace }}/common/
         run: |
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/nightly-publish-main_test.ps1 `
@@ -179,7 +182,7 @@ jobs:
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun $DryRun
           
       - name: Integration Test Results
         if: ${{ matrix.options.packagerequirement }}
@@ -215,6 +218,7 @@ jobs:
         if: ${{ success() }}
         working-directory: ${{ github.workspace }}/common/
         run: |
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = @{}
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
@@ -225,4 +229,4 @@ jobs:
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun $DryRun
