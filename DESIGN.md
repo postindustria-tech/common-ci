@@ -20,6 +20,8 @@ Steps are the scripts called by workflows. Almost exclusively implemented in Pow
 exception is setting up an environment, which is a set up step when running in GitHub Actions.
 Details of the steps can be found in [Readme](./README.md)
 
+Scripts should be written to support PowerShell 7.
+
 ### Scripts and Their Locations
 
 | root scripts |
