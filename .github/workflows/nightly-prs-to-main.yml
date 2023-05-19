@@ -20,8 +20,8 @@ on:
         default: "51DCI@51Degrees.com"
       dryrun:
         required: false
-        type: string
-        default: "$False"
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
