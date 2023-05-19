@@ -89,7 +89,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
           
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -129,7 +130,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -176,7 +178,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
           
       - name: Integration Test Results
         if: ${{ matrix.options.packagerequirement }}

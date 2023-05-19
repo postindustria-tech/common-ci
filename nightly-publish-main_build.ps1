@@ -9,7 +9,8 @@ param (
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [Parameter(Mandatory=$true)]
-    [Hashtable]$Options
+    [Hashtable]$Options,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -38,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Build Package"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-package.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-package.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {

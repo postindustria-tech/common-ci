@@ -3,7 +3,8 @@ param (
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
     [string]$ScriptName,
-    $Options = @{}
+    $Options = @{},
+    [bool]$DryRun = $False
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -36,6 +37,11 @@ if ($Null -ne $Options.Keys) {
 if ($ScriptParameters.ContainsKey("RepoName")) {
     Write-Output "Adding parameter RepoName"
     $Parameters.Add("RepoName", $RepoName)
+}
+# If the script accepts a dryrun option, then add it.
+if ($ScriptParameters.ContainsKey("DryRun")) {
+    Write-Output "Adding parameter DryRun"
+    $Parameters.Add("DryRun", $DryRun)
 }
 
 Write-Output "Running script '$Script'."
