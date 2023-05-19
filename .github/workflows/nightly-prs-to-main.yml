@@ -20,7 +20,7 @@ on:
         default: "51DCI@51Degrees.com"
       dryrun:
         required: false
-        type: boolean
+        type: string
         default: false
     secrets:
       token:
