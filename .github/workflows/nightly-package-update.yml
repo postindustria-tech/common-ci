@@ -20,7 +20,7 @@ on:
         default: "51DCI@51Degrees.com"
       dryrun:
         required: false
-        type: boolean
+        type: string
         default: false
     secrets:
       token:
@@ -44,6 +44,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           . ${{ github.workspace }}/common/nightly-package-update.ps1 `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
@@ -51,4 +52,4 @@ jobs:
           -RunId ${{ github.run_id }} `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun $DryRun
