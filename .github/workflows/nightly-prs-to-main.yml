@@ -63,7 +63,7 @@ jobs:
       matrix:
         id: ${{ fromJSON(needs.Get_Pull_Requests.outputs.pull_request_ids) }}
 
-    uses: ${{ inputs.org-name }}/common-ci/.github/workflows/nightly-pr-to-main.yml@main
+    uses: /51degrees/common-ci/.github/workflows/nightly-pr-to-main.yml@main
     with:
       repo-name: ${{ inputs.repo-name }}
       org-name: ${{ inputs.org-name }}
