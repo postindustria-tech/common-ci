@@ -52,7 +52,8 @@ jobs:
           -VariableName PullRequestIds `
           -GitHubToken ${{ secrets.token }} `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -GitHubOutput $Env:GITHUB_OUTPUT 
 
   # Run the common workflow on each pull request
   Nightly_PR_to_Main:
