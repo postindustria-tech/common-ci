@@ -20,7 +20,7 @@ on:
         default: "51DCI@51Degrees.com"
       dryrun:
         required: false
-        type: boolean
+        type: string
         default: false
     secrets:
       token:
@@ -44,10 +44,11 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           . ${{ github.workspace }}/common/monthly-copyright-update.ps1 `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun $DryRun
