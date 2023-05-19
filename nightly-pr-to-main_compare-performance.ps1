@@ -42,9 +42,14 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Output "::group::Download Performance Artifact"
-./steps/download-artifact.ps1 -RepoName $RepoName -OrgName $OrgName -RunId $RunId -ArtifactName "performance_results_$PullRequestId" -GitHubToken $GitHubToken
-Write-Output "::endgroup::"
+if ($True -ne $env:CI) {
+    # The REST API cannot be used while the workflow is running. So in CI,
+    # a GitHub Actions step is used instead.
+    # See https://github.com/actions/upload-artifact/issues/53
+    Write-Output "::group::Download Performance Artifact"
+    ./steps/download-artifact.ps1 -RepoName $RepoName -OrgName $OrgName -RunId $RunId -ArtifactName "performance_results_$PullRequestId" -GitHubToken $GitHubToken
+    Write-Output "::endgroup::"
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Output "::group::Compare Performance Results"

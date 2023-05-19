@@ -120,9 +120,23 @@ function Generate-Performance-Results {
 
         # Output the graph
         $Plot.SaveFig("$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png")
+        Copy-Item `
+            -Path "$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png" `
+            -Destination "$pwd/perf-graph-$($Options.Name)-$Metric-latest.png"
+
+        # Remove any old images
+        foreach ($Png in $(Get-ChildItem -Path $pwd -Filter *.png)) {
+            $DateString = git log -n 1 --pretty=format:%aD -- $Png.Name
+            $Date = [DateTime]::Parse($DateString)
+            if ($([DateTime]::Now - $Date).TotalDays -gt 30) {
+                Write-Output "Image '$($Png.Name)' is older than 30 days, removing"
+                git rm $Png.Name
+            }
+        }
 
         # Commit the image, and change back to the original branch
         git add "$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png"
+        git add "$pwd/perf-graph-$($Options.Name)-$Metric-latest.png"
         git commit -m "Added performance graph for for $RunId-$PullRequestId-$($Options.Name)-$Metric"
         git push origin $ImagesBranch
         git checkout $CurrentBranch
@@ -132,7 +146,7 @@ function Generate-Performance-Results {
     }
 
     # Write out the summary for GitHub actions
-    if ($Null -ne $env:GITHUB_STEP_SUMMARY) {
+    if ($env:CI) {
         Write-Output "## Performance Figures - $($Options.Name) - $Metric" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/$OrgName/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| Date | $Metric |" >> $env:GITHUB_STEP_SUMMARY

@@ -2,11 +2,10 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$Configuration = "Release",
-    # TODO add arch
     [string]$ProjectDir = ".",
-    [Parameter(Mandatory=$true)]
-    [string]$ResultName
+    [string]$Name = "Release_x64",
+    [string]$Configuration = "Release",
+    [string]$Arch = "x64"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -15,8 +14,8 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-
-    ## TODO MSBuild framework
+    msbuild /p:Platform=$Arch /p:Configuration=$Configuration /t:Restore
+    msbuild $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true /t:Restore
 
 }
 finally {
