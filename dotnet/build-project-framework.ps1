@@ -15,7 +15,7 @@ Push-Location $RepoPath
 
 try {
     msbuild /p:Platform=$Arch /p:Configuration=$Configuration /t:Restore
-    msbuild $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true /t:Restore
+    msbuild $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true
 
 }
 finally {
