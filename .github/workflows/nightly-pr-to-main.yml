@@ -87,7 +87,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $DryRun = [bool]::Parse( ${{ inputs.dryrun }} )
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/nightly-pr-to-main_build-and-test.ps1 `
@@ -158,7 +158,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $DryRun = [bool]::Parse( ${{ inputs.dryrun }} )
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ needs.configure.outputs.options }}')
           . ${{ github.workspace }}/common/nightly-pr-to-main_compare-performance.ps1 `
           -RepoName ${{ inputs.repo-name }} `
@@ -196,7 +196,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
-          $DryRun = [bool]::Parse( ${{ inputs.dryrun }} )
+          $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           . ${{ github.workspace }}/common/nightly-pr-to-main_complete.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
