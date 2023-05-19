@@ -9,7 +9,9 @@ param (
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [Parameter(Mandatory=$true)]
-    [string]$GitHubOutput
+    [string]$GitHubOutput,
+    [Parameter(Mandatory=$true)]
+    [string]$VariableName
 )
 
 . ./constants.ps1
@@ -38,7 +40,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Get Pull Requests"
-./steps/get-pull-requests.ps1 -RepoName $RepoName -OrgName $OrgName -VariableName PullRequestIds -GitHubToken $GitHubToken
+./steps/get-pull-requests.ps1 -RepoName $RepoName -OrgName $OrgName -VariableName $VariableName -GitHubToken $GitHubToken
 Write-Output pull_request_ids="[$([string]::Join(",", $PullRequestIds))]" | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
 Write-Output "::endgroup::"
 
