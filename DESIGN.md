@@ -338,6 +338,22 @@ When calling steps from a workflow scripts, each script should be surrounded by 
 ::endgroup::
 ```
 
+## Dry Run
+
+A `DryRun` parameter is passed to all the steps which could write changes to git or package managers. This includes `run-repo-script`, as a repo script could do this.
+If the parameter is `true`, then any write operations should just be logged rather than executed. An example of this is:
+```pwsh
+$Command = "git push origin"
+if ($DryRun -eq $False) {
+  Invoke-Expression $Command
+}
+else {
+  Write-Output "Dry run - not executing the following: $Command"
+}
+```
+
+The parameter can be set when running from GitHub, and is passed to the scripts.
+
 ## Testing
 
 ## Integration Tests

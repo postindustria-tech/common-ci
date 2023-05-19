@@ -21,6 +21,10 @@ on:
         required: false
         type: string
         default: "51DCI@51Degrees.com"
+      dryrun:
+        required: false
+        type: boolean
+        default: false
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
@@ -85,7 +89,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
           
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -125,7 +130,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3.1.2
@@ -172,7 +178,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
           
       - name: Integration Test Results
         if: ${{ matrix.options.packagerequirement }}
@@ -217,4 +224,5 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}

@@ -8,7 +8,8 @@ param (
     [string]$GitHubUser,
     [Parameter(Mandatory=$true)]
     [string]$GitHubEmail,
-    [string]$GitHubToken
+    [string]$GitHubToken,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -36,7 +37,7 @@ $Options = @{
 Write-Output "::endgroup::"
 
 Write-Output "::group::Update Copyright"
-./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "update-copyright.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "update-copyright.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 Write-Output "::group::Has Changed"
@@ -50,11 +51,11 @@ if ($LASTEXITCODE -eq 0) {
     Write-Output "::endgroup::"
 
     Write-Output "::group::Push Changes"
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $CopyrightUpdateBranch
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $CopyrightUpdateBranch -DryRun $DryRun
     Write-Output "::endgroup::"
 
     Write-Output "::group::PR To Main"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated copyright." -GitHubToken $GitHubToken
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated copyright." -GitHubToken $GitHubToken -DryRun $DryRun
     Write-Output "::endgroup::"
 
 }

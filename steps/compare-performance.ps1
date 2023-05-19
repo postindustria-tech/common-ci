@@ -7,7 +7,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$OrgName,
     [string]$RunId,
-    [string]$PullRequestId
+    [string]$PullRequestId,
+    [bool]$DryRun = $False
 )
 
 # Disable progress bars
@@ -138,7 +139,14 @@ function Generate-Performance-Results {
         git add "$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png"
         git add "$pwd/perf-graph-$($Options.Name)-$Metric-latest.png"
         git commit -m "Added performance graph for for $RunId-$PullRequestId-$($Options.Name)-$Metric"
-        git push origin $ImagesBranch
+        $Command = "git push origin $ImagesBranch"
+        if ($DryRun -eq $False) {
+            Invoke-Expression $Command
+        }
+        else {
+            Write-Output "Dry run - not executing the following: $Command"
+        }
+        
         git checkout $CurrentBranch
     }
     finally {
@@ -148,7 +156,12 @@ function Generate-Performance-Results {
     # Write out the summary for GitHub actions
     if ($env:CI) {
         Write-Output "## Performance Figures - $($Options.Name) - $Metric" >> $env:GITHUB_STEP_SUMMARY
-        Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/$OrgName/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
+        if ($DryRun -eq $False) {
+            Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/$OrgName/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
+        }
+        else {
+            Write-Output "No image - Images weren't pushed in this dryrun" >> $env:GITHUB_STEP_SUMMARY
+        }
         Write-Output "| Date | $Metric |" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| ---- | ---------------- |" >> $env:GITHUB_STEP_SUMMARY
         foreach ($i in 0..$($Results.Length - 1)) {

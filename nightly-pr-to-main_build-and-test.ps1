@@ -13,7 +13,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$PullRequestId,
     [Parameter(Mandatory=$true)]
-    [Hashtable]$Options
+    [Hashtable]$Options,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -51,7 +52,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Fetch Assets"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "fetch-assets.ps1" -Options $Options.Keys
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "fetch-assets.ps1" -Options $Options.Keys -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -59,7 +60,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Setup Environment"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "setup-environment.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "setup-environment.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -67,7 +68,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Build Project"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "build-project.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -75,7 +76,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Run Unit Tests"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-unit-tests.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-unit-tests.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -83,7 +84,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Run Integration Tests"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -92,7 +93,7 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($Options.RunPerformance -eq $True) {
     Write-Output "::group::Run Performance Tests"
-    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-performance-tests.ps1" -Options $Options
+    ./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-performance-tests.ps1" -Options $Options -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {

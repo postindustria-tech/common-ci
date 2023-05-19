@@ -18,6 +18,10 @@ on:
         required: false
         type: string
         default: "51DCI@51Degrees.com"
+      dryrun:
+        required: false
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
@@ -71,6 +75,7 @@ jobs:
       pull-request-id: ${{ matrix.id }}
       user: ${{ inputs.user }}
       email: ${{ inputs.email }}
+      dryrun: ${{ inputs.dryrun }}
     secrets: 
       token: ${{ secrets.token }}
       asset-keys: ${{ secrets.asset-keys }}

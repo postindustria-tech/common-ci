@@ -4,7 +4,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$OrgName,
     [Parameter(Mandatory=$true)]
-    [string]$Tag
+    [string]$Tag,
+    [bool]$DryRun = $False
 )
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
@@ -18,12 +19,24 @@ try {
     git tag $Tag
 
     Write-Output "Pushing tag"
-    git push origin $Tag
+    $Command = "git push origin $Tag"
+    if ($DryRun -eq $False) {
+        Invoke-Expression $Command
+    }
+    else {
+        Write-Output "Dry run - not executing the following: $Command"
+    }
 
     # When creating the release, auto-generate the release notes from the
     # PRs that are included in the changes.
     Write-Output "Creating a GitHub release"
-    hub api /repos/$OrgName/$RepoName/releases -X POST -f "tag_name=$Tag" -F "generate_release_notes=true" -f "name=Version $Tag"
+    $Command = "hub api /repos/$OrgName/$RepoName/releases -X POST -f `"tag_name=$Tag`" -F `"generate_release_notes=true`" -f `"name=Version $Tag`""
+    if ($DryRun -eq $False) {
+        Invoke-Expression $Command
+    }
+    else {
+        Write-Output "Dry run - not executing the following: $Command"
+    }
 
 }
 finally {

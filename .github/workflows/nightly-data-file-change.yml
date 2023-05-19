@@ -18,6 +18,10 @@ on:
         required: false
         type: string
         default: "51DCI@51Degrees.com"
+      dryrun:
+        required: false
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
@@ -51,4 +55,5 @@ jobs:
           -DeviceDetectionKey ${{ secrets.device-detection-key }} `
           -DeviceDetectionUrl ${{ secrets.device-detection-url }} `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}

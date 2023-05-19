@@ -4,7 +4,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$OrgName,
     [Parameter(Mandatory=$true)]
-    [int]$PullRequestId
+    [int]$PullRequestId,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -27,7 +28,13 @@ try {
     $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     Write-Output "Merging PR $PrTitle"
-    hub api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"
+    $Command = "hub api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f `"commit_title=Merged Pull Request '$PrTitle'`""
+    if ($DryRun -eq $False) {
+        Invoke-Expression $Command
+    }
+    else {
+        Write-Output "Dry run - not executing the following: $Command"
+    }
     
 }
 finally {

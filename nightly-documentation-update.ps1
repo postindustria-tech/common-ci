@@ -6,7 +6,8 @@ param (
     [string]$OrgName,
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
-    [string]$GitHubToken
+    [string]$GitHubToken,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -75,7 +76,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Push Changes"
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch gh-pages
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch gh-pages -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {

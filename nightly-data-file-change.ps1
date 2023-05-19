@@ -8,7 +8,8 @@ param (
     [string]$GitHubEmail = "",
     [string]$DeviceDetectionKey,
     [string]$DeviceDetectionUrl,
-    [string]$GitHubToken
+    [string]$GitHubToken,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -45,7 +46,7 @@ $Options = @{
 Write-Output "::endgroup::"
 
 Write-Output "::group::Fetch Assets"
-./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "fetch-assets.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "fetch-assets.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -53,7 +54,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Generate Accessors"
-./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "generate-accessors.ps1" -Options $Options
+./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "generate-accessors.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -75,7 +76,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Push Changes"
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
@@ -83,7 +84,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::PR To Main"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties." -GitHubToken $GitHubToken
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties." -GitHubToken $GitHubToken -DryRun $DryRun
     Write-Output "::endgroup::"
 
 }

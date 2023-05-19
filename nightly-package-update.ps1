@@ -8,7 +8,8 @@ param (
     [string]$GitHubToken,
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
-    [int]$RunId = 0
+    [int]$RunId = 0,
+    [bool]$DryRun  = $False
 )
 
 . ./constants.ps1
@@ -37,7 +38,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Update Package Dependencies"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "update-packages.ps1"
+./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "update-packages.ps1" -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -59,7 +60,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Push Changes"
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PackageUpdateBranch
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PackageUpdateBranch -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
@@ -67,7 +68,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Create Pull Request"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages." -GitHubToken $GitHubToken
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages." -GitHubToken $GitHubToken -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
