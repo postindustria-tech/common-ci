@@ -23,7 +23,7 @@ on:
         default: "51DCI@51Degrees.com"
       dryrun:
         required: false
-        type: boolean
+        type: string
         default: false
     secrets:
       token:
@@ -98,7 +98,7 @@ jobs:
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun ${{ inputs.dryrun }}
+          -DryRun [bool]::Parse(${{ inputs.dryrun }})
 
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
