@@ -9,7 +9,8 @@ param (
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [Parameter(Mandatory=$true)]
-    [string]$PullRequestId
+    [string]$PullRequestId,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -38,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Complete Pull Request"
-./steps/merge-pr.ps1 -RepoName $RepoName -OrgName $OrgName -PullRequestId $PullRequestId
+./steps/merge-pr.ps1 -RepoName $RepoName -OrgName $OrgName -PullRequestId $PullRequestId -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {

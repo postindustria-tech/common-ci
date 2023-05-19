@@ -3,7 +3,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$Branch
+    [string]$Branch,
+    [bool]$DryRun = $False
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -14,7 +15,13 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Pushing"
-    git push origin $Branch
+    $Command = "git push origin $Branch"
+    if ($DryRun -eq $False) {
+        Invoke-Expression $Command
+    }
+    else {
+        Write-Output "Dry run - not executing the following: $Command"
+    }
 
 }
 finally {

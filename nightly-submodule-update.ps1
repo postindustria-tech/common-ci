@@ -8,7 +8,8 @@ param (
     [string]$GitHubToken,
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
-    [string]$RunId = $Null
+    [string]$RunId = $Null,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -59,7 +60,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Push Changes"
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $SubModuleUpdateBranch
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $SubModuleUpdateBranch -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
@@ -67,7 +68,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Create Pull Request"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated submodule." -GitHubToken $GitHubToken
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated submodule." -GitHubToken $GitHubToken -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {

@@ -8,7 +8,8 @@ param (
     [string]$GitHubEmail = "",
     [string]$DeviceDetectionKey,
     [string]$DeviceDetectionUrl,
-    [string]$GitHubToken
+    [string]$GitHubToken,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -75,7 +76,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Push Changes"
-    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch
+    ./steps/push-changes.ps1 -RepoName $RepoName -Branch $PropertiesUpdateBranch -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
@@ -83,7 +84,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::PR To Main"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties." -GitHubToken $GitHubToken
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated properties." -GitHubToken $GitHubToken -DryRun $DryRun
     Write-Output "::endgroup::"
 
 }

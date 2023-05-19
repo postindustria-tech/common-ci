@@ -3,7 +3,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
-    [string]$Message
+    [string]$Message,
+    [bool]$DryRun = $False
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -22,7 +23,13 @@ try {
 
     if ($Prs.Count -eq 0) {
         Write-Output "Creating pull request"
-        hub pull-request --no-edit --message $Message
+        $Command = "hub pull-request --no-edit --message $Message"
+        if ($DryRun -eq $False) {
+            Invoke-Expression $Command
+        }
+        else {
+            Write-Output "Dry run - not executing the following: $Command"
+        }
     }
     else {
         Write-Output "A PR already exists for this branch."

@@ -21,6 +21,10 @@ on:
         required: false
         type: string
         default: "51DCI@51Degrees.com"
+      dryrun:
+        required: false
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
@@ -93,7 +97,8 @@ jobs:
           -PullRequestId ${{ inputs.pull-request-id }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
 
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
@@ -162,7 +167,8 @@ jobs:
           -Options $Options `
           -RunId ${{ github.run_id }} `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}
 
       - name: Upload Successful Performance Results Artifact
         if: ${{ success() && matrix.options.runperformance }}
@@ -194,4 +200,5 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -PullRequestId ${{ inputs.pull-request-id }} `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun ${{ inputs.dryrun }}

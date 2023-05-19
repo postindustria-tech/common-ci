@@ -14,7 +14,8 @@ param (
     [string]$PullRequestId,
     [Parameter(Mandatory=$true)]
     $Options,
-    $RunId = 0
+    $RunId = 0,
+    [bool]$DryRun = $False
 )
 
 . ./constants.ps1
@@ -53,7 +54,7 @@ if ($True -ne $env:CI) {
 
 if ($LASTEXITCODE -ne 0) {
     Write-Output "::group::Compare Performance Results"
-    ./steps/compare-performance.ps1 -RepoName $RepoName -OrgName $OrgName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options
+    ./steps/compare-performance.ps1 -RepoName $RepoName -OrgName $OrgName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
