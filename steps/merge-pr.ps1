@@ -2,6 +2,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
+    [string]$OrgName,
+    [Parameter(Mandatory=$true)]
     [int]$PullRequestId
 )
 
@@ -25,7 +27,7 @@ try {
     $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
 
     Write-Output "Merging PR $PrTitle"
-    hub api /repos/51Degrees/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"
+    hub api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"
     
 }
 finally {

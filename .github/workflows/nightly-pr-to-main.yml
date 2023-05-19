@@ -8,7 +8,19 @@ on:
         type: string
       pull-request-id:
         required: true
-        type: number        
+        type: number
+      org-name:
+        required: false
+        type: string
+        default: 51degrees
+      user:
+        required: false
+        type: string
+        default: Automation51D
+      email:
+        required: false
+        type: string
+        default: "51DCI@51Degrees.com"
     secrets:
       token:
         required: true
@@ -26,7 +38,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Download Performance Artifact
@@ -43,9 +55,12 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/nightly-pr-to-main_configure-pr.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
-          -PullRequestId ${{ inputs.pull-request-id }}
+          -PullRequestId ${{ inputs.pull-request-id }} `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
 
   Build-and-Test:
     needs: Configure
@@ -60,7 +75,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Build and Test
@@ -72,10 +87,13 @@ jobs:
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
           . ${{ github.workspace }}/common/nightly-pr-to-main_build-and-test.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
-          -Options $Options
+          -Options $Options `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
 
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
@@ -127,7 +145,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v2
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Compare Performance
@@ -137,11 +155,14 @@ jobs:
           $Options = $(ConvertFrom-Json -AsHashtable '${{ needs.configure.outputs.options }}')
           . ${{ github.workspace }}/common/nightly-pr-to-main_compare-performance.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
           -Options $Options `
-          -RunId ${{ github.run_id }}
+          -RunId ${{ github.run_id }} `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}
 
       - name: Upload Successful Performance Results Artifact
         if: ${{ success() && matrix.options.runperformance }}
@@ -160,7 +181,7 @@ jobs:
       - name: Checkout Common
         uses: actions/checkout@v3
         with:
-          repository: 51degrees/common-ci
+          repository: ${{ inputs.org-name }}/common-ci
           path: common
 
       - name: Compete
@@ -169,5 +190,8 @@ jobs:
         run: |
           . ${{ github.workspace }}/common/nightly-pr-to-main_complete.ps1 `
           -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
-          -PullRequestId ${{ inputs.pull-request-id }}
+          -PullRequestId ${{ inputs.pull-request-id }} `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }}

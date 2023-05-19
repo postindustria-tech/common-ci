@@ -3,6 +3,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
+    [string]$OrgName,
+    [Parameter(Mandatory=$true)]
     $RunId,
     [Parameter(Mandatory=$true)]
     [string]$ArtifactName,
@@ -10,7 +12,9 @@ param (
     [string]$GitHubToken
 )
 
-$Artifacts = $(hub api /repos/51degrees/$RepoName/actions/runs/$RunId/artifacts | ConvertFrom-Json).artifacts
+$Artifacts = $(hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/artifacts | ConvertFrom-Json).artifacts
+hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/artifacts
+Write-Output $Artifacts
 
 foreach ($Artifact in $Artifacts) {
     if ($Artifact.name -eq $ArtifactName) {

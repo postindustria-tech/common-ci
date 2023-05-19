@@ -3,22 +3,33 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
+    [string]$OrgName,
+    [Parameter(Mandatory=$true)]
     [string]$GitHubToken,
+    [string]$GitHubUser = "",
+    [string]$GitHubEmail = "",
     [string]$RunId = $Null
 )
 
 . ./constants.ps1
+
+if ($GitHubUser -eq "") {
+    $GitHubUser = $DefaultGitUser
+}
+if ($GitHubEmail -eq "") {
+    $GitHubEmail = $DefaultGitEmail
+}
 
 # This token is used by the hub command.
 Write-Output "Setting GITHUB_TOKEN"
 $env:GITHUB_TOKEN="$GitHubToken"
 
 Write-Output "::group::Configure Git"
-./steps/configure-git.ps1 -GitHubToken $GitHubToken
+./steps/configure-git.ps1 -GitHubToken $GitHubToken -GitHubUser $GitHubUser -GitHubEmail $GitHubEmail
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone $RepoName"
-./steps/clone-repo.ps1 -RepoName $RepoName -Branch $SubModuleUpdateBranch
+./steps/clone-repo.ps1 -RepoName $RepoName -OrgName $OrgName -Branch $SubModuleUpdateBranch
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -56,7 +67,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Create Pull Request"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated submodule."
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated submodule." -GitHubToken $GitHubToken
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
@@ -70,6 +81,6 @@ else {
 
     if ($Null -ne $RunId) {
         Write-Output "Cancelling Run"
-        hub api /repos/51Degrees/$RepoName/actions/runs/$RunId/cancel -X POST
+        hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/cancel -X POST
     }
 }
