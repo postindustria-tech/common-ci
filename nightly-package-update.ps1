@@ -68,7 +68,7 @@ if ($LASTEXITCODE -eq 0) {
     }
     
     Write-Output "::group::Create Pull Request"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages." -GitHubToken $GitHubToken -DryRun $DryRun
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated packages." -DryRun $DryRun
     Write-Output "::endgroup::"
 
     if ($LASTEXITCODE -ne 0) {
