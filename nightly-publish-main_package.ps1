@@ -39,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Install Package From Artifact"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "install-package.ps1" -Options $Options -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "install-package.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -47,7 +47,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Publish Packages"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "publish-package.ps1" -Options $Options -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "publish-package.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {

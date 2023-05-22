@@ -37,7 +37,7 @@ $Options = @{
 Write-Output "::endgroup::"
 
 Write-Output "::group::Update Copyright"
-./steps/run-repo-script.ps1 -RepoName "tools" -ScriptName "update-copyright.ps1" -Options $Options -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName "tools" -OrgName $OrgName -ScriptName "update-copyright.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 Write-Output "::group::Has Changed"

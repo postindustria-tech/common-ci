@@ -38,7 +38,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Update Package Dependencies"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "update-packages.ps1" -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "update-packages.ps1" -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {

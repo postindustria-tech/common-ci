@@ -39,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Fetch Assets"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "fetch-assets.ps1" -Options $Options.Keys -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "fetch-assets.ps1" -Options $Options.Keys -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -47,7 +47,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Setup Environment"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "setup-environment.ps1" -Options $Options -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "setup-environment.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -55,7 +55,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Install Package From Artifact"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "install-package.ps1" -Options $Options -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "install-package.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -64,7 +64,7 @@ if ($LASTEXITCODE -ne 0) {
 
 
 Write-Output "::group::Run Integration Tests"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "run-integration-tests.ps1" -Options $Options -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "run-integration-tests.ps1" -Options $Options -DryRun $DryRun
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {

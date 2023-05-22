@@ -39,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Get Next Package Version"
-./steps/run-repo-script.ps1 -RepoName $RepoName -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"} -DryRun $DryRun
+./steps/run-repo-script.ps1 -RepoName $RepoName -OrgName $OrgName -ScriptName "get-next-package-version.ps1" -Options @{VariableName = "Version"} -DryRun $DryRun
 Write-Output version=$Version
 $IsValid = [bool]([regex]::Match($Version, '^(\d+)\.(\d+)\.(\d+)(-SNAPSHOT)?$')) 
 if ($IsValid -eq $False) {

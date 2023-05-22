@@ -2,6 +2,8 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
+    [string]$OrgName,
+    [Parameter(Mandatory=$true)]
     [string]$ScriptName,
     $Options = @{},
     [bool]$DryRun = $False
@@ -37,6 +39,11 @@ if ($Null -ne $Options.Keys) {
 if ($ScriptParameters.ContainsKey("RepoName")) {
     Write-Output "Adding parameter RepoName"
     $Parameters.Add("RepoName", $RepoName)
+}
+# If the org name is required, then add that too.
+if ($ScriptParameters.ContainsKey("OrgName")) {
+    Write-Output "Adding parameter OrgName"
+    $Parameters.Add("OrgName", $RepoName)
 }
 # If the script accepts a dryrun option, then add it.
 if ($ScriptParameters.ContainsKey("DryRun")) {

@@ -128,7 +128,7 @@ Runs a named script from within the `ci` directory of the repo supplied by name.
 Any options are passed to this script as a hashtable. They are then parsed, checked against the parameters
 required by the repo script, and used when calling the repo script.
 
-The `RepoName`, and `DryRun` parameters will always be available to the repo script, and do not need to be added to the options object.
+The `RepoName`, `OrgName`, and `DryRun` parameters will always be available to the repo script, and do not need to be added to the options object.
 
 For a more detailed description of options usage, see [Options](/DESIGN.md#build-options).
 
