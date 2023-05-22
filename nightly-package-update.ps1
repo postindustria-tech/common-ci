@@ -8,7 +8,7 @@ param (
     [string]$GitHubToken,
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
-    [int]$RunId = 0,
+    [string]$RunId = $Null,
     [bool]$DryRun  = $False
 )
 
@@ -80,7 +80,7 @@ else {
 
     Write-Output "No package changes, so not creating a pull request."
 
-    if ($RunId -gt 0) {
+    if ($Null -ne $RunId) {
         Write-Output "Cancelling Run"
         hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/cancel -X POST
     }
