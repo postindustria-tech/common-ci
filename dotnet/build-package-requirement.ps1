@@ -9,6 +9,6 @@ if ($Arch -eq "x86"){
     $ExtraArgs = "-D32bit=on"
 }
 
-./cxx/build-project.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Configuration $Configuration -ExtraArgs $ExtraArgs
+./cxx/build-project.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Configuration $Configuration -ExtraArgs $ExtraArgs -Arch $Arch
 
 exit $LASTEXITCODE
