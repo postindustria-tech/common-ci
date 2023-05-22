@@ -25,7 +25,7 @@ try {
     else{
 
         Get-ChildItem -Path $RepoPath -Filter "*Tests.dll" -Recurse -File | ForEach-Object {
-            if ($_.DirectoryName -like "*\bin\*" -and $_.Name -notlike $skipPattern)) {
+            if ($_.DirectoryName -like "*\bin\*" -and $_.Name -notlike $skipPattern) {
                 Write-Output "Testing Assembly: '$_'"
                 & vstest.console.exe $_.FullName /Logger:trx /ResultsDirectory:"./test-results/unit/" 
             }
