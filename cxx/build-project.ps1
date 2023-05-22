@@ -17,13 +17,18 @@ if ($BuildMethod -eq "cmake") {
 
     Write-Output "Entering '$RepoPath'"
     Push-Location $RepoPath
-    
+
+    if($IsWindows -and $Arch -eq "x86"){
+        $ExtraArgs += ' -A win32'
+    }
+
     try {
     
         Write-Output "Building '$Name'"
         
-        cmake .. -DCMAKE_BUILD_TYPE=$Configuration $ExtraArgs
-        cmake --build . --config $Configuration
+        Invoke-Expression "cmake .. -DCMAKE_BUILD_TYPE=$Configuration $ExtraArgs"
+    
+        cmake --build . --config $Configuration  
     
     }
     finally {
