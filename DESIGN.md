@@ -14,6 +14,9 @@ A table of workflows can be found in [Readme](./README.md).
 
 Workflows contained in this repository are reused by all 51Degrees repositories to avoid repetition. See [reusing workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows).
 
+In addition to PowerShell scripts, the [EnricoMi/publish-unit-test-result-action/composite](https://github.com/EnricoMi/publish-unit-test-result-action)
+action is used to display test results nicely in the run summary, and link as a check in related PRs.
+
 ### Steps
 
 Steps are the scripts called by workflows. Almost exclusively implemented in PowerShell. The only
