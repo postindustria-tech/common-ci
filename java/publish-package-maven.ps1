@@ -26,33 +26,44 @@ try {
     Set-Content -Path $SettingsFile -Value $SettingsContent
     $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
     
-
-    Write-Output "Deploying to Nexus staging"
+    $ArtifactId = mvn help:evaluate "-Dexpression=project.artifactId" -q -DforceStdout
+    $GroupId = mvn help:evaluate "-Dexpression=project.groupId" -q -DforceStdout
+    $GroupId = $GroupId.Replace(".", "/")
+    $URL = "https://repo1.maven.org/maven2/$GroupId/$ArtifactId/$Version"
+    $Request = Invoke-WebRequest -Uri $URL -Method GET -SkipHttpErrorCheck
     
-    mvn nexus-staging:deploy-staged `
-        -s $SettingsPath  `
-        -f pom.xml `
-        -DXmx2048m `
-        -DskipTests `
-        --no-transfer-progress `
-        "-Dhttps.protocols=TLSv1.2" `
-        "-DfailIfNoTests=false" 
+    if ($Request.StatusCode -eq "404"){
+    
+        Write-Output "Deploying to Nexus staging"
 
-    if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
+        mvn nexus-staging:deploy-staged `
+            -s $SettingsPath  `
+            -f pom.xml `
+            -DXmx2048m `
+            -DskipTests `
+            --no-transfer-progress `
+            "-Dhttps.protocols=TLSv1.2" `
+            "-DfailIfNoTests=false" 
 
-        Write-Output "Releasing from Nexus to Maven central"
-        mvn nexus-staging:release `
-        -s $SettingsPath  `
-        -f pom.xml `
-        -DXmx2048m `
-        -DskipTests `
-        --no-transfer-progress `
-        "-Dhttps.protocols=TLSv1.2" `
-        "-DfailIfNoTests=false" 
+        if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
+
+            Write-Output "Releasing from Nexus to Maven central"
+            mvn nexus-staging:release `
+            -s $SettingsPath  `
+            -f pom.xml `
+            -DXmx2048m `
+            -DskipTests `
+            --no-transfer-progress `
+            "-Dhttps.protocols=TLSv1.2" `
+            "-DfailIfNoTests=false" 
         
     
+        }
     }
-
+    else{
+    
+        Write-Output "Skipping release. The package has already been released. "
+    }
 }
 finally {
 
