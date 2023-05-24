@@ -6,7 +6,8 @@ param(
     [string]$Name = "Release_x64",
     [string]$Configuration = "Release",
     [string]$Arch = "x64",
-    [string]$BuildMethod="dotnet"
+    [string]$BuildMethod="dotnet",
+    [string]$Filter
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
