@@ -309,3 +309,4 @@ To run these PowerShell scripts, either locally, or in a CI/CD pipeline, the fol
 - [Git CLI](https://git-scm.com/downloads)
 - [Hub CLI](https://hub.github.com/)
 - `GITHUB_TOKEN` environment variable (this is automatically set if using GitHub actions)
+- Some repositories require a cloud resource key. This can be obtained on the [Configurator](https://configure.51degrees.com)
