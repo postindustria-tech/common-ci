@@ -11,7 +11,7 @@ param(
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
-$TestResultPath = [IO.Path]::Combine($RepoName, "test-results", "unit", $Name)
+$TestResultPath = [IO.Path]::Combine($RepoName, "test-results", "unit")
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
@@ -33,7 +33,7 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like "*\bin\*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                & vstest.console.exe $_.FullName /Logger:trx /ResultsDirectory:"./test-results/unit/" 
+                & vstest.console.exe $_.FullName /Logger:trx /ResultsDirectory:$TestResultPath
             }
         }
     } 
