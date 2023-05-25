@@ -16,10 +16,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Building '$Name'"
-    dotnet restore
     dotnet build $ProjectDir -c $Configuration /p:Platform=$Arch /p:BuiltOnCI=true
-    Get-ChildItem -Recurse -Name
-
 }
 finally {
 
