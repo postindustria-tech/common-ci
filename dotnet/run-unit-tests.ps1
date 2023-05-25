@@ -11,11 +11,10 @@ param(
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
+$TestResultPath = [IO.Path]::Combine($RepoName, "test-results", "unit", $Name)
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
-
-Get-ChildItem -Recurse -Name 
 
 try {
 
@@ -23,9 +22,9 @@ try {
     Write-Output "Testing '$Name'"
     if ($BuildMethod -eq "dotnet"){
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
-            if (($_.DirectoryName -like "*\bin\*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
+            if (($_.DirectoryName -like "*bin*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                dotnet test $_.FullName --results-directory "test-results/unit/$Name" --blame-crash -l "trx"
+                dotnet test $_.FullName --results-directory $TestResultPath --blame-crash -l "trx"
             }
         }
     }
