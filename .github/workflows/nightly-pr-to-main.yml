@@ -149,7 +149,7 @@ jobs:
     name: Compare Performance - ${{ inputs.pull-request-id }} 
     steps:
       - name: Checkout Common
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
