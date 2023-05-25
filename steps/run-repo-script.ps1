@@ -43,7 +43,7 @@ if ($ScriptParameters.ContainsKey("RepoName")) {
 # If the org name is required, then add that too.
 if ($ScriptParameters.ContainsKey("OrgName")) {
     Write-Output "Adding parameter OrgName"
-    $Parameters.Add("OrgName", $RepoName)
+    $Parameters.Add("OrgName", $OrgName)
 }
 # If the script accepts a dryrun option, then add it.
 if ($ScriptParameters.ContainsKey("DryRun")) {
