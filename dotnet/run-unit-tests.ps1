@@ -7,11 +7,12 @@ param(
     [string]$Configuration = "Release",
     [string]$Arch = "x64",
     [string]$BuildMethod="dotnet",
-    [string]$Filter
+    [string]$Filter,
+    [string]$OutputFolder = "unit"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
-$TestResultPath = [IO.Path]::Combine($RepoName, "test-results", "unit")
+$TestResultPath = [IO.Path]::Combine($RepoPath, "test-results", $OutputFolder, $Name)
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
