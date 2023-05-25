@@ -15,6 +15,8 @@ $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
+Get-ChildItem -Recurse -Name 
+
 try {
 
     $skipPattern = "*performance*"
