@@ -23,7 +23,7 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like "*\bin\*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                dotnet test $_.FullName --results-directory "test-results/unit/$Name" --blame-crash -l "trx" -c $Configuration --no-build /p:Platform=$Arch
+                dotnet test $_.FullName --results-directory "test-results/unit/$Name" --blame-crash -l "trx"
             }
         }
     }
