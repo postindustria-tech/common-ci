@@ -56,21 +56,16 @@ if ($LASTEXITCODE -ne 0) {
 Write-Output "::group::Package Update Required"
 try {
     ./steps/package-update-required.ps1 -RepoName $RepoName -Version $Version
-  } finally {
+} finally {
     if ($LASTEXITCODE -eq 0) {
-      Write-Output update_required=true | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
+        Write-Output update_required=true | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
     } else {
       Write-Output update_required=false | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
-      # Exit with a zero exit code as we don't want to fail just because an update is not required.
-      exit 0
+      # Set a zero exit code as we don't want to fail just because an update is not required.
+      $LASTEXITCODE = 0
     }
-    
-  }
-Write-Output "::endgroup::"
-
-if ($LASTEXITCODE -ne 0) {
-  exit $LASTEXITCODE
 }
+Write-Output "::endgroup::"
 
 Write-Output "::group::Get Options"
 $OptionsFile = [IO.Path]::Combine($pwd, $RepoName, "ci", "options.json")
