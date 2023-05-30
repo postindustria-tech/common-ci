@@ -31,7 +31,7 @@ try {
 
     Write-Output "Building package for '$Name'"
    
-    $Projects = Get-Content "$SolutionName.sln" |
+    $Projects = Get-Content "$SolutionName" |
     Select-String $SearchPattern |
         ForEach-Object {
             $projectParts = $_ -Split '[,=]' | ForEach-Object { $_.Trim('[ "{}]') };
