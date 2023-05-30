@@ -9,7 +9,7 @@ param(
     [string]$Version,
     [string]$SolutionName,
     # Regex pattern to filter out projects that will not be published as a package 
-    [string]$SearchPatern = "^(?!.*Test)Project\(.*csproj",
+    [string]$SearchPattern = "^(?!.*Test)Project\(.*csproj",
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningCert,
     [Parameter(Mandatory=$true)]
@@ -32,7 +32,7 @@ try {
     Write-Output "Building package for '$Name'"
    
     $Projects = Get-Content "$SolutionName.sln" |
-    Select-String $SearchPatern |
+    Select-String $SearchPattern |
         ForEach-Object {
             $projectParts = $_ -Split '[,=]' | ForEach-Object { $_.Trim('[ "{}]') };
             New-Object PSObject -Property @{
