@@ -106,7 +106,7 @@ jobs:
         if: ${{ always() }}
         with:
           name: dump_${{ inputs.pull-request-id }}
-          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}
+          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/performance-tests
           if-no-files-found: ignore
 
       - name: Unit Test Results
