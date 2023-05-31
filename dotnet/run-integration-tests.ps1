@@ -5,26 +5,11 @@ param(
     [string]$ProjectDir = ".",
     [string]$Name = "Release_x64",
     [string]$Configuration = "Release",
-    [string]$Arch = "x64"
+    [string]$Arch = "x64",
+    [string]$BuildMethod = "msbuild",
+    [Parameter(Mandatory=$true)]
+    [string]$Filter
 )
 
-$RepoPath = [IO.Path]::Combine($pwd, $RepoName)
+./dotnet/run-unit-tests.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Name $Name -Configuration $Configuration -Arch $Arch -BuildMethod $BuildMethod -Filter $Filter -OutputFolder "integration"
 
-Write-Output "Entering '$RepoPath'"
-Push-Location $RepoPath
-
-try {
-
-    Write-Output "Testing $($Options.Name)"
-    
-    dotnet test $ProjectDir --results-directory "test-results/integration/$Name"--filter "FullyQualifiedName~Integration|TestCategory=Integration" --blame-crash -l "trx" -c $Configuration -a $Arch
-
-}
-finally {
-
-    Write-Output "Leaving '$RepoPath'"
-    Pop-Location
-
-}
-
-exit $LASTEXITCODE
