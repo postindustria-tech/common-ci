@@ -103,6 +103,7 @@ jobs:
           
       - name: Dump
         uses: actions/upload-artifact@v3.1.2
+        if: ${{ always() }}
         with:
           name: dump_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}
