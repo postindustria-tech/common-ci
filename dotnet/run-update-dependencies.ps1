@@ -11,9 +11,9 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-
-    dotnet restore 
     
+    dotnet restore $ProjectDir
+
     foreach ($Project in $(Get-ChildItem -Path $pwd -Filter *.csproj -Recurse -ErrorAction SilentlyContinue -Force)) {
         foreach ($Package in $(dotnet list $Project.FullName package --outdated | Select-String -Pattern "^\s*>")) {
             $PackageName = $Package -replace '^ *> ([a-zA-Z0-9\.]*) .*$', '$1' 
