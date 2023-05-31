@@ -55,7 +55,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Output "::endgroup::"
 
     Write-Output "::group::PR To Main"
-    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated copyright." -GitHubToken $GitHubToken -DryRun $DryRun
+    ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated copyright." -DryRun $DryRun
     Write-Output "::endgroup::"
 
 }
