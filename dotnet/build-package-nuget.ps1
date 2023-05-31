@@ -44,7 +44,7 @@ try {
     foreach($Project in $Projects){
         dotnet pack $Project.File -o "$PackagesFolder" -c $Configuration /p:Platform=$Arch /p:PackageVersion=$Version /p:BuiltOnCI=true
     }
-    nuget sign "$PackagesFolder\*.nupkg" -CertificatePath $CertPath -CertificatePassword $CodeSigningCertPassword -Timestamper http://timestamp.digicert.com
+    nuget sign -Overwrite "$PackagesFolder\*.nupkg" -CertificatePath $CertPath -CertificatePassword $CodeSigningCertPassword -Timestamper http://timestamp.digicert.com
 
 }
 finally {
