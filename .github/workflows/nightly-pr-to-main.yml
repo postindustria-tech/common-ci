@@ -100,6 +100,14 @@ jobs:
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
           -DryRun $DryRun
+          
+      - name: Upload Performance Results Artifact
+        uses: actions/upload-artifact@v3.1.2
+        if: ${{ matrix.options.runperformance }}
+        with:
+          name: dump
+          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}
+          if-no-files-found: ignore
 
       - name: Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
