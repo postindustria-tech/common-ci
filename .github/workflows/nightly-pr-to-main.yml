@@ -192,7 +192,7 @@ jobs:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
 
-      - name: Compete
+      - name: Complete
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
