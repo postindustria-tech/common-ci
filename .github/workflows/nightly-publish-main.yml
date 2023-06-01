@@ -114,7 +114,7 @@ jobs:
 
       - name: Download Package Artifacts
         if: ${{ success() }}
-        uses: actions/download-artifact@v2.1.1
+        uses: actions/download-artifact@v3
         with:
           path: ${{ github.workspace }}/common/package-files
 
@@ -162,7 +162,7 @@ jobs:
 
       - name: Download Package Artifact
         if: ${{ success() && matrix.options.packagerequirement }}
-        uses: actions/download-artifact@v2.1.1
+        uses: actions/download-artifact@v3
         with:
           name: package
           path: ${{ github.workspace }}/common/package
@@ -208,7 +208,7 @@ jobs:
 
       - name: Download Package Artifact
         if: ${{ success() }}
-        uses: actions/download-artifact@v2.1.1
+        uses: actions/download-artifact@v3
         with:
           name: package
           path: ${{ github.workspace }}/common/package

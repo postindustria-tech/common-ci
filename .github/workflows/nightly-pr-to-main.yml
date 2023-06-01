@@ -148,7 +148,7 @@ jobs:
           path: common
 
       - name: Download Performance Artifact
-        uses: actions/download-artifact@v2.1.1
+        uses: actions/download-artifact@v3
         continue-on-error: true
         with:
           name: performance_results_${{ inputs.pull-request-id }}
