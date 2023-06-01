@@ -52,14 +52,9 @@ if ($True -ne $env:CI) {
     Write-Output "::endgroup::"
 }
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Output "::group::Compare Performance Results"
-    ./steps/compare-performance.ps1 -RepoName $RepoName -OrgName $OrgName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options -DryRun $DryRun
-    Write-Output "::endgroup::"
 
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
-    }
-}
+Write-Output "::group::Compare Performance Results"
+./steps/compare-performance.ps1 -RepoName $RepoName -OrgName $OrgName -RunId $RunId -PullRequestId $PullRequestId -AllOptions $Options -DryRun $DryRun
+Write-Output "::endgroup::"
 
-exit 0
+exit $LASTEXITCODE
