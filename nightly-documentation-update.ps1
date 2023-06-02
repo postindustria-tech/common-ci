@@ -38,18 +38,16 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($SeparateExamples){
     try{
+        $ExamplesRepo = "$RepoName-examples"
         Write-Output "::group::Clone $ExamplesRepo"
         Write-Output "Entering '$RepoName'"
         Push-Location $RepoName
-
-        $ExamplesRepo = "$RepoName-examples"
         ./steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName
-
+    }
+    finally{
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
         }
-    }
-    finally{
         Write-Output "Leaving'$RepoName'"
         Pop-Location $RepoName
         Write-Output "::endgroup::"
