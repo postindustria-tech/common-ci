@@ -36,11 +36,23 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
+
 if ($SeparateExamples){
-    # TODO : Remove below and replace with $RepoName-"examples"
+# TODO : Remove below and replace with $RepoName-"examples"
     $ExamplesRepo = "device-detection-dotnet-examples"
     Write-Output "::group::Clone $ExamplesRepo"
     ./steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName -DestinationDir $RepoName
+
+    try{
+        $ExamplesPath = [IO.Path]::Combine($pwd, $RepoName, $ExamplesRepo)
+        Push-Location $RepoName
+        Write-Output $pwd
+        git submodule add $ExamplesPath
+    }
+    finally {
+        Pop-Location
+        Write-Output $pwd
+    }
     Write-Output "::endgroup::"
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
