@@ -37,21 +37,14 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 if ($SeparateExamples){
-    try{
-        $ExamplesRepo = "$RepoName-examples"
-        Write-Output "::group::Clone $ExamplesRepo"
-        Write-Output "Entering '$RepoName'"
-        Push-Location $RepoName
-        ./../steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName
-    }
-    finally{
-        if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
-        }
-        Write-Output "Leaving'$RepoName'"
-        Pop-Location
-        Write-Output "::endgroup::"
-    }
+    # TODO : Remove below and replace with $RepoName-"examples"
+    $ExamplesRepo = "device-detection-dotnet-examples"
+    Write-Output "::group::Clone $ExamplesRepo"
+    ./steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName -DestinationDir $RepoName
+    Write-Output "::endgroup::"
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }    
 }
 
 Write-Output "::group::Clone Tools"

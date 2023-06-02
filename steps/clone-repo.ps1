@@ -3,12 +3,13 @@ param (
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
     [string]$OrgName,
-    [string]$Branch
+    [string]$Branch,
+    [string]$DestinationDir = ""
 )
 
 . ./constants.ps1
 
-$TemporaryRepoName = "b"
+$TemporaryRepoName = [IO.Path]::Combine($DestinationDir, "b")
 $Url = "https://github.com/$OrgName/$RepoName"
 $RepoPath = [IO.Path]::Combine($pwd, $TemporaryRepoName)
 
