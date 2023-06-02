@@ -3,9 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
     [string]$ProjectDir = ".",
-    [string]$Name = "Release_x64",
+    [string]$Name = "Release",
     [string]$Configuration = "Release",
-    [string]$Arch = "x64",
     [string]$Version,
     [string]$SolutionName,
     # Regex pattern to filter out projects that will not be published as a package 
@@ -42,7 +41,7 @@ try {
             }
     }
     foreach($Project in $Projects){
-        dotnet pack $Project.File -o "$PackagesFolder" -c $Configuration /p:Platform=$Arch /p:PackageVersion=$Version /p:BuiltOnCI=true
+        dotnet pack $Project.File -o "$PackagesFolder" -c $Configuration /p:PackageVersion=$Version /p:BuiltOnCI=true
     }
     nuget sign -Overwrite "$PackagesFolder\*.nupkg" -CertificatePath $CertPath -CertificatePassword $CodeSigningCertPassword -Timestamper http://timestamp.digicert.com
 
