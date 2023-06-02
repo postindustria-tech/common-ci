@@ -127,11 +127,16 @@ function Generate-Performance-Results {
 
         # Remove any old images
         foreach ($Png in $(Get-ChildItem -Path $pwd -Filter *.png)) {
-            $DateString = git log -n 1 --pretty=format:%aD -- $Png.Name
-            $Date = [DateTime]::Parse($DateString)
-            if ($([DateTime]::Now - $Date).TotalDays -gt 30) {
-                Write-Output "Image '$($Png.Name)' is older than 30 days, removing"
-                git rm $Png.Name
+            try {
+                $DateString = git log -n 1 --pretty=format:%aD -- $Png.Name
+                $Date = [DateTime]::Parse($DateString)
+                if ($([DateTime]::Now - $Date).TotalDays -gt 30) {
+                    Write-Output "Image '$($Png.Name)' is older than 30 days, removing"
+                    git rm $Png.Name
+                }
+            }
+            catch {
+                Write-Output "Not able to parse age of '$($Png.Name)'"
             }
         }
 
