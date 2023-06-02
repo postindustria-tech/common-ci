@@ -49,7 +49,7 @@ if ($SeparateExamples){
             exit $LASTEXITCODE
         }
         Write-Output "Leaving'$RepoName'"
-        Pop-Location $RepoName
+        Pop-Location
         Write-Output "::endgroup::"
     }
 }
