@@ -7,7 +7,8 @@ param (
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [string]$GitHubToken,
-    [bool]$DryRun = $False
+    [bool]$DryRun = $False,
+    [bool]$SeparateExamples= $False
 )
 
 . ./constants.ps1
@@ -33,6 +34,26 @@ Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
+}
+
+if ($SeparateExamples){
+    try{
+        Write-Output "::group::Clone $ExamplesRepo"
+        Write-Output "Entering '$RepoName'"
+        Push-Location $RepoName
+
+        $ExamplesRepo = "$RepoName-examples"
+        ./steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName
+
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+    }
+    finally{
+        Write-Output "Leaving'$RepoName'"
+        Pop-Location $RepoName
+        Write-Output "::endgroup::"
+    }
 }
 
 Write-Output "::group::Clone Tools"
