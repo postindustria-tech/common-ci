@@ -22,6 +22,10 @@ on:
         required: false
         type: string
         default: false
+      separate-examples:
+        required: false
+        type: string
+        default: false
     secrets:
       token:
         required: true        
@@ -39,16 +43,19 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
-        
+            
       - name: Generate Documentation
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
+          $SeparateExamples = [bool]::Parse( "${{ inputs.separate-examples}}" )
           . ${{ github.workspace }}/common/nightly-documentation-update.ps1 `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun $DryRun
+          -DryRun $DryRun `
+          -SeparateExamples $SeparateExamples
+          
