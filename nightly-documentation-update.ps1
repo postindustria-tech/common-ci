@@ -42,7 +42,7 @@ if ($SeparateExamples){
         Write-Output "::group::Clone $ExamplesRepo"
         Write-Output "Entering '$RepoName'"
         Push-Location $RepoName
-        ./steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName
+        ./../steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName
     }
     finally{
         if ($LASTEXITCODE -ne 0) {
