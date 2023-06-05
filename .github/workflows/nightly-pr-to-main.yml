@@ -173,7 +173,7 @@ jobs:
           -DryRun $DryRun
 
       - name: Upload Successful Performance Results Artifact
-        if: ${{ success() && matrix.options.runperformance }}
+        if: ${{ success()}}
         uses: actions/upload-artifact@v3.1.2
         with:
           name: performance_results_passed_${{ inputs.pull-request-id }}
