@@ -28,3 +28,47 @@ The script executes the dotnet list command to retrieve a list of outdated packa
 Next, it searches for the available versions of the package on the NuGet package source https://api.nuget.org/v3/index.json, matching the major and minor versions. The available versions are sorted in ascending order based on the patch version, and the last (highest) version is selected.
 
 The script checks if the highest patch version differs from the currently installed version. If an update is required it executes dotnet add command to update the package to the highest available version.
+
+## Common Parameters
+
+These parameters are common to all the C/C++ scripts:
+| Parameter | Mandatory | Description |
+| --------- | :-------: | ----------- |
+| ProjectDir |    | The project directory (or full path) to give to the build tool. By default this is `./`. |
+| RepoName | &check; | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
+| Name | &check; | The name of the configuration. This comes from `options.json` and can be automatically populated for the caller by `run-repo-script`. |
+| Configuration | | The build configuration to give to the build tool. Generally this is either `Debug` or `Release` (default). |
+| Arch | | The architecture to build with. by default this is `x64`. |
+
+
+## Build Project
+
+**Script: `build-project.ps1`**
+
+Takes the following additional parameters:
+| Parameter | Mandatory | Description |
+| --------- | :-------: | ----------- |
+| BuildMethod |  | The build tool to use. This can be either `msbuild` (default) or `dotnet`. |
+
+## Run Unit Tests
+
+**Script: `run-unit-tests.ps1`**
+
+| Parameter | Mandatory | Description |
+| --------- | :-------: | ----------- |
+| BuildMethod |  | The build tool to use. This can be either `dotnet` (default) or `msbuild`. If msbuild is specified the `vstest.console.exe` command is used for running the tests. |
+| Filter |  |  It applies a regex pattern to the names of files found during recursive traversal of the "RepoPath" directory. The filter is used to test only the files whose names match the filter.  |
+| OutputFolder |  |  Specifies the name of the folder where the test results will be stored. This is because the integration and performance test scripts call this script with a filter that specifies integration or performance tests assemblies.  |
+
+
+## Run Performance Tests
+
+**Script: `run-performance-tests.ps1`**
+
+See [Run Unit Tests](#Run-Unit-Tests)
+
+## Run Integration Tests
+
+**Script: `run-integration-tests.ps1`**
+
+See [Run Unit Tests](#Run-Unit-Tests)
