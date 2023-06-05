@@ -38,7 +38,7 @@ These parameters are common to all the C/C++ scripts:
 | RepoName | &check; | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
 | Name | &check; | The name of the configuration. This comes from `options.json` and can be automatically populated for the caller by `run-repo-script`. |
 | Configuration | | The build configuration to give to the build tool. Generally this is either `Debug` or `Release` (default). |
-| Arch | | The architecture to build with. by default this is `x64`. |
+| Arch* | | The architecture to build with. by default this is `x64`. ****The only exception is the `build-package-nuget.ps1` script, where the architecture is omitted entirely as the packages are built using `Any CPU` architecture***|
 
 
 ## Build Project
