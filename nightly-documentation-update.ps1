@@ -75,6 +75,18 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
+if ($SeparateExamples){
+    $ExamplesRepo = "$RepoName-examples"
+    
+    Write-Output "::group::Removing $ExamplesRepo"
+    Remove-Item -Path $ExamplesRepo -Recurse -Force
+    Write-Output "::endgroup::"
+    
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }    
+}
+
 Write-Output "::group::Has Changed"
 ./steps/has-changed.ps1 -RepoName $RepoName
 Write-Output "::endgroup::"
