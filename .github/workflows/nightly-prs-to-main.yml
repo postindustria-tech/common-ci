@@ -22,6 +22,9 @@ on:
         required: false
         type: string
         default: false
+      cache-assets:
+        default: false
+        type: boolean
     secrets:
       token:
         required: true
@@ -35,10 +38,7 @@ jobs:
       pull_request_ids: ${{ steps.get_pull_requests.outputs.pull_request_ids }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-      
-      - name: Checkout reusable workflow dir
+      - name: Checkout Common
         uses: actions/checkout@v3
         with:
           repository: ${{ inputs.org-name }}/common-ci
@@ -76,6 +76,7 @@ jobs:
       user: ${{ inputs.user }}
       email: ${{ inputs.email }}
       dryrun: ${{ inputs.dryrun }}
+      cache-assets: ${{ inputs.cache-assets }}
     secrets: 
       token: ${{ secrets.token }}
       asset-keys: ${{ secrets.asset-keys }}

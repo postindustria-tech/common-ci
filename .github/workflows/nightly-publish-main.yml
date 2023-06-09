@@ -25,6 +25,9 @@ on:
         required: false
         type: string
         default: false
+      cache-assets:
+        default: false
+        type: boolean
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
@@ -37,6 +40,7 @@ jobs:
   Configure:
     runs-on: ubuntu-latest
     outputs:
+      asset-cache-key: ${{ steps.hash-asset-cache-key.outputs.hash }}
       options: ${{ steps.configure.outputs.options }}
       version: ${{ steps.configure.outputs.version }}
       update_required: ${{ steps.configure.outputs.update_required }}
@@ -47,6 +51,20 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+
+      - name: Hash the Asset Cache Key
+        id: hash-asset-cache-key
+        if: inputs.cache-assets
+        shell: pwsh
+        env:
+          KEY: ${{ secrets.asset-keys }}
+        run: |
+          $stringAsStream = [System.IO.MemoryStream]::new()
+          $writer = [System.IO.StreamWriter]::new($stringAsStream)
+          $writer.write($env:KEY)
+          $writer.Flush()
+          $stringAsStream.Position = 0
+          "hash=$(Get-Date -Format FileDate)-$((Get-FileHash -InputStream $stringAsStream).Hash)" | Out-File $env:GITHUB_OUTPUT -Append
         
       - name: Configure
         id: configure
@@ -167,6 +185,20 @@ jobs:
           name: package
           path: ${{ github.workspace }}/common/package
 
+      - name: Install Runtime
+        if: matrix.options.Language != '' && matrix.options.LanguageVersion != ''
+        uses: ./common/.github/actions/install_runtime
+        with:
+          language: ${{ matrix.options.Language }}
+          version: ${{ matrix.options.LanguageVersion }}
+
+      - name: Restore Asset Cache
+        if: inputs.cache-assets
+        uses: actions/cache/restore@v3
+        with:
+          key: ${{ needs.configure.outputs.asset-cache-key }}
+          path: ${{ github.workspace }}/common/assets
+
       - name: Test
         shell: pwsh
         if: ${{ success() && matrix.options.packagerequirement }}
@@ -183,16 +215,22 @@ jobs:
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
           -DryRun $DryRun
-          
-      - name: Integration Test Results
-        if: ${{ matrix.options.packagerequirement }}
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+
+      - name: Save Asset Cache
+        if: inputs.cache-assets && always()
+        uses: actions/cache/save@v3
         with:
-          check_name: Integration Tests - ${{ matrix.options.name }}
-          files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.json
+          key: ${{ needs.configure.outputs.asset-cache-key }}
+          path: ${{ github.workspace }}/common/assets
+
+      - name: Publish Test Results
+        if: matrix.options.packagerequirement
+        uses: ./common/.github/actions/publish_test_results
+        with:
+          repo-name: ${{ inputs.repo-name }}
+          name: ${{ matrix.options.name }}
+          skip-unit: true
+          skip-performance: true
           
   Package:      
     runs-on: ${{ inputs.build-platform }}

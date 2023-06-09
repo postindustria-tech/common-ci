@@ -16,6 +16,9 @@ Workflows contained in this repository are reused by all 51Degrees repositories 
 
 In addition to PowerShell scripts, the [EnricoMi/publish-unit-test-result-action/composite](https://github.com/EnricoMi/publish-unit-test-result-action)
 action is used to display test results nicely in the run summary, and link as a check in related PRs.
+The action requires Python, so it's wrapped in a [custom composite action](.github/actions/publish_test_results/action.yml)
+which installs the supported version of Python before calling the action. This makes it independent
+of the Python version that may have been installed on the runner in an earlier step.
 
 ### Steps
 
@@ -215,6 +218,19 @@ param (
 # Do some building with these options.
 ```
 Note that the options object is not passed in "as is". It is parsed by `run-repo-script.ps1`, and the correct parameters populated.
+
+
+### Asset Caching
+
+Some repositories need additional assets for running tests, which are fetched by the `fetch-assets.ps1` script.
+Workflows that may need assets optinally support asset caching. To use it, a caller must set the `cache-assets` input
+flag to `true`, and make sure that the assets are located in the `${{ github.workspace }}/common/assets` directory. If
+repository requires assets to be located in a different place, [symbolic links](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-item?view=powershell-7.2#example-7-create-a-symbolic-link-to-a-file-or-folder)
+or regular file copies may be used to put cached assets in the right places during build.
+
+The hash of the `asset-keys` secret, with current date prepended, is used as the cache key so that the cache gets
+invalidated daily, as well as when any of the asset keys change.
+
 
 ## Entering Directories
 

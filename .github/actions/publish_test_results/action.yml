@@ -1,0 +1,63 @@
+name: Publish Test Results
+inputs:
+  repo-name:
+    type: string
+    required: true
+  name:
+    type: string
+    default: Test Results
+  commit:
+    type: string
+    default: ${{ github.sha }}
+  skip-unit:
+    type: boolean
+    default: false
+  skip-integration:
+    type: boolean
+    default: false
+  skip-performance:
+    type: boolean
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    # publish-unit-test-result-action doesn't support Python 3.11 on Windows,
+    # so we install the recommended version of Python before using it
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+
+    - name: Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      if: ${{ !inputs.skip-unit }}
+      with:
+        check_name: Unit Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: |
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.json
+
+    - name: Integration Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      if: ${{ !inputs.skip-integration }}
+      with:
+        check_name: Integration Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: |
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.json
+
+    - name: Performance Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      if: ${{ !inputs.skip-performance }}
+      with:
+        check_name: Performance Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: |
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.json
