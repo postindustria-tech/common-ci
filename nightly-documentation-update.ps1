@@ -77,9 +77,9 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($SeparateExamples){
     $ExamplesRepo = "$RepoName-examples"
-    
+    $ExamplesPath = [IO.Path]::Combine($RepoName, $ExamplesRepo)
     Write-Output "::group::Removing $ExamplesRepo"
-    Remove-Item -Path $ExamplesRepo -Recurse -Force
+    Remove-Item -Path $ExamplesPath -Recurse -Force
     Write-Output "::endgroup::"
     
     if ($LASTEXITCODE -ne 0) {
