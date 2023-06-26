@@ -11,7 +11,6 @@ param (
 Push-Location $RepoName
 
 try {
-
     # Creating result folder for packages with relative path to common
     $packageFolder = New-Item -ItemType directory -Path ../package -Force
 
@@ -21,8 +20,6 @@ try {
         Push-Location $path
 
         try {
-
-
             # All modules that reference other pipeline modules in this repository
             # have package.json files where the dependency is defined relative to
             # the local file system.
@@ -52,8 +49,6 @@ try {
             Write-Output "Creating package - $package"
             npm pack || $(throw "ERROR: Failed to pack $package")
 
-
-
             # Moving tgz file to common/package
             Move-Item -Path "${package}-${Version}.tgz" -Destination (New-Item -ItemType directory -Path $packageFolder -Force)
 
@@ -64,13 +59,4 @@ try {
 
 } finally {
     Pop-Location
-    $items = Get-ChildItem -Path ./ -Force
-
-    foreach ($item in $items) {
-        if ($item.Attributes -band [System.IO.FileAttributes]::Directory) {
-            Write-Host "Directory: $($item.Name)"
-        } else {
-            Write-Host "File: $($item.Name)"
-        }
-    }
 }

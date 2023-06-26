@@ -9,7 +9,6 @@ param (
 Push-Location $RepoName
 
 try {
-
     # Using NPM Token to sign in
     npm config set //registry.npmjs.org/:_authToken $Options.Keys.NPMAuthToken
 

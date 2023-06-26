@@ -9,7 +9,6 @@ param (
 Push-Location $RepoName
 
 try {
-
     npm install -g eslint
 
     foreach ($package in $Packages) {
@@ -27,9 +26,7 @@ try {
         }
 
         Pop-Location
-
     }
-
 } finally {
     Pop-Location
 }

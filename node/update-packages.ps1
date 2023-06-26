@@ -8,7 +8,6 @@ param (
 Push-Location $RepoName
 
 try {
-
     foreach ($package in $Packages) {
         $path = Join-Path . $package
         Push-Location $path
@@ -33,7 +32,6 @@ try {
         }
 
         Pop-Location
-
     }
 } finally {
     #   npm install -g eslint
