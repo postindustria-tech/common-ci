@@ -1,0 +1,68 @@
+name: Nightly Documentation Update
+
+on:
+  workflow_call:
+    inputs:
+      repo-name:
+        required: true
+        type: string
+      org-name:
+        required: false
+        type: string
+        default: 51degrees
+      user:
+        required: false
+        type: string
+        default: Automation51D
+      email:
+        required: false
+        type: string
+        default: "51DCI@51Degrees.com"
+      dryrun:
+        required: false
+        type: string
+        default: false
+      separate-examples:
+        required: false
+        type: string
+        default: false
+    secrets:
+      token:
+        required: true        
+
+jobs:
+  nightly-documentation-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        
+      - name: Checkout reusable workflow dir
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.org-name }}/common-ci
+          path: common
+            
+      - name: Generate Documentation
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          $SeparateExamples = [bool]::Parse( "${{ inputs.separate-examples}}" )
+          . ${{ github.workspace }}/common/generate-documentation.ps1 `
+          -GitHubToken ${{ secrets.token }} `
+          -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
+          -GitHubUser ${{ inputs.user }} `
+          -GitHubEmail ${{ inputs.email }} `
+          -DryRun $DryRun `
+          -SeparateExamples $SeparateExamples
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: docs_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/*
+          if-no-files-found: ignore
+
+          
