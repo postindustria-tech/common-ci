@@ -1,0 +1,21 @@
+name: Install runtime
+inputs:
+  language:
+    type: string
+    required: true
+  version:
+    type: string
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install Python
+      if: inputs.language == 'python'
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.version }}
+    - name: Install Node
+      if: inputs.language == 'node'
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.version }}

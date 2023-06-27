@@ -19,6 +19,18 @@ param (
     -GitHubToken $GitHubToken `
     -SeparateExamples $SeparateExamples
 
+if ($SeparateExamples){
+    $ExamplesRepo = "$RepoName-examples"
+    $ExamplesPath = [IO.Path]::Combine($RepoName, $ExamplesRepo)
+    Write-Output "::group::Removing $ExamplesRepo"
+    Remove-Item -Path $ExamplesPath -Recurse -Force
+    Write-Output "::endgroup::"
+    
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }    
+}
+
 Write-Output "::group::Has Changed"
 ./steps/has-changed.ps1 -RepoName $RepoName
 Write-Output "::endgroup::"

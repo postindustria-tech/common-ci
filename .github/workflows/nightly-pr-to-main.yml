@@ -25,6 +25,9 @@ on:
         required: false
         type: string
         default: false
+      cache-assets:
+        default: false
+        type: boolean
     secrets:
       token:
         required: true
@@ -37,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       options: ${{ steps.configure.outputs.options }}
+      asset-cache-key: ${{ steps.hash-asset-cache-key.outputs.hash }}
     steps:
     
       - name: Checkout Common
@@ -44,6 +48,20 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+
+      - name: Hash the Asset Cache Key
+        id: hash-asset-cache-key
+        if: inputs.cache-assets
+        shell: pwsh
+        env:
+          KEY: ${{ secrets.asset-keys }}
+        run: |
+          $stringAsStream = [System.IO.MemoryStream]::new()
+          $writer = [System.IO.StreamWriter]::new($stringAsStream)
+          $writer.write($env:KEY)
+          $writer.Flush()
+          $stringAsStream.Position = 0
+          "hash=$(Get-Date -Format FileDate)-$((Get-FileHash -InputStream $stringAsStream).Hash)" | Out-File $env:GITHUB_OUTPUT -Append
 
       - name: Configure
         shell: pwsh
@@ -68,12 +86,25 @@ jobs:
     runs-on: ${{ matrix.options.image }}
     
     steps:
-
       - name: Checkout Common
         uses: actions/checkout@v3
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+
+      - name: Install Runtime
+        if: matrix.options.Language != '' && matrix.options.LanguageVersion != ''
+        uses: ./common/.github/actions/install_runtime
+        with:
+          language: ${{ matrix.options.Language }}
+          version: ${{ matrix.options.LanguageVersion }}
+
+      - name: Restore Asset Cache
+        if: inputs.cache-assets
+        uses: actions/cache/restore@v3
+        with:
+          key: ${{ needs.configure.outputs.asset-cache-key }}
+          path: ${{ github.workspace }}/common/assets
 
       - name: Build and Test
         id: build-and-test
@@ -94,39 +125,22 @@ jobs:
           -GitHubEmail ${{ inputs.email }} `
           -DryRun $DryRun
 
-      - name: Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ always() }}
+      - name: Save Asset Cache
+        if: inputs.cache-assets && always()
+        uses: actions/cache/save@v3
         with:
-          check_name: Unit Tests - ${{ matrix.options.name }}
-          commit: ${{ steps.build-and-test.outputs.pr-sha }}
-          files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.json
-            
-      - name: Integration Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ always() }}
+          key: ${{ needs.configure.outputs.asset-cache-key }}
+          path: ${{ github.workspace }}/common/assets
+
+      - name: Publish Test Results
+        if: always()
+        uses: ./common/.github/actions/publish_test_results
         with:
-          check_name: Integration Tests - ${{ matrix.options.name }}
+          repo-name: ${{ inputs.repo-name }}
+          name: ${{ matrix.options.name }}
           commit: ${{ steps.build-and-test.outputs.pr-sha }}
-          files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.json
-            
-      - name: Performance Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: ${{ always() && matrix.options.runperformance }}
-        with:
-          check_name: Performance Tests - ${{ matrix.options.name }}
-          commit: ${{ steps.build-and-test.outputs.pr-sha }}
-          files: |
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
-            ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.json
-            
+          skip-performance: ${{ !matrix.options.runperformance }}
+
       - name: Upload Performance Results Artifact
         uses: actions/upload-artifact@v3.1.2
         if: ${{ matrix.options.runperformance }}
@@ -134,7 +148,14 @@ jobs:
           name: performance_results_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
-                
+          
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: artifacts_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/artifacts/*
+          if-no-files-found: ignore
+
   Compare-Performance:
     # This needs to run on Windows to support ScottPlot
     runs-on: windows-latest
