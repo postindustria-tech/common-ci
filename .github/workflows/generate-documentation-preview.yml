@@ -26,6 +26,10 @@ on:
         required: false
         type: string
         default: false
+      pull-request-id:
+        required: false
+        type: number
+        default: 0
     secrets:
       token:
         required: true        
@@ -55,6 +59,7 @@ jobs:
           -OrgName ${{ inputs.org-name }} `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
+          -PullRequestId ${{ inputs.pull-request-id }} `
           -SeparateExamples $SeparateExamples
 
       - name: Upload Artifact
