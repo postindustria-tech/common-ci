@@ -76,6 +76,7 @@ jobs:
           . ${{ github.workspace }}/common/steps/comment-on-issue.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -GitHubToken ${{ secrets.token }} `
           -PullRequestId ${{ inputs.pull-request-id }} `
           -Message "Preview available [here](https://github.com/${{ inputs.org-name }}/${{ inputs.repo-name }}/actions/runs/${{ github.run_id }}#artifacts)."
           
