@@ -68,5 +68,10 @@ jobs:
           name: docs_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/*
           if-no-files-found: ignore
-
           
+      - name: Link to PRs
+        uses: tonyhallett/artifacts-url-comments@v1.1.0
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            prefix: Documentation preview generated
