@@ -1,4 +1,4 @@
-name: Nightly Documentation Update
+name: Generate Documentation Preview
 
 on:
   workflow_call:
@@ -31,7 +31,7 @@ on:
         required: true        
 
 jobs:
-  nightly-documentation-update:
+  generate-documentation-preview:
     runs-on: ubuntu-latest
 
     steps:
