@@ -18,7 +18,7 @@ try {
     $FileName = [IO.Path]::Combine($pwd, "51Degrees-TacV3.4.trie.zip")
     
     Write-Output "Downloading CSV data file"
-    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "CSV" -product "TAC" -fullFilePath $FileName -Url $Url)
+    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "CSV" -product "V4TAC" -fullFilePath $FileName -Url $Url)
 
     if ($Result -eq $False) {
 
