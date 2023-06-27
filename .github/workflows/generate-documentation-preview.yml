@@ -68,10 +68,14 @@ jobs:
           name: docs_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/*
           if-no-files-found: ignore
+
+      - name: Comment on PR
+        shell: pwsh
+        working-directory: ${{ github.workspace }}/common/
+        run: |
+          . ${{ github.workspace }}/common/steps/comment-on-issue.ps1 `
+          -RepoName ${{ inputs.repo-name }} `
+          -OrgName ${{ inputs.org-name }} `
+          -PullRequestId ${{ inputs.pull-request-id }} `
+          -Message "Preview available [here](https://github.com/${{ inputs.org-name }}/${{ inputs.repo-name }}/actions/runs/${{ github.run_id }}#artifacts)."
           
-      - name: Link to PRs
-        uses: tonyhallett/artifacts-url-comments@v1.1.0
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            prefix: Documentation preview generated
