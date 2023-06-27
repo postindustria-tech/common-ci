@@ -28,8 +28,8 @@ try {
     }
 
     Write-Output "Extracting $FileName"
-    & $CommonPath\steps\gunzip-file.ps1 -Source $FileName
-    
+    Expand-Archive -Path $FileName
+     
 }
 finally {
 
