@@ -7,11 +7,8 @@ param (
     [string]$Url = $Null
 )
 
+$CommonPath = $pwd
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
-
-Write-Output "Adding data file module"
-$Env:PSModulePath += ";$([IO.Path]::Combine($pwd, 'scripts', 'modules'))"
-Write-Output "Module Path: $($Env:PSModulePath)"
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
@@ -21,7 +18,7 @@ try {
     $FileName = [IO.Path]::Combine($pwd, "51Degrees-TacV3.4.trie.zip")
     
     Write-Output "Downloading CSV data file"
-    $Result = $(Get-DataFile -licenseKey $LicenseKey -dataType "CSV" -product "TAC" -fullFilePath $FileName -Url $Url)
+    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "CSV" -product "TAC" -fullFilePath $FileName -Url $Url)
 
     if ($Result -eq $False) {
 
@@ -31,7 +28,7 @@ try {
     }
 
     Write-Output "Extracting $FileName"
-    Gunzip -Source $FileName
+    & $CommonPath\steps\gunzip-file.ps1 -Source $FileName
     
 }
 finally {
