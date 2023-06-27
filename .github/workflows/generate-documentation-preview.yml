@@ -55,7 +55,6 @@ jobs:
           -OrgName ${{ inputs.org-name }} `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DryRun $DryRun `
           -SeparateExamples $SeparateExamples
 
       - name: Upload Artifact
