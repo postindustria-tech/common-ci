@@ -7,7 +7,8 @@ param (
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [string]$GitHubToken,
-    [bool]$SeparateExamples= $False
+    [bool]$SeparateExamples = $False,
+    [string]$PullRequestId = ""
 )
 
 . ./constants.ps1
@@ -35,6 +36,11 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
+if ($PullRequestId -ne 0) {
+
+    ./steps/checkout-pr -RepoName $RepoName -PullRequestId $PullRequestId
+
+}
 
 if ($SeparateExamples){
     $ExamplesRepo = "$RepoName-examples"
