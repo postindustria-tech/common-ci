@@ -20,8 +20,6 @@ if ($IsMacOS) {
     $os = "unknown"
 }
 
-git submodule update --init --recursive
-
 # Creating folder for future build
 New-Item -ItemType Directory -Path build | Out-Null
 
