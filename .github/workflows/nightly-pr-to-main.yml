@@ -148,6 +148,13 @@ jobs:
           name: performance_results_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
+          
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: artifacts_${{ inputs.pull-request-id }}
+          path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/artifacts/*
+          if-no-files-found: ignore
 
   Compare-Performance:
     # This needs to run on Windows to support ScottPlot
