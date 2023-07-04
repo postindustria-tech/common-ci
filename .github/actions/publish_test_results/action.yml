@@ -31,7 +31,7 @@ runs:
 
     - name: Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
-      if: ${{ !inputs.skip-unit }}
+      if: ${{ inputs.skip-unit == 'false' }}
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
@@ -42,7 +42,7 @@ runs:
 
     - name: Integration Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
-      if: ${{ !inputs.skip-integration }}
+      if: ${{ inputs.skip-integration == 'false' }}
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
@@ -53,7 +53,7 @@ runs:
 
     - name: Performance Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
-      if: ${{ !inputs.skip-performance }}
+      if: ${{ inputs.skip-performance == 'false' }}
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
