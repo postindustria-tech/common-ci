@@ -25,6 +25,9 @@ on:
       cache-assets:
         default: false
         type: boolean
+      prs: # Comma-separated list of pull request IDs to build
+        required: false
+        type: string
     secrets:
       token:
         required: true
@@ -49,6 +52,8 @@ jobs:
         id: get_pull_requests
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        env:
+          PULL_REQUEST_IDS: ${{ inputs.prs }}
         run: |
           . ${{ github.workspace }}/common/nightly-pr-to-main_get-prs.ps1 `
           -RepoName ${{ inputs.repo-name }} `
