@@ -11,6 +11,7 @@ param (
     [bool]$DryRun = $False
 )
 
+Set-PSDebug -Trace 2
 # Disable progress bars
 $ProgressPreference = "SilentlyContinue"
 
