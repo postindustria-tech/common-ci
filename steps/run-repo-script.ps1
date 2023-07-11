@@ -20,7 +20,7 @@ $Parameters = @{}
 
 # Add all the parameters that are available in the options.
 foreach ($Option in $Options.GetEnumerator()) {
-    if ($ScriptParameters.ContainsKey($Option.Key)) {
+    if ($ScriptParameters.ContainsKey($Option.Key) -and $Option.Value -ne "") {
         Write-Output "Adding parameter '$($Option.Key)'"
         $Parameters.Add($Option.Key, $Option.Value)
     }
@@ -29,7 +29,7 @@ foreach ($Option in $Options.GetEnumerator()) {
 # If there are keys required, add these too.
 if ($Null -ne $Options.Keys) {
     foreach ($Key in $Options.Keys.GetEnumerator()) {
-        if ($ScriptParameters.ContainsKey($Key.Key)) {
+        if ($ScriptParameters.ContainsKey($Key.Key) -and $Key.Value -ne "") {
             Write-Output "Adding parameter '$($Key.Key)'"
             $Parameters.Add($Key.Key, $Key.Value)
         }
