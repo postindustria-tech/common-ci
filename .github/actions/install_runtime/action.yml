@@ -19,3 +19,9 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.version }}
+    - name: Install PHP
+      if: inputs.language == 'php'
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.version }}
+        tools: phpunit
