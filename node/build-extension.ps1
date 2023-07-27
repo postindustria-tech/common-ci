@@ -3,7 +3,7 @@ param (
     [string]$PackageName
 )
 
-Write-Output "Building extension for $package"
+Write-Output "Building extension for $PackageName"
 
 # Installing binary builder
 npm install node-gyp --global || $(throw "ERROR: Failed to install node-gyp")
@@ -39,11 +39,15 @@ Move-Item -Path ./build/Release/FiftyOneDeviceDetectionHashV4.node -Destination 
 $nodeVersion = node --version  || $(throw "ERROR: Failed to get node version")
 $nodeMajorVersion = $nodeVersion.TrimStart('v').Split('.')[0]
 
-
 # Renaming building config file
 $fileName = "FiftyOneDeviceDetectionHashV4-$os-$nodeMajorVersion.node"
 Rename-Item -Path "./build/FiftyOneDeviceDetectionHashV4.node" -NewName $fileName
 
+# Creating folder for binaries artifacts
+New-Item -ItemType Directory -Path "../../package-files" | Out-Null
+
+# Storing binary artifact
+Copy-Item -Path "./build/$fileName" -Destination "../../package-files"
 
 # Installing package for some examples
 npm install n-readlines || $(throw "ERROR: Failed to install n-readlines")
