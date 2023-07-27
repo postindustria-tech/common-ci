@@ -94,6 +94,13 @@ jobs:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
 
+      - name: Install Runtime
+        if: matrix.options.Language != '' && matrix.options.LanguageVersion != ''
+        uses: ./common/.github/actions/install_runtime
+        with:
+          language: ${{ matrix.options.Language }}
+          version: ${{ matrix.options.LanguageVersion }}
+
       - name: PreBuild
         if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
