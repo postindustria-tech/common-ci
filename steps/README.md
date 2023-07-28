@@ -75,7 +75,6 @@ Gets the open PRs for the repo, and sets the ids of valid PRs as an array under 
 A PR is considered valid if it was created by one of the following roles:
 - `OWNER`
 - `COLLABORATOR`
-- `CONTRIBUTOR`
 - `MEMBER`
 or was approved by a member of the 51Degrees Github organisation.
 
