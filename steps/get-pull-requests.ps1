@@ -51,7 +51,6 @@ function ShouldRun {
     $Pr = hub api /repos/$OrgName/$RepoName/pulls/$Id | ConvertFrom-Json
     if ($Pr.author_association -eq 'OWNER' -or
         $Pr.author_association -eq 'COLLABORATOR' -or
-        $Pr.author_association -eq 'CONTRIBUTOR' -or
         $Pr.author_association -eq 'MEMBER') {
         # The author is one of the above, so return true
         Write-Information "The creator is '$($Pr.author_association)', so allow automation"
