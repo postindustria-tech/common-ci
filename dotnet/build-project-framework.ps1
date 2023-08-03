@@ -15,8 +15,7 @@ Push-Location $RepoPath
 
 try {
     
-    nuget restore $ProjectDir
-    msbuild $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true
+    msbuild -t:build -restore $ProjectDir /p:Platform=$Arch /p:Configuration=$Configuration /p:BuiltOnCI=true -verbosity:minimal
 
 }
 finally {
