@@ -1,5 +1,5 @@
 param(
-    [string]$ImageFile = "dockerimage.tag.gz"
+    [string]$ImageFile = "dockerimage.tar"
 )
 
 $PackagePath = [IO.Path]::Combine($pwd, "package")

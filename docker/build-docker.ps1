@@ -4,7 +4,7 @@ param(
     [string]$Version,
     [Parameter(Mandatory=$true)]
     [Hashtable]$Keys,
-    [string]$ImageFile = "dockerimage.tag.gz"
+    [string]$ImageFile = "dockerimage.tar"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -25,7 +25,7 @@ try {
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     Write-Output "Saving docker image $Tag"
-    docker save $Tag | gzip > $PackageFile
+    docker save -o $PackageFile $Tag
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 finally {
