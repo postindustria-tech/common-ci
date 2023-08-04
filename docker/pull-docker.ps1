@@ -1,5 +1,4 @@
 param(
-    [string]$RepoName,
     [Parameter(Mandatory=$true)]
     [string]$Version,
     [Parameter(Mandatory=$true)]
