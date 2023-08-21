@@ -8,7 +8,7 @@ param(
     [string]$Version,
     [string]$SolutionName,
     # Regex pattern to filter out projects that will not be published as a package 
-    [string]$SearchPattern = "^(?!.*Test)Project\(.*csproj",
+    [string]$SearchPattern = "^(?!.*(Test|GenerateConfig))Project\(.*csproj",
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningCert,
     [Parameter(Mandatory=$true)]
