@@ -13,9 +13,9 @@ Push-Location $RepoName
 try {
     foreach ($package in $Packages) {
         Write-Output "Testing $package"
-        Push-Location $package/tests
+        Push-Location $package
         try {
-            coverage run -m xmlrunner discover -p 'test*.py' -o $commonTestResults || $($testsFailed = $true)
+            coverage run -m xmlrunner discover -s tests -p 'test*.py' -o $commonTestResults || $($testsFailed = $true)
             Move-Item -Path .coverage -Destination $repoPath/.coverage.$package || $(throw "failed to move coverage report")
         } finally {
             Pop-Location
