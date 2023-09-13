@@ -17,6 +17,8 @@ $TestResultPath = [IO.Path]::Combine($RepoPath, "test-results", $OutputFolder, $
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
+$ok = $true
+
 try {
 
     $skipPattern = "*performance*"
@@ -25,7 +27,7 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like "*bin*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                dotnet test $_.FullName --results-directory $TestResultPath --blame-crash -l "trx"
+                dotnet test $_.FullName --results-directory $TestResultPath --blame-crash -l "trx" || $($script:ok = $false)
             }
         }
     }
@@ -34,10 +36,10 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like "*\bin\*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                & vstest.console.exe $_.FullName /Logger:trx /ResultsDirectory:$TestResultPath
+                & vstest.console.exe $_.FullName /Logger:trx /ResultsDirectory:$TestResultPath || $($script:ok = $false)
             }
         }
-    } 
+    }
 
 }
 finally {
@@ -47,4 +49,4 @@ finally {
 
 }
 
-exit $LASTEXITCODE
+exit $ok ? 0 : 1
