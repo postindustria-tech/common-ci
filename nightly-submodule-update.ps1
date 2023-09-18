@@ -50,7 +50,7 @@ Write-Output "::group::Check for Changes"
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -eq 0) {
-    
+
     Write-Output "::group::Commit Changes"
     ./steps/commit-changes.ps1 -RepoName $RepoName -Message "REF: Updated submodules."
     Write-Output "::endgroup::"
@@ -58,7 +58,7 @@ if ($LASTEXITCODE -eq 0) {
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
-    
+
     Write-Output "::group::Push Changes"
     ./steps/push-changes.ps1 -RepoName $RepoName -Branch $SubModuleUpdateBranch -DryRun $DryRun
     Write-Output "::endgroup::"
@@ -66,7 +66,7 @@ if ($LASTEXITCODE -eq 0) {
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
-    
+
     Write-Output "::group::Create Pull Request"
     ./steps/pull-request-to-main.ps1 -RepoName $RepoName -Message "Updated submodule." -DryRun $DryRun
     Write-Output "::endgroup::"
@@ -74,14 +74,8 @@ if ($LASTEXITCODE -eq 0) {
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
-    
-}
-else {
 
-    Write-Output "No submodule changes, so not creating a pull request."
-
-    if ($Null -ne $RunId) {
-        Write-Output "Cancelling Run"
-        hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/cancel -X POST
-    }
+} else {
+    Write-Output "$($env:CI -eq 'true' ? '::warning::' : '')No submodule changes, so not creating a pull request."
+    exit 0
 }
