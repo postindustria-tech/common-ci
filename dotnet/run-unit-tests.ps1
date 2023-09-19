@@ -7,6 +7,7 @@ param(
     [string]$Configuration = "Release",
     [string]$Arch = "x64",
     [string]$BuildMethod="dotnet",
+    [string]$DirNameFormat = "*bin*",
     [string]$Filter,
     [string]$OutputFolder = "unit"
 )
@@ -25,7 +26,7 @@ try {
     Write-Output "Testing '$Name'"
     if ($BuildMethod -eq "dotnet"){
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
-            if (($_.DirectoryName -like "*bin*" -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
+            if (($_.DirectoryName -like $DirNameFormat -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
                 dotnet test $_.FullName --results-directory $TestResultPath --blame-crash -l "trx" || $($script:ok = $false)
             }
