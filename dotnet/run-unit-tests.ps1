@@ -25,6 +25,7 @@ try {
     $skipPattern = "*performance*"
     Write-Output "Testing '$Name'"
     if ($BuildMethod -eq "dotnet"){
+        Write-Output "Looking for '$Filter' in directories like '$DirNameFormat'"
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like $DirNameFormat -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
