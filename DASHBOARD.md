@@ -112,10 +112,10 @@
 [![Monthly Copyright Update](https://github.com/51Degrees/pipeline-node/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/pipeline-node/actions/workflows/monthly-copyright-update.yml)
 
 ### device-detection-node
-[![Nightly Documentation Update](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-documentation-update.yml)
-[![Nightly Package Update](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-package-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-package-update.yml)
 [![Nightly PRs to Main](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-prs-to-main.yml)
 [![Nightly Publish Main](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-publish-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-publish-main.yml)
+[![Nightly Documentation Update](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-documentation-update.yml)
+[![Nightly Package Update](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-package-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-package-update.yml)
 [![Nightly Submodule Update](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-submodule-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/device-detection-node/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/monthly-copyright-update.yml)
 
