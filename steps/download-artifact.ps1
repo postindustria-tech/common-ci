@@ -12,8 +12,9 @@ param (
     [string]$GitHubToken
 )
 
-$Artifacts = $(hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/artifacts | ConvertFrom-Json).artifacts
-hub api /repos/$OrgName/$RepoName/actions/runs/$RunId/artifacts
+$Response = gh api /repos/$OrgName/$RepoName/actions/runs/$RunId/artifacts
+$Artifacts = $($Response | ConvertFrom-Json).artifacts
+Write-Output $Response
 Write-Output $Artifacts
 
 foreach ($Artifact in $Artifacts) {

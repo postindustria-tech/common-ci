@@ -17,15 +17,15 @@ try {
     $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
     
     Write-Output "Getting PRs from '$CurrentBranch' to 'main'"
-    $Prs = $(hub pr list -b main -h $CurrentBranch --format "%I%n")
+    $Prs = gh pr list -B main -H $CurrentBranch --json number --jq '.[].number'
 
     Write-Output "There are '$($Prs.Count)' PRs"
 
     if ($Prs.Count -eq 0) {
         Write-Output "Creating pull request"
-        $Command = "hub pull-request --no-edit --message $Message"
+        $Command = {gh pr create --message $Message}
         if ($DryRun -eq $False) {
-            Invoke-Expression $Command
+            & $Command
         }
         else {
             Write-Output "Dry run - not executing the following: $Command"
