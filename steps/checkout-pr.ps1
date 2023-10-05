@@ -22,11 +22,10 @@ try {
     
     }
 
-    # For the format argument, see https://hub.github.com/hub-pr.1.html
-    $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
+    $PrTitle = gh pr view $PullRequestId --json number,baseRefName,headRefName,title --jq '"#\(.number) \(.headRefName)->\(.baseRefName) : \(.title)"'
 
     Write-Output "Checking out PR $PrTitle"
-    hub pr checkout $PullRequestId
+    gh pr checkout $PullRequestId
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
@@ -43,7 +42,7 @@ try {
         exit $LASTEXITCODE
     }
     
-    $Sha = hub pr show $PullRequestId -f "%sH"
+    $Sha = gh pr view $PullRequestId --json headRefOid --jq '.headRefOid'
     Write-Output "Setting '$VariableName' to '$Sha'"
     Set-Variable -Name $VariableName -Value $Sha -Scope Global
 

@@ -23,7 +23,7 @@ if ($GitHubEmail -eq "") {
     $GitHubEmail = $DefaultGitEmail
 }
 
-# This token is used by the hub command.
+# This token is used by the gh command.
 Write-Output "Setting GITHUB_TOKEN"
 $env:GITHUB_TOKEN="$GitHubToken"
 

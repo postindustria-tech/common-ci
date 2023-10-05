@@ -25,12 +25,12 @@ try {
     }
     
     # For the format argument, see https://hub.github.com/hub-pr.1.html
-    $PrTitle = $(hub pr show $PullRequestId -f "%i %H->%B : '%t'")
+    $PrTitle = gh pr view $PullRequestId --json number,baseRefName,headRefName,title --jq '"#\(.number) \(.headRefName)->\(.baseRefName) : \(.title)"'
 
     Write-Output "Merging PR $PrTitle"
-    $Command = "hub api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f `"commit_title=Merged Pull Request '$PrTitle'`""
+    $Command = {gh api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"}
     if ($DryRun -eq $False) {
-        Invoke-Expression $Command
+        & $Command
     }
     else {
         Write-Output "Dry run - not executing the following: $Command"

@@ -30,9 +30,9 @@ try {
     # When creating the release, auto-generate the release notes from the
     # PRs that are included in the changes.
     Write-Output "Creating a GitHub release"
-    $Command = "hub api /repos/$OrgName/$RepoName/releases -X POST -f `"tag_name=$Tag`" -F `"generate_release_notes=true`" -f `"name=Version $Tag`""
+    $Command = {gh api /repos/$OrgName/$RepoName/releases -X POST -f "tag_name=$Tag" -F "generate_release_notes=true" -f "name=Version $Tag"}
     if ($DryRun -eq $False) {
-        Invoke-Expression $Command
+        & $Command
     }
     else {
         Write-Output "Dry run - not executing the following: $Command"

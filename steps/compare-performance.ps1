@@ -225,7 +225,7 @@ if ($PlotReady -eq $False) {
 }
 
 # Get all the artifactrs
-$AllArtifacts = $(hub api /repos/$OrgName/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
+$AllArtifacts = $(gh api /repos/$OrgName/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
 
 foreach ($Options in $AllOptions) {
     if ($Options.RunPerformance -eq $True) {
