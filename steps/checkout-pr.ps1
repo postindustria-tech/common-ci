@@ -22,7 +22,7 @@ try {
     
     }
 
-    $PrTitle = gh pr view $PullRequestId --json number,baseRefName,headRefName,title --jq '"#\(.number) \(.headRefName)->\(.baseRefName) : \(.title)"'
+    $PrTitle = gh pr view $PullRequestId --json number,headRefName,baseRefName,title -t '#{{.number}} {{.headRefName}}->{{.baseRefName}} : {{.title}}'
 
     Write-Output "Checking out PR $PrTitle"
     gh pr checkout $PullRequestId
