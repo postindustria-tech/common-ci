@@ -23,7 +23,7 @@ try {
 
     if ($Prs.Count -eq 0) {
         Write-Output "Creating pull request"
-        $Command = {gh pr create --message $Message}
+        $Command = {gh pr create --title $Message --body ''}
         if ($DryRun -eq $False) {
             & $Command
         }
