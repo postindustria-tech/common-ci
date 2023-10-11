@@ -67,9 +67,9 @@ function ShouldRun {
                     $Allowed = $True
                 }
             }
-            if ($Allowed -eq $False) {
-                Write-Information "The creator is external, and has not been approved, so no automation"
-            }
+        }
+        if ($Allowed -eq $False) {
+            Write-Information "The creator is external, and has not been approved, so no automation"
         }
     }
     if ($Pr.requested_reviewers.Count -gt 0) {
