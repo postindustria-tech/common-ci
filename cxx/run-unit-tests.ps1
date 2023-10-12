@@ -6,8 +6,10 @@ param(
     [string]$Name,
     [string]$Configuration = "Release",
     [string]$Arch = "x64",
-    [string]$BuildMethod = "cmake"
+    [string]$BuildMethod = "cmake",
+    [string]$ExcludeRegex = ".*Performance|Integration|Example.*"
 )
+
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 if ($BuildMethod -eq "cmake") {
 
@@ -20,7 +22,7 @@ if ($BuildMethod -eq "cmake") {
 
         Write-Output "Testing $Name"
 
-        ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex ".*Performance|Integration|Example.*"
+        ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex $ExcludeRegex
     }
     finally {
 
