@@ -421,3 +421,36 @@ As performance tests in CI can be inconsistent, an absolute value is not tested.
 If the test passes, then the successful results are written to an artifact. Only successful results are used when getting past results. This prevents a performance degradation from changing the mean and deviation, which in turn could allow future degradations to pass this test.
 
 Note that if there are less than ten data points, it is not considered a failure, but a warning is logged.
+
+## Job Scheduling
+
+Github does not have a full-fledged job orchestrator, it only has some (limited) features that allow to trigger jobs after one another, f.e.:
+
+- [workflow_run](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) triggers with activity type completed. limited by the fact that you can not chain more than 3 workflows
+- [cross-repository](https://github.com/orgs/community/discussions/26323) triggers can be done via repository_dispatch
+
+We need to seek a tradeoff between satisfying the requirements and stretching the github features. We propose to not use cross-repository dispatch triggers for now, but rather rely on proper timing of actions and workflow_run triggers within the repository. Let's start with terminal repositories (that are submodules for other repos).
+
+### common-cxx
+* Monthly Copyright Update should run at 0 0 1 * * - this action usually takes less than a minute - this action does not always run, so we can't use a workflow_run completion trigger, we just schedule the Nightly PRs to Main run slightly after it
+* Nightly PRs to Main should run at 0 5 * * * - the action takes less than 30 minutes
+* Nightly Publish Main should run on workflow_run completion of Nightly PRs to Main workflow
+
+### device-detection-cxx
+* Nightly Submodule Update should run at 35 0 * * * - that is 30 minutes after midnight to pick up any changes from common-cxx
+* Nightly PRs to Main should run on workflow_run completion of Nightly Submodule Update workflow - can take up to 1.5 hours to complete
+* Nightly Documentation Update at 0 3 * * * as it is a completely independent action and it will be guaranteed to run after PRs to Main
+* Nightly Publish Main should run on workflow_run completion of Nightly PRs to Main workflow
+* Monthly Copyright Update should run at 0 0 1 * * - this action usually takes less than a minute
+
+Other repos should start submodule updates around 0 2 * * * - after the device-detection-cxx has likely finished running:
+
+### device-detection-dotnet
+* Nightly Data File Change should run at 0 0 * * *
+* Nightly Package Update should run at 0 0 * * *
+* Nightly Submodule Update should run at 0 2 * * * - to incorporate updates from device-detection-cxx
+* Monthly Copyright Update should run at 0 0 1 * *
+* Nightly PRs to Main should run on workflow_run complete after Submodule Update
+* Nightly Publish Main should run on wokflow_run complete after PRs to Main
+* Nightly Documentation Update should run at 30 3 * * * - as it is a completely independent job dealing with github pages, but should run presumably after PRs to Main is complete
+* Other repos should follow suite of device-detection-dotnet, mainly run Submodule Update at 2 o'clock, then triggered by its completion Nightly PRs to Main, then triggered by its completion Nightly Publish Main
