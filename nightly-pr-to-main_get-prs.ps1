@@ -14,6 +14,14 @@ param (
     [string]$VariableName
 )
 
+# If the list of pull requests is provided as a CI parameter - output it and exit early.
+# An environment variable is used instead of a parameter to avoid arbitrary code injection.
+if ($env:PULL_REQUEST_IDS) {
+    Write-Output "Pull request ids are: $env:PULL_REQUEST_IDS"
+    "pull_request_ids=[$env:PULL_REQUEST_IDS]" | Out-File -FilePath $GitHubOutput -Encoding utf8 -Append
+    return
+}
+
 . ./constants.ps1
 
 if ($GitHubUser -eq "") {
