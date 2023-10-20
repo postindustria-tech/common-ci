@@ -15,7 +15,10 @@ try {
         Write-Output "Testing $package"
         Push-Location $package
         try {
-            coverage run -m xmlrunner discover -s tests -p 'test*.py' -o $commonTestResults || $($testsFailed = $true)
+            Write-Output "Running tests in '$pwd'"
+            # coverage run -m xmlrunner discover -s tests -p 'test*.py' -o $commonTestResults || $($testsFailed = $true)
+            $coverageOutputFile = Join-Path -Path $commonTestResults -ChildPath "$package.xml"
+            python -m tox -e py -- --junit-xml=$coverageOutputFile || $($testsFailed = $true)
             Move-Item -Path .coverage -Destination $repoPath/.coverage.$package || $(throw "failed to move coverage report")
         } finally {
             Pop-Location
