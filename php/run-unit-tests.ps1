@@ -5,7 +5,7 @@ param (
 
 Push-Location $RepoName
 try {
-    phpunit --testsuite Unit --log-junit test-results/unit/$RepoName/tests.xml || $(throw "tests failed")
+    phpunit --fail-on-warning --testsuite Unit --log-junit test-results/unit/$RepoName/tests.xml || $(throw "tests failed")
 } finally {
     Pop-Location
 }
