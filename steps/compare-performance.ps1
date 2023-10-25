@@ -160,6 +160,7 @@ function Generate-Performance-Results {
 
     # Write out the summary for GitHub actions
     if ($env:CI) {
+        Write-Output "Writing summary..."
         Write-Output "## Performance Figures - $($Options.Name) - $Metric" >> $env:GITHUB_STEP_SUMMARY
         if ($DryRun -eq $False) {
             Write-Output "![Historic Performance Figures](https://raw.githubusercontent.com/$OrgName/$RepoName/gh-images/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png)" >> $env:GITHUB_STEP_SUMMARY
@@ -174,6 +175,8 @@ function Generate-Performance-Results {
             $Result = $Results[$i]
             Write-Output "| $($Artifact.created_at) | $Result |" >> $env:GITHUB_STEP_SUMMARY
         }
+    } else {
+        Write-Output "Not writing summary: `$env:CI is $($env:CI)"
     }
 
     # Check if the current result is more than 2 standard deviations out.
