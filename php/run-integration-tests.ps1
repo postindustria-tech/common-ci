@@ -7,9 +7,16 @@ param (
 # set by the caller, e.g.:
 #   $env:RESOURCEKEY = $Keys.TestResourceKey
 
+$options = @("--fail-on-warning")
+
+phpunit --atleast-version=10 | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    $options += "--display-warnings"
+}
+
 Push-Location $RepoName
 try {
-    phpunit --fail-on-warning --display-warnings --testsuite Integration --log-junit test-results/integration/$RepoName/tests.xml || $(throw "tests failed")
+    phpunit $options --testsuite Integration --log-junit test-results/integration/$RepoName/tests.xml || $(throw "tests failed")
 } finally {
     Pop-Location
 }
