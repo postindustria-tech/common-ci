@@ -71,6 +71,7 @@ try {
 
     # Import the pgp key 
     echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
+    gpg --list-keys
 
     Write-Output "Deploying '$Name' Locally"
     mvn deploy `
