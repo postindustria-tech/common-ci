@@ -25,6 +25,10 @@ on:
       cache-assets:
         default: false
         type: boolean
+      common-ci-ref:
+        required: false
+        type: string
+        default: ''
       prs: # Comma-separated list of pull request IDs to build
         required: false
         type: string
@@ -46,6 +50,7 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+          ref: ${{ inputs.common-ci-ref }}
 
       # Get all the pull requests into main, and output the ids
       - name: Get Pull Requests
@@ -82,6 +87,7 @@ jobs:
       email: ${{ inputs.email }}
       dryrun: ${{ inputs.dryrun }}
       cache-assets: ${{ inputs.cache-assets }}
+      common-ci-ref: ${{ inputs.common-ci-ref }}
     secrets: 
       token: ${{ secrets.token }}
       asset-keys: ${{ secrets.asset-keys }}
