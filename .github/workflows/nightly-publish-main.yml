@@ -28,6 +28,10 @@ on:
       cache-assets:
         default: false
         type: boolean
+      common-ci-ref:
+        required: false
+        type: string
+        default: ''
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
@@ -51,6 +55,7 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+          ref: ${{ inputs.common-ci-ref }}
 
       - name: Hash the Asset Cache Key
         id: hash-asset-cache-key
@@ -93,6 +98,7 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+          ref: ${{ inputs.common-ci-ref }}
 
       - name: Install Runtime
         if: matrix.options.Language != '' && matrix.options.LanguageVersion != ''
@@ -136,6 +142,7 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+          ref: ${{ inputs.common-ci-ref }}
 
       - name: Download Package Artifacts
         if: ${{ success() }}
@@ -184,6 +191,7 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+          ref: ${{ inputs.common-ci-ref }}
 
       - name: Download Package Artifact
         if: ${{ success() && matrix.options.packagerequirement }}
@@ -250,6 +258,7 @@ jobs:
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
+          ref: ${{ inputs.common-ci-ref }}
 
       - name: Download Package Artifact
         if: ${{ success() }}
