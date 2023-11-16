@@ -46,6 +46,7 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 try {
     $VersionPath = Get-ChildItem -Path $pwd -Filter "4.*"
+    Write-Output "Moving $($VersionPath.FullName)"
     Move-Item $VersionPath.FullName "$($VersionPath.FullName)-new"
 
     # Check out the gh-pages branch so we're ready to commit images.
@@ -62,6 +63,7 @@ try {
     }
 
     if ($(Test-Path -Path $VersionPath.FullName)) {
+        Write-Output "Removing existing docs in $($VersionPath.FullName)"
         Remove-Item -Recurse -Path $VersionPath.FullName
     }
     if ($(Test-Path -Path ".nojekyll") -eq $False) {
@@ -69,7 +71,7 @@ try {
         Write-Output "" > .nojekyll
         git add .nojekyll
     }
-
+    Write-Output "Moving $($VersionPath.FullName)-new back to original location"
     Move-Item "$($VersionPath.FullName)-new" $VersionPath.FullName
 }
 finally {
