@@ -36,9 +36,34 @@ on:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
         required: true
-      # Any secrets needed for retrieving files, signing packages or tests.
-      asset-keys:
-        required: true
+      AcceptCHBrowserKey:
+      AcceptCHHardwareKey:
+      AcceptCHNoneKey:
+      AcceptCHPlatformKey:
+      ApiKey:
+      CodeSigningCert:
+      CodeSigningCertAlias:
+      CodeSigningCertPassword:
+      CsvUrl:
+      DeviceDetection:
+      DeviceDetectionUrl:
+      JavaGpgKeyPassphrase:
+      JavaPGP:
+      MavenSettings:
+      NPMAuthToken:
+      NginxCert:
+      NginxKey:
+      PypiToken:
+      TestBrowserResourceKey:
+      TestHardwareResourceKey:
+      TestLicenseKey:
+      TestNoSetHeaderResourceKey:
+      TestPlatformResourceKey:
+      TestPypiToken:
+      TestResourceKey:
+      TestSuperResourceKey:
+      UsePublishTests:
+
 
 jobs:
   Configure:
@@ -62,7 +87,7 @@ jobs:
         if: inputs.cache-assets
         shell: pwsh
         env:
-          KEY: ${{ secrets.asset-keys }}
+          KEY: ${{ toJSON(secrets) }}
         run: |
           $stringAsStream = [System.IO.MemoryStream]::new()
           $writer = [System.IO.StreamWriter]::new($stringAsStream)
@@ -111,10 +136,12 @@ jobs:
         if: ${{ matrix.options.packagerequirement }}
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        env:
+          SECRETS: ${{ toJSON(secrets) }}
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable $env:SECRETS))
           . ${{ github.workspace }}/common/nightly-publish-main_prebuild.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
@@ -153,10 +180,12 @@ jobs:
       - name: Build
         shell: pwsh
         working-directory: ${{ github.workspace }}/common/
+        env:
+          SECRETS: ${{ toJSON(secrets) }}
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = @{}
-          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable $env:SECRETS))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
           . ${{ github.workspace }}/common/nightly-publish-main_build.ps1 `
           -RepoName ${{ inputs.repo-name }} `
@@ -218,10 +247,12 @@ jobs:
         shell: pwsh
         if: ${{ success() && matrix.options.packagerequirement }}
         working-directory: ${{ github.workspace }}/common/
+        env:
+          SECRETS: ${{ toJSON(secrets) }}
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
-          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable $env:SECRETS))
           . ${{ github.workspace }}/common/nightly-publish-main_test.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
@@ -271,10 +302,12 @@ jobs:
         shell: pwsh
         if: ${{ success() }}
         working-directory: ${{ github.workspace }}/common/
+        env:
+          SECRETS: ${{ toJSON(secrets) }}
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = @{}
-          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable '${{ secrets.asset-keys }}'))
+          $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable $env:SECRETS))
           $Options.Add("Version", "${{ needs.configure.outputs.version }}")
           . ${{ github.workspace }}/common/nightly-publish-main_package.ps1 `
           -RepoName ${{ inputs.repo-name }} `
