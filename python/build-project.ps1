@@ -21,11 +21,11 @@ foreach ($package in $Packages) {
         # the same name, so instead we'll lint the first subdir with the name
         # that starts with 'fiftyone*'
         if ($package -eq '.') {
-            $package = (get-item src/fiftyone_*)[0]
+            $package = (get-item src/fiftyone_*)[0].Name
         }
 
         Write-Output "Linting $package"
-        pylint --rcfile=.pylintrc src/$package || $(throw "pylint failed for $package")
+        pylint --rcfile=.pylintrc (Join-Path -Path (Get-Item src) -ChildPath $package) || $(throw "pylint failed for $package")
     } finally {
         Pop-Location
     }
