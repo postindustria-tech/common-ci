@@ -25,3 +25,8 @@ runs:
       with:
         php-version: ${{ inputs.version }}
         tools: phpunit
+    - name: Install Go
+      if: inputs.language == 'go'
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.version }}
