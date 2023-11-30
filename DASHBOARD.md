@@ -192,3 +192,13 @@
 [![Nightly Publish Main](https://github.com/51Degrees/location-python/actions/workflows/nightly-publish-main.yml/badge.svg)](https://github.com/51Degrees/location-python/actions/workflows/nightly-publish-main.yml)
 [![Nightly Documentation Update](https://github.com/51Degrees/location-python/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/location-python/actions/workflows/nightly-documentation-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/location-python/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/location-python/actions/workflows/monthly-copyright-update.yml)
+
+## Go
+
+### device-detection-go
+[![Nightly PRs to Main](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-prs-to-main.yml)
+[![Nightly Submodule Update](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-submodule-update.yml)
+
+### device-detection-examples-go
+[![Nightly PRs to Main](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-prs-to-main.yml)
+[![Nightly Submodule Update](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-submodule-update.yml)
