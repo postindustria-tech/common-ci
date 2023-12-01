@@ -21,16 +21,22 @@ function Get-Artifact-Result {
         [Parameter(Mandatory=$true)]
         [string]$Name
     )
-    Invoke-WebRequest -Uri $Artifact.archive_download_url -Headers @{"Authorization" = "Bearer $($env:GITHUB_TOKEN)"} -Outfile "$($Artifact.id).zip"
-    Expand-Archive -Path "$($Artifact.id).zip" -DestinationPath $Artifact.id -Force
-    $TargetFile = [IO.Path]::Combine($Artifact.id, "results_$Name.json")
-    if (Test-Path -Path $TargetFile) {
-        $Result = Get-Content $TargetFile | ConvertFrom-Json -AsHashtable
-        $Result.Artifact = $Artifact
-    }
-    else {
+    try {
+        Invoke-WebRequest -Uri $Artifact.archive_download_url -Headers @{"Authorization" = "Bearer $($env:GITHUB_TOKEN)"} -Outfile "$($Artifact.id).zip"
+        Expand-Archive -Path "$($Artifact.id).zip" -DestinationPath $Artifact.id -Force
+        $TargetFile = [IO.Path]::Combine($Artifact.id, "results_$Name.json")
+        if (Test-Path -Path $TargetFile) {
+            $Result = Get-Content $TargetFile | ConvertFrom-Json -AsHashtable
+            $Result.Artifact = $Artifact
+        }
+        else {
+            $Result = $Null
+        }
+    } catch {
+        Write-Warning "Can't get artifact[$($Artifact.id)] result: $($_.Exception.Message)"
         $Result = $Null
     }
+
     return $Result
 }
 
@@ -238,16 +244,21 @@ foreach ($Options in $AllOptions) {
                 Write-Warning "The file '$ResultsPath' did not exist"
                 exit 0
             }
+            # Get the result for the current artifact
             $CurrentResult = Get-Content $ResultsPath | ConvertFrom-Json -AsHashtable
             $CurrentResult.Artifact = @{}
             $CurrentResult.Artifact.created_at = Get-Date
         }
         else {
+            # Get the result for the current artifact
             $CurrentArtifact = $AllArtifacts | Where-Object { $_.workflow_run.id -eq $RunId -and $_.name -eq "performance_results_$PullRequestId" }
             $CurrentResult = Get-Artifact-Result -Artifact $CurrentArtifact -Name $Options.Name
         }
 
-        # Get the result for the current artifact
+        if ($CurrentResult -eq 0) {
+            Write-Error "Results for the workflow run '$RunId' were not found"
+            exit 1
+        }
 
         # Filter the artifacts so we only have ones that have passed the performance tests
         $Artifacts = $AllArtifacts | Where-Object { $_.name.StartsWith("performance_results_passed") }
@@ -255,8 +266,7 @@ foreach ($Options in $AllOptions) {
         # Sort by date
         $Artifacts = $Artifacts | Sort-Object -Property created_at
 
-
-        # Get the performance results from the artifacts
+        # Get the historic performance results from the artifacts
         $Results = @()
         foreach ($Artifact in $Artifacts) {
             $Result = Get-Artifact-Result -Artifact $Artifact -Name $Options.Name
@@ -265,11 +275,6 @@ foreach ($Options in $AllOptions) {
             }
         }
         $Results += $CurrentResult
-
-        if ($CurrentResult -eq 0) {
-            Write-Error "Results for the workflow run '$RunId' were not found"
-            exit 1
-        }
 
         # Generate the performance results for all metrics
         foreach ($Metric in $CurrentResult.HigherIsBetter.Keys) {
