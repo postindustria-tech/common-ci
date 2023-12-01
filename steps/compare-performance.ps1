@@ -32,7 +32,7 @@ function Get-Artifact-Result {
         else {
             $Result = $Null
         }
-    } catch [System.Net.WebException] {
+    } catch {
         Write-Warning "Can't get artifact[$($Artifact.id)] result: $($_.Exception.Message)"
         $Result = $Null
     }
