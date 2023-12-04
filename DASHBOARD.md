@@ -132,6 +132,7 @@
 [![Nightly PRs to Main](https://github.com/51Degrees/pipeline-php-core/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/pipeline-php-core/actions/workflows/nightly-prs-to-main.yml)
 [![Nightly Publish Main](https://github.com/51Degrees/pipeline-php-core/actions/workflows/nightly-publish-main.yml/badge.svg)](https://github.com/51Degrees/pipeline-php-core/actions/workflows/nightly-publish-main.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/pipeline-php-core/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/pipeline-php-core/actions/workflows/monthly-copyright-update.yml)
+[![Nightly Package Update](https://github.com/51Degrees/pipeline-php-core/actions/workflows/nightly-package-update.yml/badge.svg)](https://github.com/51Degrees/pipeline-php-core/actions/workflows/nightly-package-update.yml)
 
 ### pipeline-php-engines
 [![Nightly PRs to Main](https://github.com/51Degrees/pipeline-php-engines/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/pipeline-php-engines/actions/workflows/nightly-prs-to-main.yml)
@@ -197,8 +198,7 @@
 
 ### device-detection-go
 [![Nightly PRs to Main](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-prs-to-main.yml)
-[![Nightly Submodule Update](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-submodule-update.yml)
+[![Nightly Package Update](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-package-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-go/actions/workflows/nightly-package-update.yml)
 
 ### device-detection-examples-go
 [![Nightly PRs to Main](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-prs-to-main.yml)
-[![Nightly Submodule Update](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-examples-go/actions/workflows/nightly-submodule-update.yml)
