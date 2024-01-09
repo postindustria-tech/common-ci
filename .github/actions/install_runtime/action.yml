@@ -30,3 +30,8 @@ runs:
       uses: actions/setup-go@v4
       with:
         go-version: ${{ inputs.version }}
+    - name: Install Dotnet
+      if: inputs.language == 'dotnet'
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.version }}
