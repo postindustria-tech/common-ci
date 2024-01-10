@@ -55,7 +55,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Update Tag"
-if ($Options.SkipUpdateTag) {
+if ($global:SkipUpdateTag) { # Using a global here so that it can be set by publish-package.ps1
   Write-Output "Tag update skipped"
 } else {
   ./steps/update-tag.ps1 -RepoName $RepoName -OrgName $OrgName -Tag $Options.Version -DryRun $DryRun
