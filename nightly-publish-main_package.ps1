@@ -55,7 +55,11 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output "::group::Update Tag"
-./steps/update-tag.ps1 -RepoName $RepoName -OrgName $OrgName -Tag $Options.Version -DryRun $DryRun
+if ($Options.SkipUpdateTag) {
+  Write-Output "Tag update skipped"
+} else {
+  ./steps/update-tag.ps1 -RepoName $RepoName -OrgName $OrgName -Tag $Options.Version -DryRun $DryRun
+}
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
