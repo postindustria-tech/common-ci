@@ -221,7 +221,7 @@ if ($PlotReady -eq $False) {
     Push-Location $PlotPath
     try {
         dotnet new console
-        dotnet add package scottplot
+        dotnet add package scottplot -v 4.1.70
         dotnet build -o bin
     }
     finally {
