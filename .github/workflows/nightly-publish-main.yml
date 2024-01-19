@@ -63,7 +63,10 @@ on:
       TestResourceKey:
       TestSuperResourceKey:
       UsePublishTests:
-
+      DockerPassword:
+      DockerContainer:
+      DockerRegistry:
+      DockerUser:
 
 jobs:
   Configure:
