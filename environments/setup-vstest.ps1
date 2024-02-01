@@ -1,5 +1,7 @@
 # Run vswhere command and capture the output
-Invoke-WebRequest -Uri https://github.com/microsoft/vswhere/releases/download/3.1.1/vswhere.exe -OutFile vswhere.exe
+if (!(Test-Path vswhere.exe)) {
+    Invoke-WebRequest -Uri https://github.com/microsoft/vswhere/releases/download/3.1.1/vswhere.exe -OutFile vswhere.exe
+}
 $vsWhereOutput = & .\vswhere.exe -latest -property installationPath
 # Extract the installation path from the output
 $installationPath = $vsWhereOutput.Trim()
