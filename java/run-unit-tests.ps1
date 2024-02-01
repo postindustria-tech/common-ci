@@ -15,7 +15,12 @@ Push-Location $RepoPath
 try {
     
     Write-Output "Testing '$Name'"
-    mvn surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2" $ExtraArgs
+    if ($ExtraArgs) {
+        mvn surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2" $ExtraArgs
+    } else {
+        mvn surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2"
+    }
+    
 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
