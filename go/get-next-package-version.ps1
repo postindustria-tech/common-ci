@@ -5,7 +5,7 @@ param (
     [string]$VariableName
 )
 
-./steps/get-next-package-version.ps1 -RepoName $RepoName -VariableName $VariableName
+./steps/get-next-package-version.ps1 -RepoName $RepoName -VariableName $VariableName -GitVersionConfigPath $PSScriptRoot/gitversion.yml
 
 $assemblySemVer = (Get-Variable -Name $VariableName).Value.AssemblySemVer
 Set-Variable -Name $VariableName -Value $assemblySemVer -Scope Global
