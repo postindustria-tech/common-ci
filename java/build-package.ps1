@@ -66,6 +66,9 @@ try {
     Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
     $CertPath = [IO.Path]::Combine($RepoPath, $CodeSigningCertFile)
 
+    Write-Output "Code signing certificate expiration:"
+    (Get-PfxCertificate -FilePath $CodeSigningCertFile -NoPromptForPassword -Password (ConvertTo-SecureString -AsPlainText -Force $CodeSigningCertPassword)).NotAfter
+
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
