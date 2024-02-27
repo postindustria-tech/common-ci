@@ -28,6 +28,9 @@ try {
     $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
     Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
 
+    Write-Output "Code signing certificate expiration:"
+    (Get-PfxCertificate -FilePath $CodeSigningCertFile -NoPromptForPassword -Password (ConvertTo-SecureString -AsPlainText -Force $CodeSigningCertPassword)).NotAfter
+
     Write-Output "Building package for '$Name'"
    
     $Projects = Get-Content "$SolutionName" |
