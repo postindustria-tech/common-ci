@@ -12,6 +12,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$JavaPGP,
     [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultName,
+    [Parameter(Mandatory=$true)]
     [string]$CodeSigningKeyVaultUrl,
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningKeyVaultClientId,
@@ -74,6 +76,8 @@ try {
     Write-Output $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
     gpg --list-keys
 
+    $CodeSigningKeyVaultAccessToken = az account get-access-token --resource "https://vault.azure.net" --tenant $CodeSigningKeyVaultTenantId | jq -r .accessToken
+
     Write-Output "Deploying '$Name' Locally"
     mvn deploy `
         -s $SettingsPath `
@@ -87,11 +91,13 @@ try {
         "-Dskippackagesign=false" `
         "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
         "-DkeyvaultJcaJar=$JcaProviderJar" `
+        "-DkeyvaultVaultName=$CodeSigningKeyVaultName" `
         "-DkeyvaultUrl=$CodeSigningKeyVaultUrl" `
         "-DkeyvaultClientId=$CodeSigningKeyVaultClientId" `
         "-DkeyvaultTenant=$CodeSigningKeyVaultTenantId" `
         "-DkeyvaultClientSecret=$CodeSigningKeyVaultClientSecret" `
         "-DkeyvaultCertName=$CodeSigningKeyVaultCertificateName" `
+        "-DkeyvaultAccessToken=$CodeSigningKeyVaultAccessToken" `
         "-DskipRemoteStaging=true"
 
     Write-Output "Maven Local 51d Repo:"
