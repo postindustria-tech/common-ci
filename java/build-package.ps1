@@ -70,7 +70,7 @@ try {
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
     # Import the pgp key 
-    echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
+    Write-Output $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
     gpg --list-keys
 
     Write-Output "Deploying '$Name' Locally"
@@ -92,7 +92,7 @@ try {
         "-DskipRemoteStaging=true"
 
     Write-Output "Maven Local 51d Repo:"
-    ls $MavenLocal51DPath
+    Get-ChildItem $MavenLocal51DPath
     
     # Create the "package" folder if it doesn't exist
     New-Item -ItemType Directory -Path $PackagePath -Force
