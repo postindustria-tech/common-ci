@@ -32,14 +32,6 @@ try {
         sudo ln -sf $env:JAVA_HOME/bin/java /usr/bin/java
     }
 
-    try {
-        Push-Location -Path "$env:JAVA_HOME/jre/lib/ext"
-        curl -O "https://repo1.maven.org/maven2/com/azure/azure-security-keyvault-jca/2.8.1/azure-security-keyvault-jca-2.8.1.jar"
-    }
-    finally {
-        Pop-Location
-    }
-
     # Verify that the correct version of Java is being used
     java -version
 }

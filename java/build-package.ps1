@@ -49,6 +49,19 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
+    try {
+        $jcaDestinationDir = "$env:JAVA_HOME/jre/lib/ext"
+        Write-Output "Switching to $jcaDestinationDir..."
+        Push-Location -Path $jcaDestinationDir
+
+        $jcaDownloadLink = "https://repo1.maven.org/maven2/com/azure/azure-security-keyvault-jca/2.8.1/azure-security-keyvault-jca-2.8.1.jar"
+        Write-Output "Downloading $jcaDownloadLink..."
+        curl -O $jcaDownloadLink
+    }
+    finally {
+        Write-Output "Restoring location..."
+        Pop-Location
+    }
       
     Write-Output "Setting package version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
