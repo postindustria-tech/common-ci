@@ -10,13 +10,17 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$JavaGpgKeyPassphrase,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCert,
-    [Parameter(Mandatory=$true)]
     [string]$JavaPGP,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertAlias,
+    [string]$CodeSigningKeyVaultUrl,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertPassword,
+    [string]$CodeSigningKeyVaultClientId,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultTenantId,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultClientSecret,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultCertificateName,
     [Parameter(Mandatory=$true)]
     [string]$MavenSettings
 )
@@ -50,7 +54,6 @@ try {
     mvn versions:set -DnewVersion="$Version"
 
     # Set file names
-    $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
     $SettingsFile = "stagingsettings.xml"
 
@@ -60,11 +63,6 @@ try {
     Set-Content -Path $SettingsFile -Value $SettingsContent
     $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
 
-
-    Write-Output "Writing PFX File"
-    $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
-    Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
-    $CertPath = [IO.Path]::Combine($RepoPath, $CodeSigningCertFile)
 
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
@@ -85,10 +83,11 @@ try {
         "-DfailIfNoTests=false" `
         "-Dskippackagesign=false" `
         "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
-        "-Dkeystore=$CertPath" `
-        "-Dalias=$CodeSigningCertAlias" `
-        "-Dkeypass=$CodeSigningCertPassword" `
-        "-Dkeystorepass=$CodeSigningCertPassword" `
+        "-DkeyvaultUrl=$CodeSigningKeyVaultUrl" `
+        "-DkeyvaultClientId=$CodeSigningKeyVaultClientId" `
+        "-DkeyvaultTenant=$CodeSigningKeyVaultTenantId" `
+        "-DkeyvaultClientSecret=$CodeSigningKeyVaultClientSecret" `
+        "-DkeyvaultCertName=$CodeSigningKeyVaultCertificateName" `
         "-DskipRemoteStaging=true"
 
     Write-Output "Maven Local 51d Repo:"
