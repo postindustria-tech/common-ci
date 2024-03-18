@@ -41,6 +41,7 @@ on:
       AcceptCHNoneKey:
       AcceptCHPlatformKey:
       ApiKey:
+      CodeSigningKeyVaultName:
       CodeSigningKeyVaultUrl:
       CodeSigningKeyVaultClientId:
       CodeSigningKeyVaultTenantId:
