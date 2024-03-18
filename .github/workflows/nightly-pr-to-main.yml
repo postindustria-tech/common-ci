@@ -40,9 +40,6 @@ on:
       AcceptCHNoneKey:
       AcceptCHPlatformKey:
       ApiKey:
-      CodeSigningCert:
-      CodeSigningCertAlias:
-      CodeSigningCertPassword:
       CsvUrl:
       DeviceDetection:
       DeviceDetectionUrl:
