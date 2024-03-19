@@ -57,7 +57,7 @@ try {
     # Set file names
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
     $SettingsFile = "stagingsettings.xml"
-    $JcaProviderJar = [IO.Path]::Combine($RepoPath, "azure-security-keyvault-jca.jar")
+    $JcaProviderJar = [IO.Path]::Combine($RepoPath, "jsign.jar")
 
     # Write the content to the files.
     Write-Output "Writing Settings File"
@@ -65,7 +65,7 @@ try {
     Set-Content -Path $SettingsFile -Value $SettingsContent
     $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
 
-    $jcaDownloadLink = "https://repo1.maven.org/maven2/com/azure/azure-security-keyvault-jca/2.8.1/azure-security-keyvault-jca-2.8.1.jar"
+    $jcaDownloadLink = "https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar"
     Write-Output "Downloading $jcaDownloadLink"
     curl -o $JcaProviderJar $jcaDownloadLink
 
