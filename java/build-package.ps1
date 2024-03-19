@@ -67,7 +67,7 @@ try {
 
     $jcaDownloadLink = "https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar"
     Write-Output "Downloading $jcaDownloadLink"
-    curl -o $JcaProviderJar $jcaDownloadLink
+    Invoke-WebRequest $jcaDownloadLink -OutFile $JcaProviderJar
 
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
