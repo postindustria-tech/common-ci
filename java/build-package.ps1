@@ -77,7 +77,12 @@ try {
     gpg --list-keys
 
     try {
-        az login --service-principal --username $CodeSigningKeyVaultClientId --password $CodeSigningKeyVaultClientSecret --tenant $CodeSigningKeyVaultTenantId
+        az login `
+            --service-principal `
+            --username $CodeSigningKeyVaultClientId `
+            --password $CodeSigningKeyVaultClientSecret `
+            --tenant $CodeSigningKeyVaultTenantId `
+            --allow-no-subscriptions
 
         $CodeSigningKeyVaultAccessToken = az account get-access-token --resource "https://vault.azure.net" --tenant $CodeSigningKeyVaultTenantId | jq -r .accessToken
 
