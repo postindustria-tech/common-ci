@@ -76,29 +76,37 @@ try {
     Write-Output $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
     gpg --list-keys
 
-    $CodeSigningKeyVaultAccessToken = az account get-access-token --resource "https://vault.azure.net" --tenant $CodeSigningKeyVaultTenantId | jq -r .accessToken
+    try {
+        az login --service-principal --username $CodeSigningKeyVaultClientId --password $CodeSigningKeyVaultClientSecret --tenant $CodeSigningKeyVaultTenantId
 
-    Write-Output "Deploying '$Name' Locally"
-    mvn deploy `
-        -s $SettingsPath `
-        $ExtraArgs `
-        -f pom.xml `
-        -DXmx2048m `
-        -DskipTests `
-        --no-transfer-progress `
-        "-Dhttps.protocols=TLSv1.2" `
-        "-DfailIfNoTests=false" `
-        "-Dskippackagesign=false" `
-        "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
-        "-DkeyvaultJcaJar=$JcaProviderJar" `
-        "-DkeyvaultVaultName=$CodeSigningKeyVaultName" `
-        "-DkeyvaultUrl=$CodeSigningKeyVaultUrl" `
-        "-DkeyvaultClientId=$CodeSigningKeyVaultClientId" `
-        "-DkeyvaultTenant=$CodeSigningKeyVaultTenantId" `
-        "-DkeyvaultClientSecret=$CodeSigningKeyVaultClientSecret" `
-        "-DkeyvaultCertName=$CodeSigningKeyVaultCertificateName" `
-        "-DkeyvaultAccessToken=$CodeSigningKeyVaultAccessToken" `
-        "-DskipRemoteStaging=true"
+        $CodeSigningKeyVaultAccessToken = az account get-access-token --resource "https://vault.azure.net" --tenant $CodeSigningKeyVaultTenantId | jq -r .accessToken
+
+        Write-Output "Deploying '$Name' Locally"
+        mvn deploy `
+            -s $SettingsPath `
+            $ExtraArgs `
+            -f pom.xml `
+            -DXmx2048m `
+            -DskipTests `
+            --no-transfer-progress `
+            "-Dhttps.protocols=TLSv1.2" `
+            "-DfailIfNoTests=false" `
+            "-Dskippackagesign=false" `
+            "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
+            "-DkeyvaultJcaJar=$JcaProviderJar" `
+            "-DkeyvaultVaultName=$CodeSigningKeyVaultName" `
+            "-DkeyvaultUrl=$CodeSigningKeyVaultUrl" `
+            "-DkeyvaultClientId=$CodeSigningKeyVaultClientId" `
+            "-DkeyvaultTenant=$CodeSigningKeyVaultTenantId" `
+            "-DkeyvaultClientSecret=$CodeSigningKeyVaultClientSecret" `
+            "-DkeyvaultCertName=$CodeSigningKeyVaultCertificateName" `
+            "-DkeyvaultAccessToken=$CodeSigningKeyVaultAccessToken" `
+            "-DskipRemoteStaging=true"
+
+    }
+    finally {
+        az logout
+    }
 
     Write-Output "Maven Local 51d Repo:"
     Get-ChildItem $MavenLocal51DPath
