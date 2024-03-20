@@ -76,9 +76,6 @@ try {
     Write-Output "Downloading $jcaDownloadLink"
     Invoke-WebRequest $jcaDownloadLink -OutFile $JcaProviderJar
 
-    Write-Output "Code signing certificate expiration:"
-    (Get-PfxCertificate -FilePath $CodeSigningCertFile -NoPromptForPassword -Password (ConvertTo-SecureString -AsPlainText -Force $CodeSigningCertPassword)).NotAfter
-
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
