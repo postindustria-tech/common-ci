@@ -47,6 +47,7 @@ on:
       CodeSigningKeyVaultTenantId:
       CodeSigningKeyVaultClientSecret:
       CodeSigningKeyVaultCertificateName:
+      CodeSigningKeyVaultCertificateData:
       CsvUrl:
       DeviceDetection:
       DeviceDetectionUrl:
