@@ -60,7 +60,7 @@ try {
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
     $SettingsFile = "stagingsettings.xml"
     $JcaProviderJar = [IO.Path]::Combine($RepoPath, "jsign.jar")
-    $CodeSigningKeyVaultCertificateChainFile = [IO.Path]::Combine($RepoPath, "certchain.cer")
+    $CodeSigningKeyVaultCertificateChainFile = [IO.Path]::Combine($RepoPath, "certchain.pem")
 
     # Write the content to the files.
     Write-Output "Writing Settings File"
@@ -70,8 +70,7 @@ try {
 
     # Write the content to the files.
     Write-Output "Writing Certificate Chain File"
-    $CertChainContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($CodeSigningKeyVaultCertificateData))
-    Set-Content -Path $CodeSigningKeyVaultCertificateChainFile -Value $CertChainContent
+    Set-Content -Path $CodeSigningKeyVaultCertificateChainFile -Value $CodeSigningKeyVaultCertificateData
 
     $jcaDownloadLink = "https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar"
     Write-Output "Downloading $jcaDownloadLink"
