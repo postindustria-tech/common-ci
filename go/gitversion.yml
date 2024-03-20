@@ -1,1 +1,1 @@
-assembly-versioning-format: '{Major}.{Minor}.{Patch}'
+assembly-versioning-format: 'v{Major}.{Minor}.{Patch}'

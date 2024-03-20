@@ -47,7 +47,7 @@ try {
 
     Write-Output "Installing NuGetKeyVaultSignTool"
     dotnet tool install -g NuGetKeyVaultSignTool || $(throw "NuGetKeyVaultSignTool installation failed")
-    
+
     Write-Output "Signing packages"
     NuGetKeyVaultSignTool sign -f "$PackagesFolder\*.nupkg" `
         --file-digest sha256 `

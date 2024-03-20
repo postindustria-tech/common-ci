@@ -20,7 +20,6 @@ param(
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 $PackagesFolder = [IO.Path]::Combine($pwd, "package")
-$CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
@@ -29,11 +28,10 @@ try {
     Write-Output "Building package for '$Name'"
    
     nuget pack $NuspecPath -NonInteractive -OutputDirectory "$PackagesFolder" -Properties config=$Configuration -version $Version
-    #nuget sign -Overwrite "$PackagesFolder\*.nupkg" -CertificatePath $CertPath -CertificatePassword $CodeSigningCertPassword -Timestamper http://timestamp.digicert.com
 
     Write-Output "Installing NuGetKeyVaultSignTool"
     dotnet tool install -g NuGetKeyVaultSignTool || $(throw "NuGetKeyVaultSignTool installation failed")
-    
+
     Write-Output "Signing packages"
     NuGetKeyVaultSignTool sign -f "$PackagesFolder\*.nupkg" `
         --file-digest sha256 `
