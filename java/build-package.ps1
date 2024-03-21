@@ -10,13 +10,21 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$JavaGpgKeyPassphrase,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCert,
-    [Parameter(Mandatory=$true)]
     [string]$JavaPGP,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertAlias,
+    [string]$CodeSigningKeyVaultName,
     [Parameter(Mandatory=$true)]
-    [string]$CodeSigningCertPassword,
+    [string]$CodeSigningKeyVaultUrl,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultClientId,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultTenantId,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultClientSecret,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultCertificateName,
+    [Parameter(Mandatory=$true)]
+    [string]$CodeSigningKeyVaultCertificateData,
     [Parameter(Mandatory=$true)]
     [string]$MavenSettings
 )
@@ -45,14 +53,14 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-      
     Write-Output "Setting package version to '$Version'"
     mvn versions:set -DnewVersion="$Version"
 
     # Set file names
-    $CodeSigningCertFile = "51Degrees Private Code Signing Certificate.pfx"
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
     $SettingsFile = "stagingsettings.xml"
+    $JcaProviderJar = [IO.Path]::Combine($RepoPath, "jsign.jar")
+    $CodeSigningKeyVaultCertificateChainFile = [IO.Path]::Combine($RepoPath, "certchain.pem")
 
     # Write the content to the files.
     Write-Output "Writing Settings File"
@@ -60,42 +68,61 @@ try {
     Set-Content -Path $SettingsFile -Value $SettingsContent
     $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
 
+    # Write the content to the files.
+    Write-Output "Writing Certificate Chain File"
+    Set-Content -Path $CodeSigningKeyVaultCertificateChainFile -Value $CodeSigningKeyVaultCertificateData
 
-    Write-Output "Writing PFX File"
-    $CodeCertContent = [System.Convert]::FromBase64String($CodeSigningCert)
-    Set-Content $CodeSigningCertFile -Value $CodeCertContent -AsByteStream
-    $CertPath = [IO.Path]::Combine($RepoPath, $CodeSigningCertFile)
-
-    Write-Output "Code signing certificate expiration:"
-    (Get-PfxCertificate -FilePath $CodeSigningCertFile -NoPromptForPassword -Password (ConvertTo-SecureString -AsPlainText -Force $CodeSigningCertPassword)).NotAfter
+    $jcaDownloadLink = "https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar"
+    Write-Output "Downloading $jcaDownloadLink"
+    Invoke-WebRequest $jcaDownloadLink -OutFile $JcaProviderJar
 
     Write-Output "Writing PGP File"
     Set-Content -Path $JavaPGPFile -Value $JavaPGP
 
     # Import the pgp key 
-    echo $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
+    Write-Output $JavaGpgKeyPassphrase | gpg --import --batch --yes --passphrase-fd 0 $JavaPGPFile
     gpg --list-keys
 
-    Write-Output "Deploying '$Name' Locally"
-    mvn deploy `
-        -s $SettingsPath `
-        $ExtraArgs `
-        -f pom.xml `
-        -DXmx2048m `
-        -DskipTests `
-        --no-transfer-progress `
-        "-Dhttps.protocols=TLSv1.2" `
-        "-DfailIfNoTests=false" `
-        "-Dskippackagesign=false" `
-        "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
-        "-Dkeystore=$CertPath" `
-        "-Dalias=$CodeSigningCertAlias" `
-        "-Dkeypass=$CodeSigningCertPassword" `
-        "-Dkeystorepass=$CodeSigningCertPassword" `
-        "-DskipRemoteStaging=true"
+    try {
+        az login `
+            --service-principal `
+            --username $CodeSigningKeyVaultClientId `
+            --password $CodeSigningKeyVaultClientSecret `
+            --tenant $CodeSigningKeyVaultTenantId `
+            --allow-no-subscriptions
+
+        $CodeSigningKeyVaultAccessToken = az account get-access-token --resource "https://vault.azure.net" --tenant $CodeSigningKeyVaultTenantId | jq -r .accessToken
+
+        Write-Output "Deploying '$Name' Locally"
+        mvn deploy `
+            -s $SettingsPath `
+            $ExtraArgs `
+            -f pom.xml `
+            -DXmx2048m `
+            -DskipTests `
+            --no-transfer-progress `
+            "-Dhttps.protocols=TLSv1.2" `
+            "-DfailIfNoTests=false" `
+            "-Dskippackagesign=false" `
+            "-Dgpg.passphrase=$JavaGpgKeyPassphrase" `
+            "-DkeyvaultJcaJar=$JcaProviderJar" `
+            "-DkeyvaultVaultName=$CodeSigningKeyVaultName" `
+            "-DkeyvaultUrl=$CodeSigningKeyVaultUrl" `
+            "-DkeyvaultClientId=$CodeSigningKeyVaultClientId" `
+            "-DkeyvaultTenant=$CodeSigningKeyVaultTenantId" `
+            "-DkeyvaultClientSecret=$CodeSigningKeyVaultClientSecret" `
+            "-DkeyvaultCertName=$CodeSigningKeyVaultCertificateName" `
+            "-DkeyvaultCertChain=$CodeSigningKeyVaultCertificateChainFile" `
+            "-DkeyvaultAccessToken=$CodeSigningKeyVaultAccessToken" `
+            "-DskipRemoteStaging=true"
+
+    }
+    finally {
+        az logout
+    }
 
     Write-Output "Maven Local 51d Repo:"
-    ls $MavenLocal51DPath
+    Get-ChildItem $MavenLocal51DPath
     
     # Create the "package" folder if it doesn't exist
     New-Item -ItemType Directory -Path $PackagePath -Force

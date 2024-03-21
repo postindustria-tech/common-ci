@@ -41,14 +41,13 @@ on:
       AcceptCHNoneKey:
       AcceptCHPlatformKey:
       ApiKey:
-      CodeSigningCert:         # TODO: remove after java stops using these
-      CodeSigningCertAlias:    # TODO: remove after java stops using these
-      CodeSigningCertPassword: # TODO: remove after java stops using these
+      CodeSigningKeyVaultName:
       CodeSigningKeyVaultUrl:
       CodeSigningKeyVaultClientId:
       CodeSigningKeyVaultTenantId:
       CodeSigningKeyVaultClientSecret:
       CodeSigningKeyVaultCertificateName:
+      CodeSigningKeyVaultCertificateData:
       CsvUrl:
       DeviceDetection:
       DeviceDetectionUrl:
