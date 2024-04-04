@@ -6,6 +6,7 @@ param (
     [string]$OrgName,
     [Parameter(Mandatory=$true)]
     [string]$GitHubToken,
+    [string]$Branch = "",
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [Parameter(Mandatory=$true)]
@@ -31,7 +32,7 @@ Write-Output "::group::Configure Git"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Clone $RepoName"
-./steps/clone-repo.ps1 -RepoName $RepoName -OrgName $OrgName
+./steps/clone-repo.ps1 -RepoName $RepoName -OrgName $OrgName -Branch $Branch
 Write-Output "::endgroup::"
 
 if ($LASTEXITCODE -ne 0) {
@@ -59,6 +60,7 @@ if ($global:SkipUpdateTag) { # Using a global here so that it can be set by publ
   Write-Output "Tag update skipped"
 } else {
   ./steps/update-tag.ps1 -RepoName $RepoName -OrgName $OrgName -Tag $Options.Version -DryRun $DryRun
+  ./steps/upload-release-assets.ps1 -RepoName $RepoName -OrgName $OrgName -Tag $Options.Version -DryRun $DryRun
 }
 Write-Output "::endgroup::"
 

@@ -102,7 +102,7 @@ jobs:
           $writer.Flush()
           $stringAsStream.Position = 0
           "hash=$(Get-Date -Format FileDate)-$((Get-FileHash -InputStream $stringAsStream).Hash)" | Out-File $env:GITHUB_OUTPUT -Append
-        
+
       - name: Configure
         id: configure
         shell: pwsh
@@ -111,6 +111,7 @@ jobs:
           . ${{ github.workspace }}/common/nightly-publish-main_configure.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch "${{ github.event_name == 'workflow_dispatch' && github.ref_name || '' }}" `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -GitHubUser ${{ inputs.user }} `
@@ -152,6 +153,7 @@ jobs:
           . ${{ github.workspace }}/common/nightly-publish-main_prebuild.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch "${{ github.event_name == 'workflow_dispatch' && github.ref_name || '' }}" `
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
@@ -197,6 +199,7 @@ jobs:
           . ${{ github.workspace }}/common/nightly-publish-main_build.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch "${{ github.event_name == 'workflow_dispatch' && github.ref_name || '' }}" `
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
@@ -263,6 +266,7 @@ jobs:
           . ${{ github.workspace }}/common/nightly-publish-main_test.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch "${{ github.event_name == 'workflow_dispatch' && github.ref_name || '' }}" `
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
@@ -319,6 +323,7 @@ jobs:
           . ${{ github.workspace }}/common/nightly-publish-main_package.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch "${{ github.event_name == 'workflow_dispatch' && github.ref_name || '' }}" `
           -GitHubToken ${{ secrets.token }} `
           -Options $Options `
           -GitHubUser ${{ inputs.user }} `
