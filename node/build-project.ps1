@@ -17,7 +17,7 @@ try {
         npm install
 
         Write-Output "Linting $package"
-        eslint . --ext .js
+        npm run lint
 
         if($NeedExtensions -Contains $package){
             & "$PSScriptRoot/build-extension.ps1" -PackageName $package
