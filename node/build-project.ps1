@@ -9,8 +9,6 @@ param (
 Push-Location $RepoName
 
 try {
-    npm install -g eslint
-
     foreach ($package in $Packages) {
         $path = Join-Path . $package
         Push-Location $path
