@@ -17,6 +17,11 @@ try {
 
     $files = Get-ChildItem "."
 
+    if ($files.count -eq 0 -or ($files.Count -eq 1 -and $files[0].Name -eq "dummy.txt")) {
+        Write-Output "No files to upload."
+        return
+    }
+
     foreach ($file in $files) {
 
         if ($file.Attributes.Equals([System.IO.FileAttributes]::Directory)) {
