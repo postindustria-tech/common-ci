@@ -5,10 +5,11 @@ param (
 
 Push-Location $RepoName
 
-Write-Output "Setuping environment insede $RepoName"
+Write-Output "Setting up environment insіde $RepoName - [START]"
 
 npm install
-npm install jest --global
+
+Write-Output "Setting up environment insіde $RepoName - [END]"
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE

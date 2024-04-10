@@ -12,12 +12,11 @@ try {
     foreach ($package in $Packages) {
         $path = Join-Path . $package
         Push-Location $path
-        Write-Output "Installing dependencies for $package"
 
+        Write-Output "Installing dependencies for $package - [START]"
         npm install
+        Write-Output "Installing dependencies for $package - [END]"
 
-        Write-Output "Linting $package"
-        npm run lint
 
         if($NeedExtensions -Contains $package){
             & "$PSScriptRoot/build-extension.ps1" -PackageName $package
@@ -25,6 +24,9 @@ try {
 
         Pop-Location
     }
+    Write-Output "Linting JS files - $RepoName - [START]"
+    npm run lint
+    Write-Output "Linting JS files - $RepoName - [END]"
 } finally {
     Pop-Location
 }
