@@ -5,11 +5,11 @@ param (
 
 Push-Location $RepoName
 
-Write-Output "Setuping environment insіde $RepoName - [START]"
+Write-Output "Setting up environment insіde $RepoName - [START]"
 
 npm install
 
-Write-Output "Setuping environment insіde $RepoName - [END]"
+Write-Output "Setting up environment insіde $RepoName - [END]"
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
