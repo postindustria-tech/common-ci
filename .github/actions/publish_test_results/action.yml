@@ -23,11 +23,11 @@ runs:
   using: "composite"
   steps:
     # publish-unit-test-result-action doesn't support Python 3.11 on Windows,
-    # so we install the recommended version of Python before using it
+    # so we install an older version of Python before using it
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: "3.8"
+        python-version: "3.10"
 
     - name: Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
