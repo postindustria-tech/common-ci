@@ -13,76 +13,60 @@ $env:GITHUB_TOKEN="$GitHubToken"
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
-$OrgUsers = gh api /orgs/$OrgName/members | ConvertFrom-JSON
+$Collaborators = gh api /repos/$OrgName/$RepoName/collaborators | ConvertFrom-Json
 
-function IsOrgUser {
+function Test-WriteAccess {
     param (
-        [string]$UserId
+        [Parameter(Mandatory, Position=0)]
+        [int]$UserId
     )
-    foreach ($OrgUser in $OrgUsers) {
-        if ($OrgUser.id -eq $UserId) {
-            return $True
+    $permissions = ($Collaborators | Where-Object id -EQ $UserId).permissions
+    return $permissions.admin -or $permissions.maintain -or $permissions.push
+}
+
+function Test-Approval {
+    param (
+        [Parameter(Position=0)]
+        [Object[]]$Reviews,
+        [Object[]]$RequestedReviewers
+    )
+
+    # First, check if all required reviewers approved the PR; fail early if not
+    foreach ($reviewer in $RequestedReviewers) {
+        if ($Reviews | Where-Object user.id -EQ $reviewer.id | .state -ne 'APPROVED') {
+            Write-Information "The pull request is not approved by the requested reviewer: $($reviewer.login)"
+            return $False
         }
     }
+
+    # Check if there's at least one approver with write access to the repo
+    $approvals = ($Reviews | Where-Object { $_.state -eq 'APPROVED' -and (Test-WriteAccess $_.user.id) }).user.login
+    if ($approvals) {
+        Write-Information "The creator doesn't have write access, but the pull request has been approved by: $approvals"
+        return $True
+    }
+
+    Write-Information "The creator doesn't have write access, and the pull request is not approved by anyone with write access to the repository"
     return $False
 }
 
-function HasReviewed {
+function Test-Pr {
     param (
-        [string]$UserId,
-        $Reviews
-    )
-    foreach ($Review in $Reviews) {
-        if ($Review.user.id -eq $UserId -and
-            $Review.state -eq 'APPROVED') {
-                return $True
-        }
-    }
-    return $False
-}
-
-function ShouldRun {
-    param (
+        [Parameter(Mandatory, Position=0)]
         [string]$RepoName,
+        [Parameter(Mandatory, Position=1)]
         [string]$Id
     )
-    $Allowed = $False
-    $Reviews = gh api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-JSON
+    $InformationPreference = 'Continue'
+
     $Pr = gh api /repos/$OrgName/$RepoName/pulls/$Id | ConvertFrom-Json
-    if ($Pr.author_association -eq 'OWNER' -or
-        $Pr.author_association -eq 'COLLABORATOR' -or
-        $Pr.author_association -eq 'MEMBER' -or
-        $Pr.user.login -eq 'Automation51D') {
-        # The author is one of the above, so return true
-        Write-Information "The creator is '$($Pr.author_association)', so allow automation"
-        $Allowed = $True
+    $Reviews = gh api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-JSON
+    if (Test-WriteAccess $Pr.user.id) {
+        Write-Information "The creator has write access"
+        return $True
+    } else {
+        return Test-Approval $Reviews -RequestedReviewers $Pr.requested_reviewers
     }
-    else {
-        # The author is not one of the above, so check that
-        # the PR has been approved
-        Write-Information "The creator is '$($Pr.author_association)', so need to check for approval"
-        foreach ($Review in $Reviews) {
-            if ($Review.state -eq 'APPROVED') {
-                if (IsOrgUser -UserId $Review.user.id) {
-                    Write-Information "The creator is external, but has been approved by '$($Review.user.id)', so allow automation"
-                    $Allowed = $True
-                }
-            }
-        }
-        if ($Allowed -eq $False) {
-            Write-Information "The creator is external, and has not been approved, so no automation"
-        }
-    }
-    if ($Pr.requested_reviewers.Count -gt 0) {
-        foreach ($Reviewer in $Pr.requested_reviewers) {
-            $User = gh api /users/$($Reviewer.login) | ConvertFrom-Json
-            if ($(HasReviewed -UserId $User.id -Reviews $Reviews) -eq $False) {
-                Write-Information "The user '$($User.login)' has not approved, so do not run automation"
-                $Allowed = $False
-            }
-        }
-    }
-    return $Allowed
 }
 
 Write-Output "Entering '$RepoPath'"
@@ -97,15 +81,9 @@ try {
         foreach ($Id in $Ids) {
             # Only select PRs which are eligeble for automation.
             Write-Output "Checking PR #$Id"
-            # Set the info preference so that we can see logging from within
-            # the function.
-            $OldPreference = $InformationPreference
-            $InformationPreference = 'Continue'
-            if (ShouldRun -RepoName $RepoName -Id $Id)
-            {
+            if (Test-Pr $RepoName $Id) {
                 $ValidIds += $Id
             }
-            $InformationPreference = $OldPreference
         }
 
         if ($ValidIds.Count -gt 0) {
