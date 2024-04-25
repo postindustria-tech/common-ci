@@ -33,7 +33,7 @@ function Test-Approval {
 
     # First, check if all required reviewers approved the PR; fail early if not
     foreach ($reviewer in $RequestedReviewers) {
-        if ($Reviews | Where-Object user.id -EQ $reviewer.id | .state -ne 'APPROVED') {
+        if ($Reviews | Where-Object { $_.user.id -eq $reviewer.id -and $_.state -ne 'APPROVED' }) {
             Write-Information "The pull request is not approved by the requested reviewer: $($reviewer.login)"
             return $False
         }
