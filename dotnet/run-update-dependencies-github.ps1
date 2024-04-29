@@ -4,6 +4,7 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$OrgName,
     [string]$ProjectDir = ".",
+    [string]$Filter = "*.csproj",
     [string]$Name
 )
 
@@ -24,6 +25,6 @@ $FetchVersions = {
     }
 }
 
-./dotnet/run-update-dependencies.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Name $Name -FetchVersions $FetchVersions
+./dotnet/run-update-dependencies.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Name $Name -Filter $Filter -FetchVersions $FetchVersions
 
 exit $LASTEXITCODE
