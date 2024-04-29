@@ -3,6 +3,7 @@ param(
     [string]$RepoName,
     [string]$ProjectDir = ".",
     [string]$Name,
+    [string]$Filter = "*.csproj",
     [scriptblock]$FetchVersions = { param($PackageName) Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json -ErrorAction SilentlyContinue }
 )
 
@@ -15,7 +16,7 @@ try {
     
     dotnet restore $ProjectDir
 
-    foreach ($Project in $(Get-ChildItem -Path $pwd -Filter *.csproj -Recurse -ErrorAction SilentlyContinue -Force)) {
+    foreach ($Project in $(Get-ChildItem -Path $pwd -Filter $Filter -Recurse -ErrorAction SilentlyContinue -Force)) {
         foreach ($Package in $(dotnet list $Project.FullName package | Select-String -Pattern "^\s*>")) {
             # Ignore version ranges like [1.0,1.0)
             if ($Package.Line.Contains('[') -eq $false -and
