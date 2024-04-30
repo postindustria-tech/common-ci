@@ -42,7 +42,7 @@ try {
             }
     }
     foreach($Project in $Projects){
-        dotnet pack $Project.File -o "$PackagesFolder" -c $Configuration /p:PackageVersion=$Version /p:BuiltOnCI=true /p:ContinuousIntegrationBuild=true
+        dotnet pack $Project.File -o "$PackagesFolder" -c $Configuration /p:PackageVersion=$Version /p:Version=$Version /p:BuiltOnCI=true /p:ContinuousIntegrationBuild=true
     }
 
     Write-Output "Installing NuGetKeyVaultSignTool"
