@@ -36,8 +36,8 @@ try {
 
                     Write-Output "Updating '$PackageName' from '$MajorVersion.$MinorVersion.$PatchVersion' to $($HighestPatch.Version)"
 
+                    dotnet remove $Project.FullName package $PackageName
                     dotnet add $Project.FullName package $PackageName -v $HighestPatch.Version
-                    
                 }
             }
             else {
