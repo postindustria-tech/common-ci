@@ -51,30 +51,12 @@ function Generate-Performance-Results {
         $Options
     )
 
-    # Calculate the mean and standard deviation
+    # Calculate the mean
     $Sum = 0
     $Results | ForEach-Object { $Sum += $_}
-    if ($Results.Length -gt 0) {
-        $Mean = $Sum / $Results.Length
-        $SumOfSquares = 0
-        foreach ($Result in $Results) {
-            $Diff = $Result - $Mean
-            if ($Diff -lt 0) {
-                $Diff = 0 - $Diff
-            }
-            $SumOfSquares += $($Diff * $Diff)
-        }
-        
-        $Variance = $SumOfSquares / $Results.Length
-        $Deviation = [Math]::Sqrt($Variance)
-    }
-    else {
-        $Mean = 0
-        $Variance = 0
-        $Deviation = 0
-    }
+    $Mean = ($Results.Length -gt 0) ? $Sum / $Results.Length : 0
 
-    Write-Output "Mean is '$Mean' with a standard deviation of '$Deviation'"
+    Write-Output "Mean is '$Mean'"
     Write-Output "Current result is '$CurrentResult'"
 
     Push-Location $RepoName
@@ -122,8 +104,8 @@ function Generate-Performance-Results {
         $Plot.AddPoint($CurrentArtifact.created_at.ToOADate(), $CurrentResult, $Null, 15, [ScottPlot.MarkerShape]::openCircle, "current")
         # Add the historic figures
         $Plot.AddScatter($Xs, $Ys, $Null, 1, 5, [ScottPlot.MarkerShape]::filledCircle, [ScottPlot.LineStyle]::Solid, "historic")
-        # Add the standard deviation
-        $Plot.AddVerticalSpan($($Mean - $Deviation), $($Mean + $Deviation))
+        # Add the acceptable variation
+        $Plot.AddVerticalSpan($($Mean - $Mean*0.1), $($Mean + $Mean*0.1))
 
         # Output the graph
         $Plot.SaveFig("$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png")
@@ -182,24 +164,24 @@ function Generate-Performance-Results {
         }
     }
 
-    # Check if the current result is more than 2 standard deviations out.
+    # Check if current result is acceptable (at most 10% worse than mean)
     $Passed = $False
     if ($HigherIsBetter) {
-        Write-Output "Checking '$CurrentResult' > '$($Mean - ($Deviation * 2))'"
-        $Passed = $CurrentResult -gt ($Mean - ($Deviation * 2))
+        Write-Output "Checking '$CurrentResult' > '$($Mean - $Mean*0.1)'"
+        $Passed = $CurrentResult -ge ($Mean - $Mean*0.1)
     }
     else {
-        Write-Output "Checking '$CurrentResult' < '$($Mean + ($Deviation * 2))'"
-        $Passed = $CurrentResult -lt ($Mean + ($Deviation * 2))
+        Write-Output "Checking '$CurrentResult' < '$($Mean + $Mean*0.1)'"
+        $Passed = $CurrentResult -le ($Mean + $Mean*0.1)
     }
     if ($Passed -eq $False) {
         
         if ($Results.Length -lt 10) {
-            Write-Warning "The performance of '$Metric' is more than 2 standard deviations from the mean for '$($Options.Name)'. 
+            Write-Warning "The performance of '$Metric' is more than 10% worse than the mean for '$($Options.Name)'. 
             There are only '$($Results.Length)' historic results, so this will not be considered a failure"
         }
         else {
-            Write-Warning "The performance of '$Metric' is more than 2 standard deviations from the mean for '$($Options.Name)'."
+            Write-Warning "The performance of '$Metric' is more than 10% worse than the mean for '$($Options.Name)'."
             exit 1
         }
     }
