@@ -74,7 +74,7 @@ Push-Location $RepoPath
 
 try {
 
-    $Ids = gh pr list -B main --json number --jq '.[].number'
+    $Ids = gh pr list -B main --json number,isDraft --jq '.[]|select(.isDraft|not).number'
     if ($Null -ne $Ids) {
         $ValidIds = @()
 
