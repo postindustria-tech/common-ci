@@ -22,7 +22,7 @@ try {
 
         $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch)
         if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
-            Write-Error ($ProjectPackagesOutdatedRaw -Join "`n")
+            Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
             continue
         }
 
