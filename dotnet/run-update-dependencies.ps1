@@ -54,6 +54,10 @@ try {
                 }
             }
         }
+        if ($RequestedPackages.Count -eq 0) {
+            Write-Output "✅ NO UPDATES"
+            continue
+        }
         Write-Output "NECESSARY UPDATES:"
         Write-Output (ConvertTo-Json -InputObject $RequestedPackages -Depth 4)
         Write-Debug "FULL PACKAGES:"
@@ -109,7 +113,7 @@ try {
             }
         }
     }
-
+    Write-Output "========= ========= ========="
 }
 finally {
 
