@@ -17,8 +17,8 @@ try {
     dotnet restore $ProjectDir
 
     foreach ($ProjectFile in $(Get-ChildItem -Path $pwd -Filter $Filter -Recurse -ErrorAction SilentlyContinue -Force)) {
-        Write-Debug "========= ========= ========="
-        Write-Debug $ProjectFile.FullName
+        Write-Output "========= ========= ========="
+        Write-Output $ProjectFile.FullName
 
         Write-Debug "OUTDATED PACKAGES:"
         $ProjectPackagesOutdated = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch | ConvertFrom-Json)
