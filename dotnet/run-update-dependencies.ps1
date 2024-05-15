@@ -20,8 +20,14 @@ try {
         Write-Output "========= ========= ========="
         Write-Output $ProjectFile.FullName
 
+        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch)
+        if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
+            Write-Error ($ProjectPackagesOutdatedRaw -Join "`n")
+            continue
+        }
+
         Write-Debug "OUTDATED PACKAGES:"
-        $ProjectPackagesOutdated = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch | ConvertFrom-Json)
+        $ProjectPackagesOutdated = (ConvertFrom-Json -InputObject (-Join $ProjectPackagesOutdatedRaw))
         Write-Debug (ConvertTo-Json -InputObject $ProjectPackagesOutdated -Depth 6)
 
         $RequestedPackages = @{}
