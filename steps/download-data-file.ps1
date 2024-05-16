@@ -10,5 +10,5 @@ param (
     [string]$Url = $Null
 )
 
-$Uri ??= "https://distributor.51degrees.com/api/v2/download?LicenseKeys=$LicenseKey&Type=$DataType&Download=True&Product=$Product"
-Invoke-WebRequest -Uri $Uri -OutFile $FullFilePath -MaximumRetryCount 10 -RetryIntervalSec 1 -ConnectionTimeoutSeconds 60 -OperationTimeoutSeconds 240
+$Url ??= "https://distributor.51degrees.com/api/v2/download?LicenseKeys=$LicenseKey&Type=$DataType&Download=True&Product=$Product"
+Invoke-WebRequest -Verbose -Uri $Url -OutFile $FullFilePath -MaximumRetryCount 3 -RetryIntervalSec 3 -ConnectionTimeoutSeconds 30 -OperationTimeoutSeconds 30
