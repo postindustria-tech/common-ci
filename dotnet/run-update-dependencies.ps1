@@ -16,36 +16,104 @@ try {
     
     dotnet restore $ProjectDir
 
-    foreach ($Project in $(Get-ChildItem -Path $pwd -Filter $Filter -Recurse -ErrorAction SilentlyContinue -Force)) {
-        foreach ($Package in $(dotnet list $Project.FullName package | Select-String -Pattern "^\s*>")) {
-            # Ignore version ranges like [1.0,1.0)
-            if ($Package.Line.Contains('[') -eq $false -and
-                $Package.Line.Contains(']') -eq $false -and
-                $Package.Line.Contains('(') -eq $false -and
-                $Package.Line.Contains(')') -eq $false) {
-                # Parse the version
-                $PackageName = $Package -replace '^ *> ([a-zA-Z0-9\.]*) .*$', '$1' 
-                $MajorVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$1' 
-                $MinorVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$2' 
-                $PatchVersion = $Package -replace '^ *> [a-zA-Z0-9\.]* *([0-9]*)\.([0-9]*)\.([0-9]*).*$', '$3' 
+    foreach ($ProjectFile in $(Get-ChildItem -Path $pwd -Filter $Filter -Recurse -ErrorAction SilentlyContinue -Force)) {
+        Write-Output "========= ========= ========="
+        Write-Output $ProjectFile.FullName
 
-                Write-Output "Checking '$($Package.Line)'"
-                $Available = $(&$FetchVersions -PackageName $PackageName | Where-Object {$_.Version -Match "^$MajorVersion\.$MinorVersion\.\d+\.*$"})
-                $HighestPatch = $Available | Sort-Object {[int]($_.Version.Split('.')[2])} | Select-Object -Last 1
-                if ($null -ne $HighestPatch.Version -and $HighestPatch.Version -ne "$MajorVersion.$MinorVersion.$PatchVersion") {
+        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch)
+        if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
+            Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
+            continue
+        }
 
-                    Write-Output "Updating '$PackageName' from '$MajorVersion.$MinorVersion.$PatchVersion' to $($HighestPatch.Version)"
+        Write-Debug "OUTDATED PACKAGES:"
+        $ProjectPackagesOutdated = (ConvertFrom-Json -InputObject (-Join $ProjectPackagesOutdatedRaw))
+        Write-Debug (ConvertTo-Json -InputObject $ProjectPackagesOutdated -Depth 6)
 
-                    dotnet remove $Project.FullName package $PackageName
-                    dotnet add $Project.FullName package $PackageName -v $HighestPatch.Version
+        $RequestedPackages = @{}
+        foreach ($ProjectDic in $ProjectPackagesOutdated.projects) {
+            Write-Debug "--------"
+            Write-Debug $ProjectDic.path
+            if ($null -eq $ProjectDic.frameworks) {
+                continue
+            }
+            if (!$RequestedPackages.ContainsKey($ProjectDic.path)) {
+                $RequestedPackages[$ProjectDic.path] = @{}
+            }
+            $ProjectFileUpdates = $RequestedPackages[$ProjectDic.path]
+            foreach ($FrameworkDic in $ProjectDic.frameworks) {
+                foreach ($PackageDic in $FrameworkDic.topLevelPackages) {
+                    if (!$ProjectFileUpdates.ContainsKey($PackageDic.id)) {
+                        $ProjectFileUpdates[$PackageDic.id] = @{}
+                    }
+                    $PackageUpdates = $ProjectFileUpdates[$PackageDic.id]
+                    $PackageUpdates[$FrameworkDic.framework] = [PSCustomObject]@{
+                        Requested = $PackageDic.requestedVersion
+                        Latest = $PackageDic.latestVersion
+                    }
                 }
             }
-            else {
-                Write-Output "Skipping '$($Package.Line)'"
+        }
+        if ($RequestedPackages.Count -eq 0) {
+            Write-Output "✅ NO UPDATES"
+            continue
+        }
+        Write-Output "NECESSARY UPDATES:"
+        Write-Output (ConvertTo-Json -InputObject $RequestedPackages -Depth 4)
+        Write-Debug "FULL PACKAGES:"
+        $ProjectPackagesFull = (dotnet list $ProjectFile.FullName package --format json | ConvertFrom-Json)
+        Write-Debug (ConvertTo-Json -InputObject $ProjectPackagesFull -Depth 6)
+
+        foreach ($ProjectDic in $ProjectPackagesFull.projects) {
+            if (!$RequestedPackages.ContainsKey($ProjectDic.path)) {
+                continue
+            }
+            $ProjectFileUpdates = $RequestedPackages[$ProjectDic.path]
+            foreach ($FrameworkDic in $ProjectDic.frameworks) {
+                foreach ($PackageDic in $FrameworkDic.topLevelPackages) {
+                    if (!$ProjectFileUpdates.ContainsKey($PackageDic.id)) {
+                        continue
+                    }
+                    $PackageUpdates = $ProjectFileUpdates[$PackageDic.id]
+                    if ($PackageUpdates.ContainsKey($FrameworkDic.framework)) {
+                        continue
+                    }
+                    # Ignore version ranges like [1.0,1.0)
+                    if ($PackageDic.requestedVersion.Contains('[') -eq $false -and
+                        $PackageDic.requestedVersion.Contains(']') -eq $false -and
+                        $PackageDic.requestedVersion.Contains('(') -eq $false -and
+                        $PackageDic.requestedVersion.Contains(')') -eq $false) 
+                    {
+                        $PackageUpdates[$FrameworkDic.framework] = [PSCustomObject]@{
+                            Requested = $PackageDic.requestedVersion
+                            Latest = $PackageDic.requestedVersion
+                        }
+                    }
+                }
+            }
+        }
+        Write-Output "AMENDED UPDATES:"
+        Write-Output (ConvertTo-Json -InputObject $RequestedPackages -Depth 4)
+
+        foreach ($ProjectFilePath in $RequestedPackages.Keys) {
+            Write-Output "===== ===== ====="
+            Write-Output "Operating on: $ProjectFilePath"
+            $ProjectFileUpdates = $RequestedPackages[$ProjectFilePath]
+            foreach ($PackageId in $ProjectFileUpdates.keys) {
+                Write-Output "----- -----"
+                Write-Output "REMOVING $PackageId"
+                dotnet remove $ProjectFilePath package $PackageId
+                $PackageVersionUpdates = $ProjectFileUpdates[$PackageId]
+                foreach ($NextFramework in $PackageVersionUpdates.keys) {
+                    $NextPackageUpdate = $PackageVersionUpdates[$NextFramework]
+                    Write-Output "----- -----"
+                    Write-Output "REINSTALLING $PackageId --- v.$($NextPackageUpdate.Latest) for [$NextFramework]"
+                    dotnet add $ProjectFilePath package $PackageId -v $NextPackageUpdate.Latest -f $NextFramework
+                }
             }
         }
     }
-
+    Write-Output "========= ========= ========="
 }
 finally {
 
