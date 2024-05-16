@@ -25,6 +25,7 @@ foreach ($package in $Packages) {
         }
 
         Write-Output "Linting $package"
+        pylint --version
         pylint --rcfile=.pylintrc (Join-Path -Path (Get-Item src) -ChildPath $package) || $(throw "pylint failed for $package")
     } finally {
         Pop-Location
