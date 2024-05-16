@@ -7,7 +7,7 @@ param (
     [string]$GitHubUser = "",
     [string]$GitHubEmail = "",
     [string]$DeviceDetectionKey,
-    [string]$DeviceDetectionUrl,
+    [string]$DeviceDetectionUrl = $Null,
     [string]$GitHubToken,
     [bool]$DryRun = $False
 )
