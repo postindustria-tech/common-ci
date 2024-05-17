@@ -54,7 +54,7 @@ jobs:
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
           -DeviceDetectionKey ${{ secrets.device-detection-key }} `
-          -DeviceDetectionUrl ${{ secrets.device-detection-url }} `
+          -DeviceDetectionUrl "${{ secrets.device-detection-url }}" `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
           -DryRun $DryRun
