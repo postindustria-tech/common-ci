@@ -53,7 +53,7 @@ function Generate-Performance-Results {
 
     # Calculate the stats
     $Stats = $Results | Measure-Object -Average -StandardDeviation
-    $MaxDiff = ($Stats.Average*0.1, $Stats.StandardDeviation*2 | Measure-Object -Maximum).Maximum
+    $MaxDiff = (($Stats.Average*0.1), ($Stats.StandardDeviation*2) | Measure-Object -Maximum).Maximum
     $LowerBound = $Stats.Average - $MaxDiff
     $HigherBound = $Stats.Average + $MaxDiff
 
