@@ -51,13 +51,14 @@ function Generate-Performance-Results {
         $Options
     )
 
-    # Calculate the mean
-    $Sum = 0
-    $Results | ForEach-Object { $Sum += $_}
-    $Mean = ($Results.Length -gt 0) ? $Sum / $Results.Length : 0
+    # Calculate the stats
+    $Stats = $Results | Measure-Object -Average -StandardDeviation
+    $MaxDiff = ($Stats.Average*0.1, $Stats.StandardDeviation*2 | Measure-Object -Maximum).Maximum
+    $LowerBound = $Stats.Average - $MaxDiff
+    $HigherBound = $Stats.Average + $MaxDiff
 
-    Write-Output "Mean is '$Mean'"
-    Write-Output "Current result is '$CurrentResult'"
+    Write-Output "Acceptable values: $($HigherIsBetter ? ">$LowerBound" : "<$HigherBound")"
+    Write-Output "Current result: $CurrentResult"
 
     Push-Location $RepoName
 
@@ -105,7 +106,7 @@ function Generate-Performance-Results {
         # Add the historic figures
         $Plot.AddScatter($Xs, $Ys, $Null, 1, 5, [ScottPlot.MarkerShape]::filledCircle, [ScottPlot.LineStyle]::Solid, "historic")
         # Add the acceptable variation
-        $Plot.AddVerticalSpan($($Mean - $Mean*0.1), $($Mean + $Mean*0.1))
+        $Plot.AddVerticalSpan($LowerBound, $HigherBound)
 
         # Output the graph
         $Plot.SaveFig("$pwd/perf-graph-$RunId-$PullRequestId-$($Options.Name)-$Metric.png")
@@ -164,24 +165,22 @@ function Generate-Performance-Results {
         }
     }
 
-    # Check if current result is acceptable (at most 10% worse than mean)
+    # Check if current result is within acceptable bounds
     $Passed = $False
     if ($HigherIsBetter) {
-        Write-Output "Checking '$CurrentResult' > '$($Mean - $Mean*0.1)'"
-        $Passed = $CurrentResult -ge ($Mean - $Mean*0.1)
+        Write-Output "Checking '$CurrentResult' > '$LowerBound'"
+        $Passed = $CurrentResult -ge $LowerBound
     }
     else {
-        Write-Output "Checking '$CurrentResult' < '$($Mean + $Mean*0.1)'"
-        $Passed = $CurrentResult -le ($Mean + $Mean*0.1)
+        Write-Output "Checking '$CurrentResult' < '$HigherBound'"
+        $Passed = $CurrentResult -le $HigherBound
     }
     if ($Passed -eq $False) {
-        
+        Write-Warning "The performance of '$Metric' is outside of the acceptable limits relative to the mean for '$($Options.Name)'"
         if ($Results.Length -lt 10) {
-            Write-Warning "The performance of '$Metric' is more than 10% worse than the mean for '$($Options.Name)'. 
-            There are only '$($Results.Length)' historic results, so this will not be considered a failure"
+            Write-Warning "There are only '$($Results.Length)' historic results, so this will not be considered a failure"
         }
         else {
-            Write-Warning "The performance of '$Metric' is more than 10% worse than the mean for '$($Options.Name)'."
             exit 1
         }
     }
