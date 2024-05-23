@@ -22,42 +22,77 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # publish-unit-test-result-action doesn't support Python 3.11 on Windows,
-    # so we install an older version of Python before using it
-    - name: Install Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
-
+    # Unit
     - name: Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2
-      if: ${{ inputs.skip-unit == 'false' }}
+      uses: EnricoMi/publish-unit-test-result-action/linux@v2
+      if: ${{ runner.os == 'Linux' && inputs.skip-unit == 'false' }}
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: |
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.json
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
 
+    - name: Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action/windows@v2
+      if: ${{ runner.os == 'Windows' && inputs.skip-unit == 'false' }}
+      with:
+        check_name: Unit Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+
+    - name: Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
+      if: ${{ runner.os == 'macOS' && inputs.skip-unit == 'false' }}
+      with:
+        check_name: Unit Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+
+    # Integration
     - name: Integration Test Results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2
-      if: ${{ inputs.skip-integration == 'false' }}
+      uses: EnricoMi/publish-unit-test-result-action/linux@v2
+      if: ${{ runner.os == 'Linux' && inputs.skip-integration == 'false' }}
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: |
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.json
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
 
+    - name: Integration Test Results
+      uses: EnricoMi/publish-unit-test-result-action/windows@v2
+      if: ${{ runner.os == 'Windows' && inputs.skip-integration == 'false' }}
+      with:
+        check_name: Integration Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+
+    - name: Integration Test Results
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
+      if: ${{ runner.os == 'macOS' && inputs.skip-integration == 'false' }}
+      with:
+        check_name: Integration Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+
+    # Performance
     - name: Performance Test Results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2
-      if: ${{ inputs.skip-performance == 'false' }}
+      uses: EnricoMi/publish-unit-test-result-action/linux@v2
+      if: ${{ runner.os == 'Linux' && inputs.skip-performance == 'false' }}
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: |
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
-          ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.json
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+
+    - name: Performance Test Results
+      uses: EnricoMi/publish-unit-test-result-action/windows@v2
+      if: ${{ runner.os == 'Windows' && inputs.skip-performance == 'false' }}
+      with:
+        check_name: Performance Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+
+    - name: Performance Test Results
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
+      if: ${{ runner.os == 'macOS' && inputs.skip-performance == 'false' }}
+      with:
+        check_name: Performance Tests - ${{ inputs.name }}
+        commit: ${{ inputs.commit }}
+        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml

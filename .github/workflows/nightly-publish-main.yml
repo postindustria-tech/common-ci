@@ -83,7 +83,7 @@ jobs:
     steps:
     
       - name: Checkout Common
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
@@ -126,7 +126,7 @@ jobs:
     runs-on: ${{ matrix.options.image }}
     steps:
       - name: Checkout Common
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ matrix.options.packagerequirement }}
         with:
           repository: ${{ inputs.org-name }}/common-ci
@@ -161,7 +161,7 @@ jobs:
           -DryRun $DryRun
           
       - name: Upload Package Artifact
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         if: ${{ success() && matrix.options.packagerequirement }}
         with:
           name: package_${{ matrix.options.name }}
@@ -174,7 +174,7 @@ jobs:
     needs: [ PreBuild, Configure ]
     steps:
       - name: Checkout Common
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
@@ -182,7 +182,7 @@ jobs:
 
       - name: Download Package Artifacts
         if: ${{ success() }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ${{ github.workspace }}/common/package-files
 
@@ -207,7 +207,7 @@ jobs:
           -DryRun $DryRun
 
       - name: Upload Package Artifact
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         if: ${{ success() }}
         with:
           name: package
@@ -226,7 +226,7 @@ jobs:
     steps:
       - name: Checkout Common
         if: ${{ matrix.options.packagerequirement }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
@@ -234,7 +234,7 @@ jobs:
 
       - name: Download Package Artifact
         if: ${{ success() && matrix.options.packagerequirement }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
           path: ${{ github.workspace }}/common/package
@@ -296,7 +296,7 @@ jobs:
     steps:
 
       - name: Checkout Common
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.org-name }}/common-ci
           path: common
@@ -304,7 +304,7 @@ jobs:
 
       - name: Download Package Artifact
         if: ${{ success() }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
           path: ${{ github.workspace }}/common/package
