@@ -175,7 +175,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ matrix.options.runperformance }}
         with:
-          name: performance_results_${{ inputs.pull-request-id }}
+          name: performance_results-${{ inputs.pull-request-id }}-${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
           
@@ -199,12 +199,13 @@ jobs:
           path: common
           ref: ${{ inputs.common-ci-ref }}
 
-      - name: Download Performance Artifact
-        uses: actions/download-artifact@v3
+      - name: Download Performance Results Artifact
+        uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          name: performance_results_${{ inputs.pull-request-id }}
+          pattern: performance_results-${{ inputs.pull-request-id }}-*
           path: ${{ github.workspace }}/common
+          merge-multiple: true
 
       - name: Compare Performance
         shell: pwsh
