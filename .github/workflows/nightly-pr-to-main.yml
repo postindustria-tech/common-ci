@@ -129,7 +129,7 @@ jobs:
 
       - name: Restore Asset Cache
         if: inputs.cache-assets
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           key: ${{ needs.configure.outputs.asset-cache-key }}
           path: ${{ github.workspace }}/common/assets
@@ -157,7 +157,7 @@ jobs:
 
       - name: Save Asset Cache
         if: inputs.cache-assets && always()
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           key: ${{ needs.configure.outputs.asset-cache-key }}
           path: ${{ github.workspace }}/common/assets

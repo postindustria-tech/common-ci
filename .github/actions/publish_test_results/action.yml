@@ -29,7 +29,7 @@ runs:
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
 
     - name: Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
@@ -37,7 +37,7 @@ runs:
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
 
     - name: Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/macos@v2
@@ -45,7 +45,7 @@ runs:
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
 
     # Integration
     - name: Integration Test Results
@@ -54,7 +54,7 @@ runs:
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
 
     - name: Integration Test Results
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
@@ -62,7 +62,7 @@ runs:
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
 
     - name: Integration Test Results
       uses: EnricoMi/publish-unit-test-result-action/macos@v2
@@ -70,7 +70,7 @@ runs:
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
 
     # Performance
     - name: Performance Test Results
@@ -79,7 +79,7 @@ runs:
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
 
     - name: Performance Test Results
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
@@ -87,7 +87,7 @@ runs:
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
 
     - name: Performance Test Results
       uses: EnricoMi/publish-unit-test-result-action/macos@v2
@@ -95,4 +95,4 @@ runs:
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+        files: common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
