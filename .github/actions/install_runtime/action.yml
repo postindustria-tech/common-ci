@@ -16,7 +16,7 @@ runs:
         python-version: ${{ inputs.version }}
     - name: Install Node
       if: inputs.language == 'node'
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.version }}
     - name: Install PHP
@@ -27,11 +27,11 @@ runs:
         tools: phpunit
     - name: Install Go
       if: inputs.language == 'go'
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.version }}
     - name: Install Dotnet
       if: inputs.language == 'dotnet'
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ inputs.version }}
