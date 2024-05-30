@@ -39,6 +39,7 @@ Takes the following parameters:
 | RepoName  | &check;   | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
 | Version   | &check;   | Version tag to publish. This will usually match the assembly version. |
 | Keys      | &check;   | Hash table of keys which must contain values for `DockerRegistry`, `DockerContainer`, `DockerUser`, and `DockerPassword`. |
+| DryRun    | | Determines if a Dry Run is being performed. This prohibits publishing of the docker image. |
 
 Pushes a docker image tag to the specified registry, using the login provided.
 
@@ -52,6 +53,7 @@ Takes the following parameters:
 | RepoName  | &check;   | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
 | Version   | &check;   | Version tag to mark as latest. This will usually match the assembly version. |
 | Keys      | &check;   | Hash table of keys which must contain values for `DockerRegistry`, `DockerContainer`, `DockerUser`, and `DockerPassword`. |
+| DryRun    | | Determines if a Dry Run is being performed. This prohibits publishing of the docker image. |
 
 Tags the version specified as `latest` and pushes the tag to the specified registry.
 
