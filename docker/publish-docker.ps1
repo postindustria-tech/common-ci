@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$Version,
     [Parameter(Mandatory=$true)]
-    [Hashtable]$Keys
+    [Hashtable]$Keys,
+    [string]$DryRun
 )
 
 try {
