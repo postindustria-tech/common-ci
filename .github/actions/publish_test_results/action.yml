@@ -29,7 +29,10 @@ runs:
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.json
 
     - name: Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
@@ -37,7 +40,10 @@ runs:
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.json
 
     - name: Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/macos@v2
@@ -45,7 +51,10 @@ runs:
       with:
         check_name: Unit Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/unit/**/*.json
 
     # Integration
     - name: Integration Test Results
@@ -54,7 +63,10 @@ runs:
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.json
 
     - name: Integration Test Results
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
@@ -62,7 +74,10 @@ runs:
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.json
 
     - name: Integration Test Results
       uses: EnricoMi/publish-unit-test-result-action/macos@v2
@@ -70,7 +85,10 @@ runs:
       with:
         check_name: Integration Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/integration/**/*.json
 
     # Performance
     - name: Performance Test Results
@@ -79,7 +97,10 @@ runs:
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.json
 
     - name: Performance Test Results
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
@@ -87,7 +108,10 @@ runs:
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.json
 
     - name: Performance Test Results
       uses: EnricoMi/publish-unit-test-result-action/macos@v2
@@ -95,4 +119,7 @@ runs:
       with:
         check_name: Performance Tests - ${{ inputs.name }}
         commit: ${{ inputs.commit }}
-        files: common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+        files: |
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.xml
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.trx
+          common/${{ inputs.repo-name }}/test-results/performance/**/*.json
