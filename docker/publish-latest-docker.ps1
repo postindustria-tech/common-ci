@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$Version,
     [Parameter(Mandatory=$true)]
-    [Hashtable]$Keys
+    [Hashtable]$Keys,
+    [string]$Dryrun
 )
 
 try {
@@ -18,8 +19,14 @@ try {
     docker tag $Tag $LatestTag
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    Write-Output "Pushing docker image $LatestTag"
-    docker push $LatestTag
+    # Push to repository when dryrun is false
+    $Command = {docker push $LatestTag}
+    if ($DryRun -eq $False) {
+        Write-Output "Pushing docker image $LatestTag"
+        & $Command
+    } else {
+        Write-Output "Dry run - not executing the following: $Command"
+    }
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 finally {
