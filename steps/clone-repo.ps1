@@ -13,8 +13,9 @@ $TemporaryRepoName = [IO.Path]::Combine($DestinationDir, "b")
 $Url = "https://github.com/$OrgName/$RepoName"
 $RepoPath = [IO.Path]::Combine($pwd, $TemporaryRepoName)
 
-Write-Output "Cloning '$Url'"
-git clone $Url $TemporaryRepoName
+$CurrentBranch = $env:GITHUB_REF_NAME ? $env:GITHUB_REF_NAME : 'main'
+Write-Output "Cloning '$Url' branch $CurrentBranch"
+git clone -b $CurrentBranch $Url $TemporaryRepoName
 
 
 Write-Output "Entering '$RepoPath'"

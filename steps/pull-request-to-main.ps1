@@ -15,9 +15,10 @@ Push-Location $RepoPath
 try {
     
     $CurrentBranch = $(git rev-parse --abbrev-ref HEAD)
+    $TargetBranch = $env:GITHUB_REF_NAME ? $env:GITHUB_REF_NAME : 'main'
     
-    Write-Output "Getting PRs from '$CurrentBranch' to 'main'"
-    $Prs = gh pr list -B main -H $CurrentBranch --json number --jq '.[].number'
+    Write-Output "Getting PRs from '$CurrentBranch' to '$TargetBranch'"
+    $Prs = gh pr list -B $TargetBranch -H $CurrentBranch --json number --jq '.[].number'
 
     Write-Output "There are '$($Prs.Count)' PRs"
 

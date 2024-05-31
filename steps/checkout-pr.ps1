@@ -30,8 +30,9 @@ try {
         exit $LASTEXITCODE
     }
 
-    Write-Output "Merging in any changes from main"
-    git merge origin/main
+    $TargetBranch = $env:GITHUB_REF_NAME ? $env:GITHUB_REF_NAME : 'main'
+    Write-Output "Merging in any changes from $TargetBranch"
+    git merge origin/$TargetBranch
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }

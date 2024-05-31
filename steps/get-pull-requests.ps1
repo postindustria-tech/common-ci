@@ -73,8 +73,9 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
+    $TargetBranch = $env:GITHUB_REF_NAME ? $env:GITHUB_REF_NAME : 'main'
 
-    $Ids = gh pr list -B main --json number,isDraft --jq '.[]|select(.isDraft|not).number'
+    $Ids = gh pr list -B $TargetBranch --json number,isDraft --jq '.[]|select(.isDraft|not).number'
     if ($Null -ne $Ids) {
         $ValidIds = @()
 
