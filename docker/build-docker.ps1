@@ -3,7 +3,9 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$Version,
     [Parameter(Mandatory=$true)]
-    [Hashtable]$Keys,
+    [string]$DockerRegistry,
+    [Parameter(Mandatory=$true)]
+    [string]$DockerContainer,
     [string]$ImageFile = "dockerimage.tar"
 )
 
@@ -18,7 +20,7 @@ Write-Output "$Version" > $PackageVersionPath
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 try {
-    $Tag = "$($Keys.DockerRegistry)/$($Keys.DockerContainer):$Version"
+    $Tag = "$($DockerRegistry)/$($DockerContainer):$Version"
 
     Write-Output "Building docker image $Tag"
     docker build --tag $Tag .
