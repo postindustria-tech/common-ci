@@ -14,8 +14,7 @@ Takes the following parameters:
 | --------- | :-------: | ----------- |
 | RepoName  | &check;   | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
 | Version   | &check;   | Version to tag the image with. This will usually match the assembly version. |
-| DockerRegistry | &check; | Name of the docker registry e.g. 51degrees. |
-| DockerContainer | &check; | Name of the docker container. |
+| Keys      | &check;   | Hash table of keys which must contain values for `DockerRegistry`, and `DockerContainer`. |
 | ImageFile |           | Name of the file to save the image to. By default this is "dockerimage.tar". |
 
 The docker image is built, and saved to the packages directory in order to be uploaded as an artifact.
@@ -39,9 +38,7 @@ Takes the following parameters:
 | --------- | :-------: | ----------- |
 | RepoName  | &check;   | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
 | Version   | &check;   | Version tag to publish. This will usually match the assembly version. |
-| DockerRegistry | &check; | Name of the docker registry e.g. 51degrees. |
-| DockerContainer | &check; | Name of the docker container. |
-| Keys      | &check;   | Hash table of keys which must contain values for `DockerUser`, and `DockerPassword`. |
+| Keys      | &check;   | Hash table of keys which must contain values for `DockerRegistry`, `DockerContainer`, `DockerUser`, and `DockerPassword`. |
 | DryRun    | | Determines if a Dry Run is being performed. This prohibits publishing of the docker image. |
 
 Pushes a docker image tag to the specified registry, using the login provided.
@@ -55,9 +52,7 @@ Takes the following parameters:
 | --------- | :-------: | ----------- |
 | RepoName  | &check;   | Name of the repo to build. This can be automatically populated for the caller by `run-repo-script`. |
 | Version   | &check;   | Version tag to mark as latest. This will usually match the assembly version. |
-| DockerRegistry | &check; | Name of the docker registry e.g. 51degrees. |
-| DockerContainer | &check; | Name of the docker container. |
-| Keys      | &check;   | Hash table of keys which must contain values for `DockerUser`, and `DockerPassword`. |
+| Keys      | &check;   | Hash table of keys which must contain values for `DockerRegistry`, `DockerContainer`, `DockerUser`, and `DockerPassword`. |
 | DryRun    | | Determines if a Dry Run is being performed. This prohibits publishing of the docker image. |
 
 Tags the version specified as `latest` and pushes the tag to the specified registry.
@@ -71,9 +66,7 @@ Takes the following parameters:
 | Parameter | Mandatory | Description |
 | --------- | :-------: | ----------- |
 | Version   | &check;   | Version tag pull. This will usually match the assembly version. |
-| DockerRegistry | &check; | Name of the docker registry e.g. 51degrees. |
-| DockerContainer | &check; | Name of the docker container. |
-| Keys      | &check;   | Hash table of keys which must contain values for `DockerUser`, and `DockerPassword`. |
+| Keys      | &check;   | Hash table of keys which must contain values for `DockerRegistry`, `DockerContainer`, `DockerUser`, and `DockerPassword`. |
 
 Pulls a docker image tag from the specified registry, using the login provided.
 
