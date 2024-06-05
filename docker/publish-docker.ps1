@@ -4,15 +4,11 @@ param(
     [string]$Version,
     [Parameter(Mandatory=$true)]
     [Hashtable]$Keys,
-    [Parameter(Mandatory=$true)]
-    [string]$DockerRegistry,
-    [Parameter(Mandatory=$true)]
-    [string]$DockerContainer,
     [string]$DryRun
 )
 
 try {
-    $Tag = "$($DockerRegistry)/$($DockerContainer):$Version"
+    $Tag = "$($Keys.DockerRegistry)/$($Keys.DockerContainer):$Version"
 
     # Login to Dockerhub
     Write-Output "Logging in to docker hub"
