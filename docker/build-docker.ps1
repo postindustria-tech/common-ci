@@ -4,7 +4,8 @@ param(
     [string]$Version,
     [Parameter(Mandatory=$true)]
     [Hashtable]$Keys,
-    [string]$ImageFile = "dockerimage.tar"
+    [string]$ImageFile = "dockerimage.tar",
+    [string]$Path = "."
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -21,7 +22,7 @@ try {
     $Tag = "$($Keys.DockerRegistry)/$($Keys.DockerContainer):$Version"
 
     Write-Output "Building docker image $Tag"
-    docker build --tag $Tag .
+    docker build --tag $Tag $Path
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     Write-Output "Saving docker image $Tag"
