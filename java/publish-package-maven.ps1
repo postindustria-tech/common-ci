@@ -36,7 +36,7 @@ try {
     
         Write-Output "Deploying to Nexus staging"
 
-        mvn nexus-staging:deploy-staged `
+        mvn nexus-staging:deploy-staged -e -X `
             -s $SettingsPath  `
             -f pom.xml `
             -DXmx2048m `
@@ -48,7 +48,7 @@ try {
         if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
             Write-Output "Releasing from Nexus to Maven central"
-            mvn nexus-staging:release `
+            mvn nexus-staging:release -e -X`
             -s $SettingsPath  `
             -f pom.xml `
             -DXmx2048m `
