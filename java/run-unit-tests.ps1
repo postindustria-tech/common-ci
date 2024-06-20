@@ -16,9 +16,9 @@ try {
     
     Write-Output "Testing '$Name'"
     if ($ExtraArgs) {
-        mvn surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2" $ExtraArgs
+        mvn -B surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2" $ExtraArgs
     } else {
-        mvn surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2"
+        mvn -B surefire:test -f pom.xml -DXmx2048m --no-transfer-progress -DfailIfNoTests=false "-Dhttps.protocols=TLSv1.2"
     }
     
 

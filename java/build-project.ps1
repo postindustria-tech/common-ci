@@ -12,7 +12,7 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 try {
     Write-Output "Building '$Name'"
-    mvn install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
+    mvn -B install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
 
 }
 finally {

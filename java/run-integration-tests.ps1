@@ -14,7 +14,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Testing $Name"
-    mvn test -Dtest=ExampleTests -DfailIfNoTests=false
+    mvn -B test -Dtest=ExampleTests -DfailIfNoTests=false
 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
