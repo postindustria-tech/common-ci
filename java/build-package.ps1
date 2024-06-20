@@ -54,7 +54,7 @@ Push-Location $RepoPath
 
 try {
     Write-Output "Setting package version to '$Version'"
-    mvn versions:set -DnewVersion="$Version"
+    mvn -B versions:set -DnewVersion="$Version"
 
     # Set file names
     $JavaPGPFile = "Java Maven GPG Key Private.pgp"  
@@ -94,7 +94,7 @@ try {
         $CodeSigningKeyVaultAccessToken = az account get-access-token --resource "https://vault.azure.net" --tenant $CodeSigningKeyVaultTenantId | jq -r .accessToken
 
         Write-Output "Deploying '$Name' Locally"
-        mvn deploy `
+        mvn -B deploy `
             -s $SettingsPath `
             $ExtraArgs `
             -f pom.xml `

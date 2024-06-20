@@ -14,7 +14,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Building '$Name'"
-    mvn compile -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
+    mvn -B compile -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
 
 }
 finally {

@@ -15,7 +15,7 @@ Push-Location $RepoPath
 try {
 
     Write-Output "Testing $Name"
-    mvn test -Dtest="*$TestName*" -DfailIfNoTests=false 
+    mvn -B test -Dtest="*$TestName*" -DfailIfNoTests=false 
     # Copy the test results into the test-results folder
     Get-ChildItem -Path . -Directory -Depth 1 | 
     Where-Object { Test-Path "$($_.FullName)\pom.xml" } | 

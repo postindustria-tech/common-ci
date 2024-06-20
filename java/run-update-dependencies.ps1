@@ -14,7 +14,7 @@ Push-Location $RepoPath
 try {
     
     Write-Output "Updating dependencies. Patch version only"
-    mvn versions:update-properties -DallowMinorUpdates=false -DgenerateBackupPoms=false
+    mvn -B versions:update-properties -DallowMinorUpdates=false -DgenerateBackupPoms=false
 
 }
 finally {
