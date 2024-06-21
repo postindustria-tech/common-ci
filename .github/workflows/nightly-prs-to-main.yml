@@ -59,6 +59,7 @@ on:
       TestResourceKey:
       TestSuperResourceKey:
       UsePublishTests:
+      PearlLicense:
 
 jobs:
   # Get all the pull requests that are going to main
