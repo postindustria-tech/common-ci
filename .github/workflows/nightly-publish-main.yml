@@ -71,6 +71,7 @@ on:
       DockerContainer:
       DockerRegistry:
       DockerUser:
+      Pearl.License:
 
 jobs:
   Configure:
