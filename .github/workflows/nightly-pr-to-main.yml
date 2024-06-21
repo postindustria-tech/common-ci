@@ -59,6 +59,7 @@ on:
       TestResourceKey:
       TestSuperResourceKey:
       UsePublishTests:
+      Pearl.License:
 
 jobs:
   Configure:
