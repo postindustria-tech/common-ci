@@ -13,7 +13,7 @@ $RepoContext = "$OrgName/$RepoName"
 
 # Download the release assets using the GitHub CLI
 Write-Output  "Downloading the Artifact"
-gh release download --repo $RepoContext "v$Version/*" --pattern "*.zip"
+gh release download --repo $RepoContext "$Version" --pattern "*.zip"
 
 # Unzip Artifact
 Write-Output  "Unzipping the Artifact"
