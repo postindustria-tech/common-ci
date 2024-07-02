@@ -15,16 +15,15 @@ $RepoContext = "$OrgName/$RepoName"
 Write-Output  "Downloading the Artifact"
 gh release download --repo $RepoContext "$Version" --pattern "*.zip"
 
-# Unzip Artifact
-Write-Output  "Unzipping the Artifact"
-$ZipFiles = Get-ChildItem -Filter *.zip
-foreach ($file in $ZipFiles) {
-    Expand-Archive -Path $file.FullName -DestinationPath "./extracted-artifact"
+# Write out the path to the artifact
+$artifactPath = Get-ChildItem -path "./" -Filter "*-$Version.zip"
+
+# Output the path(s) to the artifact(s)
+if ($artifactPath.Count -gt 1) {
+    foreach ($path in $artifactPath) {
+        Write-Output "Artifact: $($path.FullName)"
+    }
+} else {
+    Write-Output "Artifact: $($artifactPath.FullName)"
 }
 
-# Output the path of the extracted artifact(s)
-Write-Output  "OutputPath = ./extracted-artifact"
-Get-ChildItem -Path "./extracted-artifact"
-
-# set path for other jobs to use
-echo "::set-output name=artifact_path::./extracted-artifact"
