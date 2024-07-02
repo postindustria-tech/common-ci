@@ -27,9 +27,9 @@ on:
         required: true
 
 jobs:
-  nightly-submodule-update:
+  NightlySubmoduleUpdate:
     runs-on: ubuntu-latest
-
+    name: Nightly Submodule Update
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
