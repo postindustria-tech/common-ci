@@ -16,7 +16,7 @@ Write-Output  "Downloading the Artifact"
 gh release download --repo $RepoContext "$Version" --pattern "*.zip"
 
 # Write out the path to the artifact
-$artifactPath = Get-ChildItem -Path "./configurator-$Version" --pattern "*.zip"
+$artifactPath = Get-ChildItem -path "./" -Filter "*-$Version.zip"
 
 # Output the path(s) to the artifact(s)
 if ($artifactPath.Count -gt 1) {
