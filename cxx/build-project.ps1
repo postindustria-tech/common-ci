@@ -49,7 +49,7 @@ elseif ($BuildMethod -eq "msbuild") {
     try {
 
         nuget restore
-        msbuild /p:Configuration=$Configuration /p:Platform=$Arch /p:OutDir=$RepoPath\$BuildDir
+        msbuild /p:Configuration=$Configuration /p:Platform=$Arch /p:OutDir=$RepoPath\$BuildDir\
 
     }
     finally {
