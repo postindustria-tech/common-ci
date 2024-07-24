@@ -183,9 +183,10 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts_${{ inputs.pull-request-id }}
+          name: artifacts-${{ inputs.pull-request-id }}-${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/artifacts/*
           if-no-files-found: ignore
+          overwrite: true
 
   Compare-Performance:
     # This needs to run on Windows to support ScottPlot
