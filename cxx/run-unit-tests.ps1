@@ -23,6 +23,12 @@ if ($BuildMethod -eq "cmake") {
         Write-Output "Testing $Name"
 
         ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex $ExcludeRegex
+
+        if (Test-Path CMakeFiles/*-cov.dir/*.gcda) {
+            Write-Output "Generating coverage report..."
+            $artifacts = New-Item -ItemType directory -Path $RepoPath/artifacts -Force
+            python -m gcovr -r $RepoPath --html --gcov-ignore-parse-errors=negative_hits.warn > $artifacts/coverage.html || $(throw "gcovr failed")
+        }
     }
     finally {
 
