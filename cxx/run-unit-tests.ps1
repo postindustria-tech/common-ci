@@ -27,7 +27,8 @@ if ($BuildMethod -eq "cmake") {
         if (Test-Path CMakeFiles/*-cov.dir/*.gcda) {
             Write-Output "Generating coverage report..."
             $artifacts = New-Item -ItemType directory -Path $RepoPath/artifacts -Force
-            python -m gcovr -r $RepoPath --html --gcov-ignore-parse-errors=negative_hits.warn > $artifacts/coverage.html || $(throw "gcovr failed")
+            python -m gcovr -r $RepoPath --html-details --html-self-contained `
+                --gcov-ignore-parse-errors=negative_hits.warn -o $artifacts/coverage.html || $(throw "gcovr failed")
         }
     }
     finally {
