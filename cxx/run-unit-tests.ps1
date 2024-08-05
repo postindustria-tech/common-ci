@@ -25,7 +25,7 @@ if ($BuildMethod -eq "cmake") {
 
         ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex $ExcludeRegex
 
-        if (Test-Path CMakeFiles/*-cov.dir/*.gcda) {
+        if ($Coverages) {
             Write-Output "Generating coverage report..."
             $artifacts = New-Item -ItemType directory -Path $RepoPath/artifacts -Force
             python -m gcovr -r $RepoPath --html-details --html-self-contained `
