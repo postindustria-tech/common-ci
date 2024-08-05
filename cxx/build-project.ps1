@@ -29,7 +29,7 @@ if ($BuildMethod -eq "cmake") {
         
         Invoke-Expression "cmake .. -DCMAKE_BUILD_TYPE=$Configuration $ExtraArgs"
     
-        cmake --build . --config $Configuration  
+        cmake --build . --config $Configuration --parallel ([Environment]::ProcessorCount)
     
     }
     finally {
