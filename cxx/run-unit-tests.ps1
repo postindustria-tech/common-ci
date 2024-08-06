@@ -8,7 +8,7 @@ param(
     [string]$Arch = "x64",
     [string]$BuildMethod = "cmake",
     [string]$ExcludeRegex = ".*Performance|Integration|Example.*",
-    [string[]]$Coverages
+    [string]$CoverageRegex = "^\b$"
 )
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
@@ -25,12 +25,12 @@ if ($BuildMethod -eq "cmake") {
 
         ctest -C $Configuration -T test --no-compress-output --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex $ExcludeRegex
 
-        if ($Coverages) {
+        $covDirs = Get-ChildItem CMakeFiles | Where-Object Name -match $CoverageRegex
+        if ($covDirs) {
             Write-Output "Generating coverage report..."
             $artifacts = New-Item -ItemType directory -Path $RepoPath/artifacts -Force
-            python -m gcovr -r $RepoPath --html-details --html-self-contained `
-                --gcov-ignore-parse-errors=negative_hits.warn -o $artifacts/coverage.html `
-                $Coverages.foreach({"CMakeFiles/fiftyone-$_*-cov.dir"}) || $(throw "gcovr failed")
+            python -m gcovr -r $RepoPath -o $artifacts/coverage.html --html-details --html-self-contained `
+                --gcov-ignore-parse-errors=negative_hits.warn $covDirs || $(throw "gcovr failed")
         }
     }
     finally {
