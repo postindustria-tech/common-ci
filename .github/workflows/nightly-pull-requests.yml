@@ -54,6 +54,11 @@ on:
       UsePublishTests:
       PearlLicense:
 
+defaults:
+  run:
+    shell: pwsh
+    working-directory: ./common
+
 jobs:
   # Get all the pull requests that are going to main
   GetPullRequests:
@@ -70,19 +75,15 @@ jobs:
       # Get all the pull requests into main, and output the ids
       - name: Get Pull Requests
         id: get_pull_requests
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
         env:
           PULL_REQUEST_IDS: ${{ inputs.prs }}
         run: |
-          . ${{ github.workspace }}/common/nightly-pr-to-main_get-prs.ps1 `
+          ./nightly-pull-requests.get-prs.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
-          -VariableName PullRequestIds `
+          -Branch ${{ github.ref_name }} `
           -GitHubToken ${{ secrets.token }} `
-          -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }} `
-          -GitHubOutput $Env:GITHUB_OUTPUT 
+          -GitHubOutput $Env:GITHUB_OUTPUT
     outputs:
       pull_request_ids: ${{ steps.get_pull_requests.outputs.pull_request_ids }}
 

@@ -53,6 +53,7 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch ${{ github.ref_name }} `
           -DeviceDetectionKey ${{ secrets.device-detection-key }} `
           -DeviceDetectionUrl "${{ secrets.device-detection-url }}" `
           -GitHubUser ${{ inputs.user }} `

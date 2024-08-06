@@ -56,6 +56,11 @@ on:
       UsePublishTests:
       Pearl.License:
 
+defaults:
+  run:
+    shell: pwsh
+    working-directory: ./common
+
 jobs:
   Configure:
     name : Configure - ${{ inputs.pull-request-id }}
@@ -74,7 +79,6 @@ jobs:
       - name: Hash the Asset Cache Key
         id: hash_asset_cache_key
         if: inputs.cache-assets
-        shell: pwsh
         env:
           KEY: ${{ toJSON(secrets) }}
         run: |
@@ -86,13 +90,12 @@ jobs:
           "hash=$(Get-Date -Format FileDate)-$((Get-FileHash -InputStream $stringAsStream).Hash)" | Out-File $env:GITHUB_OUTPUT -Append
 
       - name: Configure
-        shell: pwsh
         id: configure
-        working-directory: ${{ github.workspace }}/common/
         run: |
-          . ${{ github.workspace }}/common/nightly-pr-to-main_configure-pr.ps1 `
+          ./nightly-pull-request.configure-pr.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch ${{ github.ref_name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
@@ -130,17 +133,16 @@ jobs:
 
       - name: Build and Test
         id: build-and-test
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
         env:
           SECRETS: ${{ toJSON(secrets) }}
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ toJSON(matrix.options) }}')
           $Options.Add("Keys", $(ConvertFrom-Json -AsHashtable $env:SECRETS))
-          . ${{ github.workspace }}/common/nightly-pr-to-main_build-and-test.ps1 `
+          ./nightly-pull-request.build-and-test.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch ${{ github.ref_name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
@@ -176,7 +178,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts_${{ inputs.pull-request-id }}
+          name: artifacts-${{ inputs.pull-request-id }}-${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/artifacts/*
           if-no-files-found: ignore
 
@@ -202,14 +204,13 @@ jobs:
           merge-multiple: true
 
       - name: Compare Performance
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           $Options = $(ConvertFrom-Json -AsHashtable '${{ needs.configure.outputs.options }}')
-          . ${{ github.workspace }}/common/nightly-pr-to-main_compare-performance.ps1 `
+          ./nightly-pull-request.compare-performance.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
+          -Branch ${{ github.ref_name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
@@ -240,15 +241,11 @@ jobs:
           ref: ${{ inputs.common-ci-ref }}
 
       - name: Complete
-        shell: pwsh
-        working-directory: ${{ github.workspace }}/common/
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
-          . ${{ github.workspace }}/common/nightly-pr-to-main_complete.ps1 `
+          ./nightly-pull-request.complete.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
           -GitHubToken ${{ secrets.token }} `
           -PullRequestId ${{ inputs.pull-request-id }} `
-          -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }} `
           -DryRun $DryRun
