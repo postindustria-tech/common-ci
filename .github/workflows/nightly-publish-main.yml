@@ -116,7 +116,8 @@ jobs:
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -GitHubUser ${{ inputs.user }} `
-          -GitHubEmail ${{ inputs.email }}
+          -GitHubEmail ${{ inputs.email }} `
+          -BuildPlatform ${{ inputs.build-platform }}
 
   PreBuild:
     needs: Configure
