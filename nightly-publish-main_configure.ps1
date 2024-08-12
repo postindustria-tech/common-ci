@@ -11,7 +11,8 @@ param (
     [string]$GitHubEmail = "",
     [Parameter(Mandatory=$true)]
     [string]$GitHubOutput,
-    [bool]$DryRun = $False
+    [bool]$DryRun = $False,
+    [string]$BuildPlatform
 )
 
 . ./constants.ps1
@@ -88,7 +89,7 @@ if ($RequiredOptions.Count -eq 0) {
   $RequiredOptions += @{
     "Name" = "No Prebuild"
     "PackageRequirement" = $False
-    "Image" = "ubuntu-latest"
+    "Image" = $BuildPlatform
   }
 }
 $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
