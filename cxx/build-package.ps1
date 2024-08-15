@@ -1,33 +1,25 @@
-
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName
 )
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
-$BuildPath = [IO.Path]::Combine($pwd, $RepoName, "build")
-$OutPath = [IO.Path]::Combine($pwd, "package")
-mkdir $BuildPath
-mkdir $OutPath
+$BuildPath = New-Item -ItemType directory -Path $RepoName/build -Force
+$OutPath = New-Item -ItemType directory -Path package -Force
 
 Write-Output "Entering '$BuildPath'"
 Push-Location $BuildPath
-
 try {
-
     Write-Output "Building"
-    
+
     cmake .. -DCMAKE_BUILD_TYPE=Release
     cmake --build . --config Release
 
-}
-finally {
-
+} finally {
     Write-Output "Leaving '$BuildPath'"
     Pop-Location
-
 }
 
 Write-Output "Copying build to '$OutPath'"
-Copy-Item -Recurse -Path $([IO.Path]::Combine($BuildPath, "bin")) -Destination $OutPath
-
-exit $LASTEXITCODE
+Copy-Item -Recurse -Path $BuildPath/bin -Destination $OutPath
