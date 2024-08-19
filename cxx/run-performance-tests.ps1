@@ -1,4 +1,3 @@
-
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
@@ -7,23 +6,19 @@ param(
     [string]$Configuration = "Release",
     [string]$Arch = "x64"
 )
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
-$RepoPath = [IO.Path]::Combine($pwd, $RepoName, $ProjectDir, "build")
+$BuildPath = "$PWD/$RepoName/$ProjectDir/build"
 
-Write-Output "Entering '$RepoPath'"
-Push-Location $RepoPath
-
+Write-Output "Entering '$BuildPath'"
+Push-Location $BuildPath
 try {
-
     Write-Output "Testing $($Options.Name)"
 
     ctest -C $Configuration -T test --no-compress-output --output-junit "../test-results/performance/$Name.xml" --tests-regex .*Perf.*
-}
-finally {
 
-    Write-Output "Leaving '$RepoPath'"
+} finally {
+    Write-Output "Leaving '$BuildPath'"
     Pop-Location
-
 }
-
-exit $LASTEXITCODE
