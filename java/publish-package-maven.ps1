@@ -17,7 +17,7 @@ try {
     # We need to set the version here again even though the packages are already built using the next version
     # as this script will run in a new job and the repo will be cloned again.
     Write-Output "Setting version to '$Version'"
-    mvn -B -Dstyle.color=always versions:set -DnewVersion="$Version"
+    mvn -B versions:set -DnewVersion="$Version"
 
     $settingsFile = "stagingsettings.xml"
 
@@ -36,7 +36,7 @@ try {
 
         Write-Output "Deploying to Nexus staging"
 
-        mvn -B -Dstyle.color=always nexus-staging:deploy-staged `
+        mvn -B nexus-staging:deploy-staged `
             -s $SettingsPath  `
             -f pom.xml `
             -DXmx2048m `
@@ -48,7 +48,7 @@ try {
         if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
             Write-Output "Releasing from Nexus to Maven central"
-            mvn -B -Dstyle.color=always nexus-staging:release `
+            mvn -B nexus-staging:release `
             -s $SettingsPath  `
             -f pom.xml `
             -DXmx2048m `
