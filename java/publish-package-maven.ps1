@@ -17,7 +17,7 @@ try {
     # We need to set the version here again even though the packages are already built using the next version
     # as this script will run in a new job and the repo will be cloned again.
     Write-Output "Setting version to '$Version'"
-    mvn versions:set -DnewVersion="$Version"
+    mvn -B -Dstyle.color=always versions:set -DnewVersion="$Version"
 
     $settingsFile = "stagingsettings.xml"
 
@@ -25,43 +25,43 @@ try {
     $SettingsContent = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($MavenSettings))
     Set-Content -Path $SettingsFile -Value $SettingsContent
     $SettingsPath = [IO.Path]::Combine($RepoPath, $SettingsFile)
-    
+
     $ArtifactId = mvn help:evaluate "-Dexpression=project.artifactId" -q -DforceStdout
     $GroupId = mvn help:evaluate "-Dexpression=project.groupId" -q -DforceStdout
     $GroupId = $GroupId.Replace(".", "/")
     $URL = "https://repo1.maven.org/maven2/$GroupId/$ArtifactId/$Version"
     $Request = Invoke-WebRequest -Uri $URL -Method GET -SkipHttpErrorCheck
-    
+
     if ($Request.StatusCode -eq "404"){
-    
+
         Write-Output "Deploying to Nexus staging"
 
-        mvn -B nexus-staging:deploy-staged `
+        mvn -B -Dstyle.color=always nexus-staging:deploy-staged `
             -s $SettingsPath  `
             -f pom.xml `
             -DXmx2048m `
             -DskipTests `
             --no-transfer-progress `
             "-Dhttps.protocols=TLSv1.2" `
-            "-DfailIfNoTests=false" 
+            "-DfailIfNoTests=false"
 
         if ($($Version.EndsWith("SNAPSHOT")) -eq $False) {
 
             Write-Output "Releasing from Nexus to Maven central"
-            mvn -B nexus-staging:release `
+            mvn -B -Dstyle.color=always nexus-staging:release `
             -s $SettingsPath  `
             -f pom.xml `
             -DXmx2048m `
             -DskipTests `
             --no-transfer-progress `
             "-Dhttps.protocols=TLSv1.2" `
-            "-DfailIfNoTests=false" 
-        
-    
+            "-DfailIfNoTests=false"
+
+
         }
     }
     else{
-    
+
         Write-Output "Skipping release. The package has already been released. "
     }
 }
