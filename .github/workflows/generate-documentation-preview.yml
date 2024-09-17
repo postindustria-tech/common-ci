@@ -68,6 +68,7 @@ jobs:
           name: docs_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/*
           if-no-files-found: ignore
+          include-hidden-files: true
 
       - name: Comment on PR
         shell: pwsh
