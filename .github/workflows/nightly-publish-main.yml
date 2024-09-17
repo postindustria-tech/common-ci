@@ -169,6 +169,7 @@ jobs:
           name: package_${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/package-files
           if-no-files-found: ignore   
+          include-hidden-files: true
           
 
   Build:
@@ -214,7 +215,8 @@ jobs:
         with:
           name: package
           path: ${{ github.workspace }}/common/package
-          if-no-files-found: ignore   
+          if-no-files-found: ignore
+          include-hidden-files: true
 
 
   Test:

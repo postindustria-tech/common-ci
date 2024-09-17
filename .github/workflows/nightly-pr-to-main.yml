@@ -179,6 +179,7 @@ jobs:
           name: performance_results-${{ inputs.pull-request-id }}-${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/test-results/performance-summary/results_*.json
           if-no-files-found: ignore
+          include-hidden-files: true
           
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -186,6 +187,7 @@ jobs:
           name: artifacts-${{ inputs.pull-request-id }}-${{ matrix.options.name }}
           path: ${{ github.workspace }}/common/${{ inputs.repo-name }}/artifacts/*
           if-no-files-found: ignore
+          include-hidden-files: true
           overwrite: true
 
   Compare-Performance:
@@ -234,6 +236,7 @@ jobs:
           name: performance_results_passed_${{ inputs.pull-request-id }}
           path: ${{ github.workspace }}/common/results_*.json
           if-no-files-found: ignore
+          include-hidden-files: true
 
   Complete:      
     runs-on: ubuntu-latest
