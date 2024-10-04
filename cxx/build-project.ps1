@@ -40,7 +40,10 @@ if ($BuildMethod -eq "cmake") {
     Write-Output "Entering '$RepoPath'"
     Push-Location $RepoPath
     try {
-        nuget restore
+        & {
+            $PSNativeCommandUseErrorActionPreference = $false
+            nuget restore || Write-Warning "nuget restore failed"
+        }
         msbuild /p:Configuration=$Configuration /p:Platform=$Arch /p:OutDir=$RepoPath\$BuildDir\
 
     } finally {
