@@ -40,5 +40,5 @@ Write-Output "::group::Install Package From Artifact"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Run Integration Tests"
-./steps/run-script.ps1 ./$RepoName/ci/run-integration-tests.ps1 $Options
+./steps/run-script.ps1 ./$RepoName/ci/run-integration-tests.ps1 $Options -Branch $Branch
 Write-Output "::endgroup::"

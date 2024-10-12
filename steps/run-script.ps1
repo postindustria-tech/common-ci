@@ -2,7 +2,8 @@ param (
     [Parameter(Mandatory=$true,Position=0)]
     [string]$Script,
     [Parameter(Position=1)]
-    $Options = @{}
+    $Options = @{},
+    [string]$Branch = "main"
 )
 $ErrorActionPreference = "Stop"
 
