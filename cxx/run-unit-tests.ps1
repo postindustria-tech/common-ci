@@ -26,7 +26,7 @@ if ($BuildMethod -eq "cmake") {
         if (Test-Path CMakeFiles/*-cov.dir) {
             Write-Output "Generating coverage report..."
             $artifacts = New-Item -ItemType directory -Path $RepoPath/artifacts -Force
-            python -m gcovr -r $RepoPath -o $artifacts/coverage.html --html-details --html-self-contained `
+            gcovr -r $RepoPath -o $artifacts/coverage.html --html-details --html-self-contained `
                 --gcov-ignore-parse-errors=negative_hits.warn --exclude '.*\.hpp$' `
                 $CoverageExcludeDirs.foreach({'--exclude-directories', "CMakeFiles/$_"}) CMakeFiles || $(throw "gcovr failed")
         }
