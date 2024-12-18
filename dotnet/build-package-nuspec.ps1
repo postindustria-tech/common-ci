@@ -26,7 +26,8 @@ Push-Location $RepoPath
 
 try {
     Write-Output "Building package for '$Name'"
-   
+
+    $env:Version = $Version
     nuget pack $NuspecPath -NonInteractive -OutputDirectory "$PackagesFolder" -Properties config=$Configuration -version $Version
 
     Write-Output "Installing NuGetKeyVaultSignTool"

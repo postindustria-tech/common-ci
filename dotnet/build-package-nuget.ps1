@@ -41,6 +41,7 @@ try {
                 Guid = $projectParts[3]
             }
     }
+    $env:Version = $Version
     foreach($Project in $Projects){
         dotnet pack $Project.File -o "$PackagesFolder" -c $Configuration /p:PackageVersion=$Version /p:Version=$Version /p:BuiltOnCI=true /p:ContinuousIntegrationBuild=true
     }
