@@ -39,6 +39,10 @@
 [![Nightly Submodule Update](https://github.com/51Degrees/pipeline-dotnet/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/pipeline-dotnet/actions/workflows/nightly-submodule-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/pipeline-dotnet/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/pipeline-dotnet/actions/workflows/monthly-copyright-update.yml)
 
+#### v4.5:
+
+[![Nightly Pipeline](https://github.com/51Degrees/pipeline-dotnet/actions/workflows/nightly-pipeline.yml/badge.svg?branch=version/4.5)](https://github.com/51Degrees/pipeline-dotnet/actions/workflows/nightly-pipeline.yml)
+
 ### [device-detection-dotnet](https://github.com/51Degrees/device-detection-dotnet)
 [![Nightly PRs to Main](https://github.com/51Degrees/device-detection-dotnet/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-dotnet/actions/workflows/nightly-prs-to-main.yml)
 [![Nightly Publish Main](https://github.com/51Degrees/device-detection-dotnet/actions/workflows/nightly-publish-main.yml/badge.svg)](https://github.com/51Degrees/device-detection-dotnet/actions/workflows/nightly-publish-main.yml)
@@ -93,7 +97,7 @@
 [![Nightly Submodule Update](https://github.com/51Degrees/device-detection-java/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-java/actions/workflows/nightly-submodule-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/device-detection-java/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-java/actions/workflows/monthly-copyright-update.yml)
 
-v4.5:
+#### v4.5:
 
 [![Nightly Pipeline](https://github.com/51Degrees/device-detection-java/actions/workflows/nightly-pipeline.yml/badge.svg?branch=version/4.5)](https://github.com/51Degrees/device-detection-java/actions/workflows/nightly-pipeline.yml)
 
