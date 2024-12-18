@@ -242,7 +242,9 @@ foreach ($Options in $AllOptions) {
         }
 
         # Filter the artifacts so we only have ones that have passed the performance tests
-        $Artifacts = $AllArtifacts | Where-Object { $_.name.StartsWith("performance_results_passed") }
+        # TODO: replace the branch filtering logic with getting results from the server only for the relevant branch
+        $Artifacts = $AllArtifacts | Where-Object { $_.name.StartsWith("performance_results_passed") -and ($env:GITHUB_REF_NAME ? $_.workflow_run.head_branch -ceq $env:GITHUB_REF_NAME : $true) }
+        Write-Output "Found $($Artifacts.Length) artifacts"
 
         # Sort by date
         $Artifacts = $Artifacts | Sort-Object -Property created_at
