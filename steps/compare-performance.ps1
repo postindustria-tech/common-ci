@@ -212,7 +212,7 @@ if ($PlotReady -eq $False) {
 }
 
 # Get all the artifactrs
-$AllArtifacts = $(gh api -X GET -f per_page=90 /repos/$OrgName/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
+$AllArtifacts = $(gh api -X GET -f per_page=100 /repos/$OrgName/$RepoName/actions/artifacts | ConvertFrom-Json).artifacts
 
 foreach ($Options in $AllOptions) {
     if ($Options.RunPerformance -eq $True) {
