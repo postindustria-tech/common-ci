@@ -4,6 +4,8 @@ param (
     [string]$RepoName,
     [Parameter(Mandatory=$true)]
     [string]$LicenseKey,
+    [string]$DataType = "HashV41",
+    [string]$ArchiveName = "TAC-HashV41.hash.gz",
     [string]$Url = $Null
 )
 
@@ -15,10 +17,10 @@ Push-Location $RepoPath
 
 try {
 
-    $FileName = [IO.Path]::Combine($pwd, "TAC-HashV41.hash.gz")
+    $FileName = [IO.Path]::Combine($pwd, $ArchiveName)
     
     Write-Output "Downloading Hash data file"
-    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType "HashV41" -product "V4TAC" -fullFilePath $FileName -Url $Url)
+    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType $DataType -product "V4TAC" -fullFilePath $FileName -Url $Url)
 
     if ($Result -eq $False) {
 
