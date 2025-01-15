@@ -14,7 +14,7 @@ if (!$cmd.Parameters) {
 $Parameters = @{}
 
 foreach ($opt in $Options.GetEnumerator()) {
-    if ($cmd.Parameters.ContainsKey($opt.Key) -and $opt.Value) {
+    if ($cmd.Parameters.ContainsKey($opt.Key) -and $null -ne $opt.Value) {
         $Parameters[$opt.Key] = $opt.Value
     }
 }
