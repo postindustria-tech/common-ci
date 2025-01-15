@@ -54,7 +54,8 @@ try {
             Write-Output "Creating new orphan branch"
         }
     }
-    git switch --recurse-submodules ($LASTEXITCODE -ne 0 ? '--orphan' : $null) $branch
+    # checkout's more aggressive (compared to switch) force behavior is required
+    git checkout --force --recurse-submodules ($LASTEXITCODE -ne 0 ? '--orphan' : $null) $branch
 
     if (Test-Path $VersionPath) {
         Write-Output "Removing existing docs in $($VersionPath.FullName)"
