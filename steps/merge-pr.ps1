@@ -22,5 +22,5 @@ if ($DryRun) {
     Write-Output "Dry run - not merging"
 } else {
     Write-Output "Merging PR $PrTitle"
-    gh api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'"
+    gh api /repos/$OrgName/$RepoName/pulls/$PullRequestId/merge -X PUT -f "commit_title=Merged Pull Request '$PrTitle'" -f "merge_method=squash"
 }
