@@ -23,7 +23,7 @@ Write-Output "::group::Clone $RepoName"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Update Package Dependencies"
-./steps/run-script.ps1 ./$RepoName/ci/update-packages.ps1 @{RepoName = $RepoName; DryRun = $DryRun}
+./steps/run-script.ps1 ./$RepoName/ci/update-packages.ps1 @{RepoName = $RepoName; OrgName = $OrgName; DryRun = $DryRun}
 Write-Output "::endgroup::"
 
 Write-Output "::group::Check for Changes"
