@@ -30,7 +30,9 @@ try {
 
     @{
         HigherIsBetter = @{
-            DetectionsPerSecond = $DetectionsPerSecond
+            # BUG: performance tests actually return detections per millisecond, so we need to scale the value.
+            # if this ever changes - remove the multiplication.
+            DetectionsPerSecond = $DetectionsPerSecond * 1000
         }
         LowerIsBetter = @{
             AvgMillisecsPerDetection = $MsPerDetection
