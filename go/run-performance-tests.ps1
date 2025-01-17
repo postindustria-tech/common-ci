@@ -3,7 +3,7 @@ param (
     [Parameter(Mandatory)][string]$OrgName,
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][string]$Example,
-    [string]$ExamplesRepo,
+    [Parameter(Mandatory)][string]$ExamplesRepo,
     [string]$Branch = "main"
 )
 $ErrorActionPreference = "Stop"
@@ -11,13 +11,11 @@ $PSNativeCommandUseErrorActionPreference = $true
 
 $summaryDir = New-Item -ItemType directory -Path $RepoName/test-results/performance-summary -Force
 
-Push-Location $RepoName
-try {
-    if ($ExamplesRepo) {
-        Write-Host "Cloning examples..."
-        ./steps/clone-repo.ps1 -OrgName $OrgName -RepoName $ExamplesRepo -Branch $Branch
-    }
+Write-Host "Cloning examples..."
+./steps/clone-repo.ps1 -OrgName $OrgName -RepoName $ExamplesRepo -Branch $Branch $DestinationDir $RepoName
 
+Push-Location $RepoName/$ExamplesRepo
+try {
     Write-Host "Running performance test..."
     go run $Example
 
