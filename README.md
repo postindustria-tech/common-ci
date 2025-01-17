@@ -274,7 +274,11 @@ Pull Requests can only be initiated by a project Contributor, Administrator, or 
 
 Any changes to the target branch are published automatically on a nightly basis as a new package at the target package manager environment.
 
-This can also be run manually against any branch. If the branch is not the main branch, then the generated version for the package will be a prerelease version, following semantic versioning.
+This can also be run manually against any branch. The automatic versioning logic will increase the last version component of the closest reachable commit on selected branch. Some examples:
+- The closest tagged commit on the `main` branch is tagged as `4.4.9`. The next version will be `4.4.10`.
+- The closest tagged commit on the `version/4.5` branch is tagged as `4.5.0-alpha.0`. The next version will be `4.5.0-alpha.1`.
+
+When a branch is split off of `main` (or any other branch that gets published) and has to run this workflow, its versioning will have to change to avoild conflicting tags with the parent branch. This change has to be done manually once, as CI cannot know the new desired version (`4.5.0`, `5.0.0`, `4.5.0-alpha.0`, etc.) otherwise. The automatic tags will then follow the manually specified version.
 
 ### Nightly Documentation Update
 
