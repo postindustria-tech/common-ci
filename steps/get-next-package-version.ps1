@@ -1,3 +1,8 @@
+# 1) If the current HEAD commit is already tagged - return the existing tag.
+# 2) Otherwise, find the closest tag reachable from the HEAD.
+# 3) If it is a single tag of that commit - return it.
+# 4) Otherwise, return the biggest version-sorted tag of that commit.
+
 param (
     [Parameter(Mandatory)][string]$RepoName,
     [string]$Version
