@@ -21,7 +21,7 @@ The following rules are common across the organisation.
 -   GitHub triggers initiate the stages.
 -   Use of GitHub actions and other platform specific features are minimised to enable portability of CI/CD. For example, cloning a repository is performed in PowerShell via a generic command line that works on Linux, Windows, and Mac rather than in a GitHub action. This ensures the PowerShell script can be tested outside a CI/CD deployment environment.
 -   C/C++ is compiled using CMake on all platforms.
--   Versioning is handled by [a custom script](steps/get-next-package-version.ps1).
+-   Versioning is handled by [a custom script](steps/get-next-package-version.ps1). Previously GitVersion was used, however on some repos it was generating incorrect versions for the main brach. Changing the GitVersion settings to fix the format was possible, but that would break the `version/*` branches' format. To avoid making custom configs for every branch of every repo - GitVersion was replaced by a custom script.
 -   Common PowerShell scripts are contained in this repository. Repository specific scripts are contained under the root `ci` folder.
 -   Code that is in the `main` branch has passed all relevant tests. This is a critical gate to avoid repeating tests.
 -   The package output from a repository in the organisation is used as the input to other packages in the same organisation via the relevant package manager. This ensures that the organisations published packages are treated just like any other dependency and are not given special treatment.
