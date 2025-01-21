@@ -228,6 +228,7 @@ jobs:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
     name: Test - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
+    timeout-minutes: 120
 
     steps:
       - name: Checkout Common
