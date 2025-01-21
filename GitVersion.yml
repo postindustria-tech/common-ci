@@ -1,0 +1,15 @@
+# Common GitVersion config
+
+# Explicitly use the default ContinuousDelivery mode unless overriden.
+# https://gitversion.net/docs/reference/modes/continuous-delivery
+mode: ContinuousDelivery
+
+branches:
+  main:
+    # Use ContinuousDeployment mode for main so that SemVer variable doesn't
+    # include prerelease tags/labels.
+    # https://gitversion.net/docs/reference/modes/continuous-deployment
+    mode: ContinuousDeployment
+  alpha:
+    regex: ^version/
+    label: alpha

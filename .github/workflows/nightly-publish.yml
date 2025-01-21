@@ -103,6 +103,15 @@ jobs:
           $stringAsStream.Position = 0
           "hash=$(Get-Date -Format FileDate)-$((Get-FileHash -InputStream $stringAsStream).Hash)" | Out-File $env:GITHUB_OUTPUT -Append
 
+      - name: Install GitVersion
+        run: |
+          if (Get-Command dotnet-gitversion -ErrorAction SilentlyContinue) {
+            Write-Host "GitVersion already installed."
+          } else {
+            Write-Host "Installing GitVersion..."
+            dotnet tool install --global GitVersion.Tool --version '6.*'
+          }
+
       - name: Configure
         id: configure
         run: |
