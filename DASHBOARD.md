@@ -146,6 +146,10 @@
 [![Nightly Submodule Update](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-submodule-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/device-detection-node/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-node/actions/workflows/monthly-copyright-update.yml)
 
+#### v4.5:
+
+[![Nightly Pipeline](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-pipeline.yml/badge.svg?branch=version/4.5)](https://github.com/51Degrees/device-detection-node/actions/workflows/nightly-pipeline.yml)
+
 ### [location-node](https://github.com/51Degrees/location-node)
 [![Nightly PRs to Main](https://github.com/51Degrees/location-node/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/location-node/actions/workflows/nightly-prs-to-main.yml)
 [![Nightly Publish Main](https://github.com/51Degrees/location-node/actions/workflows/nightly-publish-to-main.yml/badge.svg)](https://github.com/51Degrees/location-node/actions/workflows/nightly-publish-to-main.yml)
@@ -214,6 +218,10 @@
 [![Nightly Documentation Update](https://github.com/51Degrees/device-detection-python/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-python/actions/workflows/nightly-documentation-update.yml)
 [![Nightly Submodule Update](https://github.com/51Degrees/device-detection-python/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-python/actions/workflows/nightly-submodule-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/device-detection-python/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/device-detection-python/actions/workflows/monthly-copyright-update.yml)
+
+#### v4.5:
+
+[![Nightly Pipeline](https://github.com/51Degrees/device-detection-python/actions/workflows/nightly-pipeline.yml/badge.svg?branch=version/4.5)](https://github.com/51Degrees/device-detection-python/actions/workflows/nightly-pipeline.yml)
 
 ### [location-python](https://github.com/51Degrees/location-python)
 [![Nightly PRs to Main](https://github.com/51Degrees/location-python/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/location-python/actions/workflows/nightly-prs-to-main.yml)
