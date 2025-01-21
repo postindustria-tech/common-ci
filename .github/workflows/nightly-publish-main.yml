@@ -99,12 +99,9 @@ jobs:
         env:
           KEY: ${{ toJSON(secrets) }}
         run: |
-          $stringAsStream = [System.IO.MemoryStream]::new()
-          $writer = [System.IO.StreamWriter]::new($stringAsStream)
-          $writer.write($env:KEY)
-          $writer.Flush()
-          $stringAsStream.Position = 0
-          "hash=$(Get-Date -Format FileDate)-$((Get-FileHash -InputStream $stringAsStream).Hash)" | Out-File $env:GITHUB_OUTPUT -Append
+          $sha1 = [Security.Cryptography.SHA1Managed]::new()
+          $hash = [Convert]::ToHexString($sha1.ComputeHash([Text.Encoding]::Utf8.GetBytes($env:KEY)))
+          "hash=$(Get-Date -Format FileDate)-$hash" | Out-File $env:GITHUB_OUTPUT -Append
 
       - name: Install GitVersion
         run: |
