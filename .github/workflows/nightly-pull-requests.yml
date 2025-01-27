@@ -109,4 +109,5 @@ jobs:
       dryrun: ${{ inputs.dryrun }}
       cache-assets: ${{ inputs.cache-assets }}
       common-ci-ref: ${{ inputs.common-ci-ref }}
+      branch: ${{ inputs.branch }}
     secrets: inherit
