@@ -96,7 +96,7 @@ jobs:
           ./nightly-pull-request.configure-pr.ps1 `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
-          -Branch ${{ inputs.branch != '' && github.ref_name || inputs.branch }} `
+          -Branch ${{ inputs.branch != '' && inputs.branch || github.ref_name }} `
           -GitHubToken ${{ secrets.token }} `
           -GitHubOutput $Env:GITHUB_OUTPUT `
           -PullRequestId ${{ inputs.pull-request-id }} `
