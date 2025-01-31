@@ -35,3 +35,8 @@ runs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ inputs.version }}
+    - name: Install Zig
+      if: inputs.language == 'zig'
+      uses: mlugg/setup-zig@v1
+      with:
+        version: ${{ inputs.version }}
