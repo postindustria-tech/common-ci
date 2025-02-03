@@ -32,7 +32,7 @@ Write-Output "::group::Clone Tools"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Update Copyright"
-./steps/run-script.ps1 ./tools/ci/update-copyright.ps1 @{RepoName = tools; TargetRepo = $RepoName}
+./steps/run-script.ps1 ./tools/ci/update-copyright.ps1 @{RepoName = 'tools'; TargetRepo = $RepoName}
 Write-Output "::endgroup::"
 
 Write-Output "::group::Has Changed"
