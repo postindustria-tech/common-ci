@@ -125,7 +125,7 @@ function Generate-Performance-Results {
                 }
             }
             catch {
-                Write-Output "Not able to parse age of '$($Png.Name)'"
+                Write-Output "Not able to parse age of '$($Png.Name)': $_"
             }
         }
 
