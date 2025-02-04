@@ -7,6 +7,7 @@ param (
     [string]$GitHubUser,
     [string]$GitHubEmail,
     [string]$GitHubToken,
+    [int]$PullRequestId = 0,
     [bool]$SeparateExamples
 )
 
@@ -17,6 +18,10 @@ Write-Output "::endgroup::"
 Write-Output "::group::Clone $RepoName"
 ./steps/clone-repo.ps1 -RepoName $RepoName -OrgName $OrgName -Branch $Branch
 Write-Output "::endgroup::"
+
+if ($PullRequestId -ne 0) {
+    ./steps/checkout-pr.ps1 -RepoName $RepoName -PullRequestId $PullRequestId
+}
 
 if ($SeparateExamples){
     $ExamplesRepo = "$RepoName-examples"
