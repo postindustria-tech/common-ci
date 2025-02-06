@@ -20,6 +20,7 @@ Push-Location $RepoPath
 
 try {
     $ok = $true
+    $verbose = $IsMacOS ? '--verbosity', 'd' : $null # macOS debugging
 
     $skipPattern = "*performance*"
     Write-Output "Testing '$Name'"
@@ -28,7 +29,7 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like $DirNameFormatForDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                dotnet test $_.FullName --results-directory $TestResultPath --blame-crash -l "trx" || $($script:ok = $false)
+                dotnet test $_.FullName --results-directory $TestResultPath --blame-crash -l "trx" $verbose || $($script:ok = $false)
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
             }
         }
