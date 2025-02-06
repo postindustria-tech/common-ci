@@ -58,7 +58,9 @@ function Test-Pr {
 
     $Pr = gh api /repos/$OrgName/$RepoName/pulls/$Id | ConvertFrom-Json
     $Reviews = gh api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-JSON
-    if (Test-WriteAccess $Pr.user.id) {
+
+    # Allow PRs from authors with write access unless a review has been requested
+    if (-not $Pr.requested_reviewers -and (Test-WriteAccess $Pr.user.id)) {
         Write-Information "The creator has write access"
         return $True
     } else {
