@@ -20,6 +20,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$CodeSigningKeyVaultCertificateName
 )
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 $PackagesFolder = [IO.Path]::Combine($pwd, "package")
