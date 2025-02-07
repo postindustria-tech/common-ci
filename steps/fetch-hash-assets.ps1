@@ -5,6 +5,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$LicenseKey,
     [string]$DataType = "HashV41",
+    [string]$Product = "V4TAC",
     [string]$ArchiveName = "TAC-HashV41.hash.gz",
     [string]$Url = $Null
 )
@@ -20,7 +21,7 @@ try {
     $FileName = [IO.Path]::Combine($pwd, $ArchiveName)
     
     Write-Output "Downloading Hash data file"
-    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType $DataType -product "V4TAC" -fullFilePath $FileName -Url $Url)
+    $Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $LicenseKey -dataType $DataType -product $Product -fullFilePath $FileName -Url $Url)
 
     if ($Result -eq $False) {
 
