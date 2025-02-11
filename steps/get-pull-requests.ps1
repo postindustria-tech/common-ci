@@ -20,33 +20,6 @@ function Test-WriteAccess {
     return $permissions.admin -or $permissions.maintain -or $permissions.push
 }
 
-function Test-Approval {
-    param (
-        [Parameter(Position=0)]
-        [Object[]]$Reviews,
-        [Object[]]$RequestedReviewers
-    )
-    $InformationPreference = 'Continue'
-
-    # First, check if all required reviewers approved the PR; fail early if not
-    foreach ($reviewer in $RequestedReviewers) {
-        if ($Reviews | Where-Object { $_.user.id -eq $reviewer.id -and $_.state -ne 'APPROVED' }) {
-            Write-Information "The pull request is not approved by the requested reviewer: $($reviewer.login)"
-            return $false
-        }
-    }
-
-    # Check if there's at least one approver with write access to the repo
-    $approvals = ($Reviews | Where-Object { $_.state -eq 'APPROVED' -and (Test-WriteAccess $_.user.id) }).user.login
-    if ($approvals) {
-        Write-Information "The creator doesn't have write access, but the pull request has been approved by: $approvals"
-        return $true
-    }
-
-    Write-Information "The creator doesn't have write access, and the pull request is not approved by anyone with write access to the repository"
-    return $false
-}
-
 function Test-Pr {
     param (
         [Parameter(Mandatory, Position=0)]
@@ -54,18 +27,35 @@ function Test-Pr {
         [Parameter(Mandatory, Position=1)]
         [string]$Id
     )
-    $InformationPreference = 'Continue'
 
     $Pr = gh api /repos/$OrgName/$RepoName/pulls/$Id | ConvertFrom-Json
-    $Reviews = gh api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-JSON
+    $Reviews = gh api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-Json
 
-    # Allow PRs from authors with write access unless a review has been requested
-    if (-not $Pr.requested_reviewers -and (Test-WriteAccess $Pr.user.id)) {
-        Write-Information "The creator has write access"
-        return $True
-    } else {
-        return Test-Approval $Reviews -RequestedReviewers $Pr.requested_reviewers
+    if ($Pr.requested_reviewers) {
+        Write-Host "Skipping PR ${Id}: needs review from: $($Pr.requested_reviewers)"
+        return $false
     }
+
+    $WriteApproved = $false # will be true if at least one approver has write access
+    foreach ($review in $Reviews) {
+        if ($review.state -ne 'APPROVED') {
+            Write-Host "Skipping PR $Id, reason: $($review.state) by $($review.user.login)"
+            return $false
+        } elseif (Test-WriteAccess $review.user.id) {
+            Write-Host "PR $Id has been approved by $($review.user.login), who has write access"
+            $WriteApproved = $true
+        }
+    }
+
+    if ($WriteApproved) {
+        return $true
+    } elseif (Test-WriteAccess $Pr.user.id) {
+        Write-Host "PR $Id author ($($Pr.user.login)) has write access"
+        return $true
+    }
+
+    Write-Host "PR $Id author ($($Pr.user.login)) doesn't have write access, and the pull request is not approved by anyone with write access to the repository"
+    return $false
 }
 
 $Ids = gh pr list -R $OrgName/$RepoName -B $Branch --json number,isDraft --jq '.[]|select(.isDraft|not).number'
