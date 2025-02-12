@@ -6,7 +6,7 @@ param (
 Write-Output "Building extension for $PackageName"
 
 # Installing binary builder
-npm install node-gyp --global || $(throw "ERROR: Failed to install node-gyp")
+npm i -g node-gyp@11.0.0 || $(throw "ERROR: Failed to install node-gyp")
 
 # Determine the operating system
 if ($IsMacOS) {
