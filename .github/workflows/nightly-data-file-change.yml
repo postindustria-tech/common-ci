@@ -18,6 +18,18 @@ on:
         required: false
         type: string
         default: "51DCI@51Degrees.com"
+      data-type:
+        required: false
+        type: string
+        default: "HashV41"
+      data-product:
+        required: false
+        type: string
+        default: "V4TAC"
+      data-filename:
+        required: false
+        type: string
+        default: "TAC-HashV41.hash.gz"
       dryrun:
         required: false
         type: string
@@ -28,9 +40,9 @@ on:
     secrets:
       token:
         required: true
-      device-detection-key:
+      data-key:
         required: true
-      device-detection-url:
+      data-url:
         required: false
         
 jobs:
@@ -58,8 +70,11 @@ jobs:
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
           -Branch ${{ github.ref_name }} `
-          -DeviceDetectionKey ${{ secrets.device-detection-key }} `
-          -DeviceDetectionUrl "${{ secrets.device-detection-url }}" `
+          -DataKey ${{ secrets.data-key }} `
+          -DataKey "${{ secrets.data-url }}" `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
+          -DataType = ${{ inputs.data-type }} `
+          -Product = ${{ inputs.data-product }} `
+          -FileName = ${{ inputs.data-filename }} `
           -DryRun $DryRun
