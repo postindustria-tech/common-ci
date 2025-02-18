@@ -6,8 +6,11 @@ param (
     [string]$Branch = "main",
     [string]$GitHubUser,
     [string]$GitHubEmail,
-    [string]$DeviceDetectionKey,
-    [string]$DeviceDetectionUrl = $Null,
+    [string]$DataKey,
+    [string]$DataUrl = $Null,
+    [string]$DataType = "HashV41",
+    [string]$Product = "V4TAC",
+    [string]$FileName = "TAC-HashV41.hash.gz",
     [string]$GitHubToken,
     [bool]$DryRun = $False
 )
@@ -29,11 +32,18 @@ Write-Output "::group::Clone Tools"
 Write-Output "::endgroup::"
 
 Write-Output "::group::Fetch Assets"
-./steps/fetch-hash-assets.ps1 -RepoName tools -LicenseKey $DeviceDetectionKey -Url $DeviceDetectionUrl
+Write-Output "Downloading $FileName"
+$Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $DataKey -dataType $DataType -product $Product -fullFilePath [IO.Path]::Combine($pwd, $FileName) -Url $DataUrl)
+if ($Result -eq $False) {
+    Write-Error "Failed to download data file"
+    exit
+}
+Write-Output "Extracting $FileName"
+& $CommonPath\steps\gunzip-file.ps1 -Source $FileName
 Write-Output "::endgroup::"
 
 Write-Output "::group::Generate Accessors"
-./steps/run-script.ps1 ./tools/ci/generate-accessors.ps1 @{RepoName = 'tools'; TargetRepo = $RepoName}
+./steps/run-script.ps1 ./$RepoName/ci/generate-accessors.ps1 @{RepoName = 'tools'; TargetRepo = $RepoName}
 Write-Output "::endgroup::"
 
 Write-Output "::group::Has Changed"
