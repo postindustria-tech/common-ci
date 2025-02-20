@@ -33,13 +33,10 @@ Write-Output "::endgroup::"
 
 Write-Output "::group::Fetch Assets"
 Write-Output "Downloading $FileName"
-$Result = $(& $CommonPath\steps\download-data-file.ps1 -licenseKey $DataKey -dataType $DataType -product $Product -fullFilePath [IO.Path]::Combine($pwd, $FileName) -Url $DataUrl)
-if ($Result -eq $False) {
-    Write-Error "Failed to download data file"
-    exit
-}
+./steps/download-data-file.ps1 -LicenseKey $DataKey -DataType $DataType -Product $Product -FullFilePath $FileName -Url $DataUrl
+
 Write-Output "Extracting $FileName"
-& $CommonPath\steps\gunzip-file.ps1 -Source $FileName
+./steps/gunzip-file.ps1 -Source $FileName
 Write-Output "::endgroup::"
 
 Write-Output "::group::Generate Accessors"

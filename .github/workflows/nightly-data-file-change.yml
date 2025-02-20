@@ -71,10 +71,10 @@ jobs:
           -OrgName ${{ inputs.org-name }} `
           -Branch ${{ github.ref_name }} `
           -DataKey ${{ secrets.data-key }} `
-          -DataKey "${{ secrets.data-url }}" `
+          -DataUrl "${{ secrets.data-url }}" `
           -GitHubUser ${{ inputs.user }} `
           -GitHubEmail ${{ inputs.email }} `
-          -DataType = ${{ inputs.data-type }} `
-          -Product = ${{ inputs.data-product }} `
-          -FileName = ${{ inputs.data-filename }} `
+          -DataType ${{ inputs.data-type }} `
+          -Product ${{ inputs.data-product }} `
+          -FileName ${{ inputs.data-filename }} `
           -DryRun $DryRun
