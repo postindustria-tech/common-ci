@@ -42,10 +42,14 @@ Write-Output "::group::Fetch Assets"
     -Url $DataUrl
 Write-Output "::endgroup::"
 
+Write-Output "::group::Setup Environment"
+./tools/ci/setup-environment.ps1 -NugetUser $GitHubUser -NugetPassword $GitHubToken
+Write-Output "::endgroup::"
+
 Write-Output "::group::Generate Accessors"
 ./steps/run-script.ps1 ./$RepoName/ci/generate-accessors.ps1 @{
     RepoName = 'tools'
-    DataFile = "tools/$FileName" -creplace '\.gz$', ''
+    DataFile = "$PWD/tools/$FileName" -creplace '\.gz$', ''
 }
 Write-Output "::endgroup::"
 
