@@ -10,7 +10,7 @@ on:
         required: false
         type: string
         default: 51degrees
-      user:
+      user: # required for authenticating to a private nuget repo in tools' setup-environment.ps1
         required: false
         type: string
         default: Automation51D
@@ -40,8 +40,6 @@ on:
     secrets:
       token:
         required: true
-      token-user: # required for authenticating to a private nuget repo in tools' setup-environment.ps1
-        default: Automation51D
       data-key:
         required: true
       data-url:
@@ -68,7 +66,6 @@ jobs:
         run: |
           $DryRun = [bool]::Parse( "${{ inputs.dryrun }}" )
           . ${{ github.workspace }}/common/nightly-data-file-change.ps1 `
-          -GitHubUser ${{ secrets.token-user }} `
           -GitHubToken ${{ secrets.token }} `
           -RepoName ${{ inputs.repo-name }} `
           -OrgName ${{ inputs.org-name }} `
