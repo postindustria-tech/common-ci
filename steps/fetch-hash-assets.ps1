@@ -10,7 +10,7 @@ param (
 )
 
 Write-Host "Downloading $DataType data file"
-./steps/download-data-file.ps1 -LicenseKey $LicenseKey -DataType $DataType -Product $Product -FullFilePath $RepoName/$FileName -Url $Url
+./steps/download-data-file.ps1 -LicenseKey $LicenseKey -DataType $DataType -Product $Product -FullFilePath $RepoName/$ArchiveName -Url $Url
 
-Write-Host "Extracting $FileName"
-./steps/gunzip-file.ps1 $RepoName/$FileName
+Write-Host "Extracting $ArchiveName"
+./steps/gunzip-file.ps1 $RepoName/$ArchiveName
