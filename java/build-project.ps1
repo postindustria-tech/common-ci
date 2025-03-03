@@ -1,25 +1,14 @@
-
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
-    [string]$ProjectDir = ".",
-    [string]$Name
+    [string]$ProjectDir = "."
 )
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
-$RepoPath = [IO.Path]::Combine($pwd, $RepoName)
-
-Write-Output "Entering '$RepoPath'"
-Push-Location $RepoPath
+Push-Location $RepoName
 try {
-    Write-Output "Building '$Name'"
     mvn -B install -f pom.xml -DXmx2048m -DskipTests --no-transfer-progress '-Dhttps.protocols=TLSv1.2' -DfailIfNoTests=false
-
-}
-finally {
-
-    Write-Output "Leaving '$RepoPath'"
+} finally {
     Pop-Location
-
 }
-
-exit $LASTEXITCODE
