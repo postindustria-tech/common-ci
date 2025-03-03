@@ -32,7 +32,7 @@ function Test-Pr {
     $Reviews = gh api /repos/$OrgName/$RepoName/pulls/$Id/reviews | ConvertFrom-Json
 
     if ($Pr.requested_reviewers) {
-        Write-Host "Skipping PR ${Id}: needs review from: $($Pr.requested_reviewers)"
+        Write-Host "Skipping PR ${Id}: needs review from: $($Pr.requested_reviewers.login)"
         return $false
     }
 
