@@ -37,10 +37,17 @@ function Test-Pr {
     }
 
     # GitHub returns a history of all reviews that seems to be ordered in time.
-    # We want to consider only the last review of each reviewer.
+    # We want to consider only the last review of each reviewer. COMMENTED
+    # reviews without a body are ignored, as they're usually just comments on
+    # review threads, not reviews themselves. Even PR author or unrelated users
+    # can produce them which leads to false negatives unless they're ignored.
+    # This, however, requires reviewers to not leave empty "Comment" reviews, as
+    # they will be indistinguishable from non-review comments.
     $LastReviews = [ordered]@{}
     foreach ($review in $Reviews) {
-        $LastReviews[$review.user.id] = $review
+        if ($review.state -cne 'COMMENTED' -or $review.body) {
+            $LastReviews[$review.user.id] = $review
+        }
     }
 
     $WriteApproved = $false # will be true if at least one approver has write access
