@@ -7,13 +7,14 @@ param(
     [string]$Arch = "x64",
     [string]$BuildMethod = "cmake",
     [string]$ExcludeRegex = ".*Performance|Integration|Example.*",
+    [string]$BuildDir = "build",
     [string[]]$CoverageExcludeDirs
 )
 $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
 $RepoPath = "$PWD/$RepoName"
-$BuildPath = "$RepoPath/$ProjectDir/build"
+$BuildPath = "$RepoPath/$ProjectDir/$BuildDir"
 
 if ($BuildMethod -eq "cmake") {
     Write-Output "Entering '$BuildPath'"
