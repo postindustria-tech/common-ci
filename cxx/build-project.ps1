@@ -44,6 +44,9 @@ if ($BuildMethod -eq "cmake") {
             $PSNativeCommandUseErrorActionPreference = $false
             nuget restore || Write-Warning "nuget restore failed"
         }
+        Write-Output "`nCleaning...`n"
+        msbuild /p:Configuration=$Configuration /p:Platform=$Arch /p:OutDir=$RepoPath\$BuildDir\ /t:Clean
+        Write-Output "`nCleaning done.`nBuilding...`n"
         msbuild /p:Configuration=$Configuration /p:Platform=$Arch /p:OutDir=$RepoPath\$BuildDir\
 
     } finally {
