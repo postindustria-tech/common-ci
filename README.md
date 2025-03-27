@@ -27,6 +27,12 @@ The following rules are common across the organisation.
 -   The package output from a repository in the organisation is used as the input to other packages in the same organisation via the relevant package manager. This ensures that the organisations published packages are treated just like any other dependency and are not given special treatment.
 -   Branching strategy is covered in the relevant CONTRIBUTIONS.md for the repository and not covered here. All organisation repositories must have a `main` branch which can accept pull requests via automated tasks.
 
+# Runners Policy
+
+All build workflows use [standard GitHub hosted runners](https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories), including those that publish packages containing pre-built binary libraries.
+
+Please note: on Linux distributions, the versions of glibc and libstdc++ (GLIBCXX) are tied to the underlying OS. These libraries are backward compatible binaries built against older versions will work on newer systems, but not vice versa. If your system has an older version than the one used during the build, you will need to compile the package from source. Instructions for doing so are provided in each repository.
+
 # Design
 
 When implementing changes, see the [Design Document](/DESIGN.md) for detailed descriptions of how each part works.
