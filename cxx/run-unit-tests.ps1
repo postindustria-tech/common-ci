@@ -23,6 +23,7 @@ if ($BuildMethod -eq "cmake") {
         Write-Output "Testing $Name"
 
         ctest -C $Configuration -T test --no-compress-output --output-on-failure --output-junit "$RepoPath/test-results/unit/$Name.xml" --exclude-regex $ExcludeRegex
+        Write-Output "Results saved to $RepoPath/test-results/unit/$Name.xml"
 
         if (Test-Path CMakeFiles/*-cov.dir) {
             Write-Output "Generating coverage report..."
@@ -47,6 +48,7 @@ if ($BuildMethod -eq "cmake") {
             Write-Output $TestBinary.FullName
             Write-Output "Testing $Name-$($TestBinary.Name)"
             & $TestBinary.FullName --gtest_catch_exceptions=1 --gtest_break_on_failure=0 --gtest_output=xml:$RepoPath\test-results\unit\$Name_$($TestBinary.BaseName).xml
+            Write-Output "Results saved to $RepoPath\test-results\unit\$Name_$($TestBinary.BaseName).xml"
         }
 
     } finally {
