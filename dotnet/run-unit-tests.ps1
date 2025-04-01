@@ -32,7 +32,7 @@ try {
                 dotnet test $_.FullName `
                     --no-build `
                     --configuration $Configuration `
-                    --arch $Arch `
+                    -p:Platform=$Arch `
                     --results-directory $TestResultPath `
                     --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
