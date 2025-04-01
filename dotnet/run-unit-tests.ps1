@@ -29,7 +29,12 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like $DirNameFormatForDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                dotnet test $_.FullName --results-directory $TestResultPath --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
+                dotnet test $_.FullName `
+                    --no-build `
+                    --configuration $Configuration `
+                    --arch $Arch `
+                    --results-directory $TestResultPath `
+                    --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
             }
         }
@@ -38,7 +43,10 @@ try {
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like $DirNameFormatForNotDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
-                & vstest.console.exe $_.FullName /Logger:trx /ResultsDirectory:$TestResultPath || $($script:ok = $false)
+                & vstest.console.exe $_.FullName `
+                    /Platform:$Arch `
+                    /Logger:trx `
+                    /ResultsDirectory:$TestResultPath || $($script:ok = $false)
                 Write-Output "vstest.console LastExitCode=$LASTEXITCODE"
             }
         }
