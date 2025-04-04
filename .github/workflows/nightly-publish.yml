@@ -106,7 +106,7 @@ jobs:
             Write-Host "GitVersion already installed."
           } else {
             Write-Host "Installing GitVersion..."
-            dotnet tool install --global GitVersion.Tool --version '6.*'
+            dotnet tool install --global GitVersion.Tool --version '6.1'
           }
 
       - name: Configure
