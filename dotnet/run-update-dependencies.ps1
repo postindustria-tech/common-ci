@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
@@ -20,7 +21,7 @@ try {
         Write-Output "========= ========= ========="
         Write-Output $ProjectFile.FullName
 
-        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch)
+        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch --include-prerelease)
         if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
             Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
             continue
