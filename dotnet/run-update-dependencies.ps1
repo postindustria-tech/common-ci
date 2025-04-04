@@ -22,8 +22,11 @@ try {
         Write-Output $ProjectFile.FullName
 
         $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch --include-prerelease)
+        Write-Debug "----- RAW OUTPUT START -----"
+        Write-Debug ($ProjectPackagesOutdatedRaw -Join "`n")
+        Write-Debug "----- RAW OUTPUT END -----"
         if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
-            Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
+            Write-Warning "^ NOT A VALID JSON -- (continue)"
             continue
         }
 
