@@ -20,6 +20,9 @@ Push-Location $RepoPath
 try {
     
     dotnet restore $ProjectDir
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+    }
 
     foreach ($ProjectFile in $(Get-ChildItem -Path $pwd -Filter $Filter -Recurse -ErrorAction SilentlyContinue -Force)) {
         Write-Output "========= ========= ========="
@@ -31,7 +34,13 @@ try {
             Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
             Write-Warning "----- RAW OUTPUT END -----"
             Write-Warning "^ NOT A VALID JSON -- (continue)"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+            }
             continue
+        }
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
         }
 
         Write-Debug "OUTDATED PACKAGES:"
@@ -70,6 +79,9 @@ try {
         Write-Output (ConvertTo-Json -InputObject $RequestedPackages -Depth 4)
         Write-Debug "FULL PACKAGES:"
         $ProjectPackagesFull = (dotnet list $ProjectFile.FullName package --format json | ConvertFrom-Json)
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+        }
         Write-Debug (ConvertTo-Json -InputObject $ProjectPackagesFull -Depth 6)
 
         foreach ($ProjectDic in $ProjectPackagesFull.projects) {
@@ -111,12 +123,18 @@ try {
                 Write-Output "----- -----"
                 Write-Output "REMOVING $PackageId"
                 dotnet remove $ProjectFilePath package $PackageId
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+                }
                 $PackageVersionUpdates = $ProjectFileUpdates[$PackageId]
                 foreach ($NextFramework in $PackageVersionUpdates.keys) {
                     $NextPackageUpdate = $PackageVersionUpdates[$NextFramework]
                     Write-Output "----- -----"
                     Write-Output "REINSTALLING $PackageId --- v.$($NextPackageUpdate.Latest) for [$NextFramework]"
                     dotnet add $ProjectFilePath package $PackageId -v $NextPackageUpdate.Latest -f $NextFramework
+                    if ($LASTEXITCODE -ne 0) {
+                        Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+                    }
                 }
             }
         }
