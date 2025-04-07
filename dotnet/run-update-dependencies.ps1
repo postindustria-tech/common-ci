@@ -4,8 +4,13 @@ param(
     [string]$ProjectDir = ".",
     [string]$Name,
     [string]$Filter = "*.csproj",
+    [switch]$IncludePrerelease,
     [scriptblock]$FetchVersions = { param($PackageName) Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json -ErrorAction SilentlyContinue }
 )
+
+Write-Debug "IncludePrerelease = $IncludePrerelease"
+$IncludePrereleaseParams = $IncludePrerelease ? @() : @("--include-prerelease")
+
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
@@ -20,9 +25,12 @@ try {
         Write-Output "========= ========= ========="
         Write-Output $ProjectFile.FullName
 
-        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch)
+        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch @IncludePrereleaseParams)
         if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
+            Write-Warning "----- RAW OUTPUT START -----"
             Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
+            Write-Warning "----- RAW OUTPUT END -----"
+            Write-Warning "^ NOT A VALID JSON -- (continue)"
             continue
         }
 
