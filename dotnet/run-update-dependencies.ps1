@@ -8,7 +8,7 @@ param(
     [scriptblock]$FetchVersions = { param($PackageName) Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json -ErrorAction SilentlyContinue }
 )
 
-Write-Debug "IncludePrerelease = $IncludePrerelease"
+Write-Output "IncludePrerelease = $IncludePrerelease"
 $IncludePrereleaseParams = $IncludePrerelease ? @() : @("--include-prerelease")
 
 
