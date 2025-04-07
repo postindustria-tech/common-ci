@@ -9,7 +9,7 @@ param(
 )
 
 Write-Output "IncludePrerelease = $IncludePrerelease"
-$IncludePrereleaseParams = $IncludePrerelease ? @() : @("--include-prerelease")
+$IncludePrereleaseParams = $IncludePrerelease ? @("--include-prerelease") : @()
 
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
