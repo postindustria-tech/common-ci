@@ -5,7 +5,8 @@ param(
     [string]$OrgName,
     [string]$ProjectDir = ".",
     [string]$Filter = "*.csproj",
-    [string]$Name
+    [string]$Name,
+    [switch]$IncludePrerelease
 )
 
 $FetchVersions = {
@@ -25,6 +26,7 @@ $FetchVersions = {
     }
 }
 
-./dotnet/run-update-dependencies.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Name $Name -Filter $Filter -FetchVersions $FetchVersions
+$IncludePrereleaseParams = $IncludePrerelease ? @("-IncludePrerelease") : @()
+./dotnet/run-update-dependencies.ps1 -RepoName $RepoName -ProjectDir $ProjectDir -Name $Name -Filter $Filter -FetchVersions $FetchVersions @IncludePrereleaseParams
 
 exit $LASTEXITCODE

@@ -4,26 +4,51 @@ param(
     [string]$ProjectDir = ".",
     [string]$Name,
     [string]$Filter = "*.csproj",
+    [switch]$IncludePrerelease,
     [scriptblock]$FetchVersions = { param($PackageName) Find-Package -Name $PackageName -AllVersions -Source https://api.nuget.org/v3/index.json -ErrorAction SilentlyContinue }
 )
+
+Write-Output "IncludePrerelease = $IncludePrerelease"
+$IncludePrereleaseParams = $IncludePrerelease ? @("--include-prerelease") : @()
+
 
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 
 Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
+$FailuresOnListOutdated = @()
+$FailuresOnModify = @()
+$LastFailCode = 0
+
 try {
     
     dotnet restore $ProjectDir
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+        $LastFailCode = $LASTEXITCODE
+    }
 
     foreach ($ProjectFile in $(Get-ChildItem -Path $pwd -Filter $Filter -Recurse -ErrorAction SilentlyContinue -Force)) {
         Write-Output "========= ========= ========="
         Write-Output $ProjectFile.FullName
 
-        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch)
+        $ProjectPackagesOutdatedRaw = (dotnet list $ProjectFile.FullName package --format json --outdated --highest-patch @IncludePrereleaseParams)
         if ($ProjectPackagesOutdatedRaw[0][0] -ne '{') {
+            Write-Warning "----- RAW OUTPUT START -----"
             Write-Warning ($ProjectPackagesOutdatedRaw -Join "`n")
+            Write-Warning "----- RAW OUTPUT END -----"
+            Write-Warning "^ NOT A VALID JSON -- (continue)"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+                $LastFailCode = $LASTEXITCODE
+            }
+            $FailuresOnListOutdated += $ProjectFile.FullName
             continue
+        }
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+            $LastFailCode = $LASTEXITCODE
         }
 
         Write-Debug "OUTDATED PACKAGES:"
@@ -62,6 +87,10 @@ try {
         Write-Output (ConvertTo-Json -InputObject $RequestedPackages -Depth 4)
         Write-Debug "FULL PACKAGES:"
         $ProjectPackagesFull = (dotnet list $ProjectFile.FullName package --format json | ConvertFrom-Json)
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+            $LastFailCode = $LASTEXITCODE
+        }
         Write-Debug (ConvertTo-Json -InputObject $ProjectPackagesFull -Depth 6)
 
         foreach ($ProjectDic in $ProjectPackagesFull.projects) {
@@ -103,12 +132,22 @@ try {
                 Write-Output "----- -----"
                 Write-Output "REMOVING $PackageId"
                 dotnet remove $ProjectFilePath package $PackageId
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+                    $LastFailCode = $LASTEXITCODE
+                    $FailuresOnModify += "$ProjectFilePath -- remove $PackageId -- exit code $LASTEXITCODE"
+                }
                 $PackageVersionUpdates = $ProjectFileUpdates[$PackageId]
                 foreach ($NextFramework in $PackageVersionUpdates.keys) {
                     $NextPackageUpdate = $PackageVersionUpdates[$NextFramework]
                     Write-Output "----- -----"
                     Write-Output "REINSTALLING $PackageId --- v.$($NextPackageUpdate.Latest) for [$NextFramework]"
                     dotnet add $ProjectFilePath package $PackageId -v $NextPackageUpdate.Latest -f $NextFramework
+                    if ($LASTEXITCODE -ne 0) {
+                        Write-Warning "⚠️ LASTEXITCODE = $LASTEXITCODE"
+                        $LastFailCode = $LASTEXITCODE
+                        $FailuresOnModify += "$ProjectFilePath -- add $PackageId -v ${$NextPackageUpdate.Latest}  -- exit code $LASTEXITCODE"
+                    }
                 }
             }
         }
@@ -122,4 +161,17 @@ finally {
 
 }
 
-exit $LASTEXITCODE
+if ($FailuresOnListOutdated.Length -gt 0) {
+    Write-Warning "Failures to list outdated packages:"
+    foreach ($NextFailure in $FailuresOnListOutdated) {
+        Write-Warning "- ⚠️ $NextFailure"
+    }
+}
+if ($FailuresOnModify.Length -gt 0) {
+    Write-Warning "Failures to modify projects:"
+    foreach ($NextFailure in $FailuresOnModify) {
+        Write-Warning "- ⚠️ $NextFailure"
+    }
+}
+
+exit ($LASTEXITCODE -ne 0) ? $LASTEXITCODE : $LastFailCode
