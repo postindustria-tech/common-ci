@@ -12,6 +12,9 @@ param(
     [string]$OutputFolder = "unit"
 )
 
+$SkipPlatformArgs = (($Arch -eq "Any CPU") -or ($Filter.Contains("dll")))
+Write-Output "SkipPlatformArgs = $SkipPlatformArgs"
+
 $RepoPath = [IO.Path]::Combine($pwd, $RepoName)
 $TestResultPath = [IO.Path]::Combine($RepoPath, "test-results", $OutputFolder, $Name)
 
@@ -26,7 +29,7 @@ try {
     Write-Output "Testing '$Name'"
     if ($BuildMethod -eq "dotnet"){
         Write-Output "[dotnet] => Looking for '$Filter' in directories like '$DirNameFormatForDotnet'"
-        $PlatformParams = ($Arch -eq "Any CPU") ? @() : @("-p:Platform=$Arch")
+        $PlatformParams = $SkipPlatformArgs ? @() : @("-p:Platform=$Arch")
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
             if (($_.DirectoryName -like $DirNameFormatForDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
@@ -42,7 +45,7 @@ try {
     } else {
         Write-Output "[$BuildMethod] ~> Looking for '$Filter' in directories like '$DirNameFormatForNotDotnet'"
         Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
-            $PlatformParams = ($Arch -eq "Any CPU") ? @() : @("/Platform:$Arch")
+            $PlatformParams = $SkipPlatformArgs ? @() : @("/Platform:$Arch")
             if (($_.DirectoryName -like $DirNameFormatForNotDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
                 Write-Output "Testing Assembly: '$_'"
                 & vstest.console.exe $_.FullName `
