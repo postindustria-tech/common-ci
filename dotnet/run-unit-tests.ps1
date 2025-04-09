@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
     [string]$RepoName,
@@ -30,10 +31,19 @@ try {
     if ($BuildMethod -eq "dotnet"){
         Write-Output "[dotnet] => Looking for '$Filter' in directories like '$DirNameFormatForDotnet'"
         $PlatformParams = $SkipPlatformArgs ? @() : @("-p:Platform=$Arch")
-        Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
-            if (($_.DirectoryName -like $DirNameFormatForDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
-                Write-Output "Testing Assembly: '$_'"
-                dotnet test $_.FullName `
+        foreach ($NextFile in (Get-ChildItem -Path $RepoPath -Recurse -File)) {
+            $NextDirName = $NextFile.DirectoryName
+            $NextFileName = $NextFile.Name
+            Write-Debug "[$NextDirName]/[$NextFileName]"
+            if ($NextDirName -notlike $DirNameFormatForDotnet) {
+                Write-Debug "- $NextDirName not matched $DirNameFormatForDotnet"
+            } elseif ($NextFileName -like $skipPattern) {
+                Write-Debug "- $NextFileName matched $skipPattern"
+            } elseif ($NextFileName -notmatch "$Filter") {
+                Write-Debug "- $NextFileName not matched $Filter"
+            } else {
+                Write-Output "Testing Assembly: '$NextFile'"
+                dotnet test $NextFile.FullName `
                     --no-build `
                     --configuration $Configuration `
                     @PlatformParams `
@@ -44,11 +54,20 @@ try {
         }
     } else {
         Write-Output "[$BuildMethod] ~> Looking for '$Filter' in directories like '$DirNameFormatForNotDotnet'"
-        Get-ChildItem -Path $RepoPath -Recurse -File | ForEach-Object {
-            $PlatformParams = $SkipPlatformArgs ? @() : @("/Platform:$Arch")
-            if (($_.DirectoryName -like $DirNameFormatForNotDotnet -and $_.Name -notlike $skipPattern) -and ($_.Name -match "$Filter")) {
-                Write-Output "Testing Assembly: '$_'"
-                & vstest.console.exe $_.FullName `
+        $PlatformParams = $SkipPlatformArgs ? @() : @("/Platform:$Arch")
+        foreach ($NextFile in (Get-ChildItem -Path $RepoPath -Recurse -File)) {
+            $NextDirName = $NextFile.DirectoryName
+            $NextFileName = $NextFile.Name
+            Write-Debug "[$NextDirName]/[$NextFileName]"
+            if ($NextDirName -notlike $DirNameFormatForNotDotnet) {
+                Write-Debug "- $NextDirName not matched $DirNameFormatForNotDotnet"
+            } elseif ($NextFileName -like $skipPattern) {
+                Write-Debug "- $NextFileName matched $skipPattern"
+            } elseif ($NextFileName -notmatch "$Filter") {
+                Write-Debug "- $NextFileName not matched $Filter"
+            } else {
+                Write-Output "Testing Assembly: '$NextFile'"
+                & vstest.console.exe $NextFile.FullName `
                     @PlatformParams `
                     /Logger:trx `
                     /ResultsDirectory:$TestResultPath || $($script:ok = $false)
