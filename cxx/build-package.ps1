@@ -22,4 +22,4 @@ try {
 }
 
 Write-Output "Copying build to '$OutPath'"
-Copy-Item -Recurse -Path $BuildPath/bin -Destination $OutPath
+Copy-Item -Recurse -Path $BuildPath -Destination $OutPath
