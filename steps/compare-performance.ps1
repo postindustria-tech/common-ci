@@ -161,8 +161,9 @@ try {
         $currentResult.Artifact = @{created_at = Get-Date}
 
         # Get the historic performance results from the artifacts
-        $results = $artifacts | Sort-Object -Property created_at | ForEach-Object {(Get-Artifact-Result -Artifact $_ -Name $Options.Name) ?? @()}
-        $results += $currentResult
+        [System.Collections.ArrayList]$results = @()
+        $artifacts | Sort-Object -Property created_at | ForEach-Object {if ($result = Get-Artifact-Result -Artifact $_ -Name $Options.Name) {$results.Add($result)}}
+        $results.Add($currentResult)
 
         # Generate the performance results for all metrics
         $higherIsBetterResults = $results.Where({$null -ne $_.HigherIsBetter})
