@@ -304,7 +304,6 @@ jobs:
     needs: [Configure, Test]
     steps:
       - name: Checkout Common
-        if: needs.Configure.outputs.runperformance
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.org-name }}/common-ci
@@ -335,6 +334,7 @@ jobs:
           -DryRun ([bool]::Parse('${{ inputs.dryrun }}'))
 
       - name: Escape Branch Name
+        if: needs.Configure.outputs.runperformance
         id: escape_branch
         run: |
           "name=" + $env:GITHUB_REF_NAME -replace '[":<>|*?/\\\r\n]', '-' | Out-File $env:GITHUB_OUTPUT -Append
