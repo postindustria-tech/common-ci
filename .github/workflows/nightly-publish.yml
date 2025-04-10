@@ -302,9 +302,9 @@ jobs:
   ComparePerformance:
     runs-on: ${{ inputs.build-platform }}
     needs: [Configure, Test]
-    if: needs.Configure.outputs.runperformance
     steps:
       - name: Checkout Common
+        if: needs.Configure.outputs.runperformance
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.org-name }}/common-ci
@@ -312,6 +312,7 @@ jobs:
           ref: ${{ inputs.common-ci-ref }}
 
       - name: Download Performance Results Artifact
+        if: needs.Configure.outputs.runperformance
         uses: actions/download-artifact@v4
         with:
           pattern: performance_results-publish-*
@@ -319,6 +320,7 @@ jobs:
           merge-multiple: true
 
       - name: Compare Performance
+        if: needs.Configure.outputs.runperformance
         run: |
           ./nightly-publish.compare-performance.ps1 `
           -RepoName '${{ inputs.repo-name }}' `
@@ -338,6 +340,7 @@ jobs:
           "name=" + $env:GITHUB_REF_NAME -replace '[":<>|*?/\\\r\n]', '-' | Out-File $env:GITHUB_OUTPUT -Append
 
       - name: Upload Performance Results Artifact
+        if: needs.Configure.outputs.runperformance
         uses: actions/upload-artifact@v4
         with:
           name: publish_performance_results@${{ steps.escape_branch.outputs.name }} # https://github.com/actions/upload-artifact/issues/22
