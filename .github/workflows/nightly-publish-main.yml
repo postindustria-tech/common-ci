@@ -83,6 +83,7 @@ jobs:
     outputs:
       asset_cache_key: ${{ steps.hash_asset_cache_key.outputs.hash }}
       options: ${{ steps.configure.outputs.options }}
+      runperformance: ${{ steps.configure.outputs.runperformance }}
       version: ${{ steps.configure.outputs.version }}
       update_required: ${{ steps.configure.outputs.update_required }}
     steps:
@@ -304,6 +305,7 @@ jobs:
   ComparePerformance:
     runs-on: ${{ inputs.build-platform }}
     needs: [Configure, Test]
+    if: needs.Configure.outputs.runperformance
     steps:
       - name: Checkout Common
         uses: actions/checkout@v4

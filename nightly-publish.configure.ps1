@@ -43,10 +43,14 @@ $Options = Get-Content $RepoName/ci/options.json | ConvertFrom-Json
 Write-Output $Options
 
 $RequiredOptions = @()
+$RunPerformance = $false
 foreach ($element in $Options) {
   if ($element.PackageRequirement) {
     $element | Add-Member -Name "Version" -Value $Version -MemberType NoteProperty
     $RequiredOptions += $element
+    if ($element.RunPerformance) {
+      $RunPerformance = $true
+    }
   }
 }
 if ($RequiredOptions.Count -eq 0) {
@@ -61,6 +65,7 @@ $RequiredOptions = $RequiredOptions | ConvertTo-Json -AsArray
 $RequiredOptions = $RequiredOptions -replace "`r?`n", ""
 Write-Host $RequiredOptions
 Write-Output options=$RequiredOptions | Out-File $GitHubOutput -Append
+if ($RunPerformance) { Write-Output runperformance=true | Out-File $GitHubOutput -Append }
 Write-Output $RequiredOptions
 Write-Output "::endgroup::"
 
