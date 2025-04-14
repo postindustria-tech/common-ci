@@ -304,6 +304,7 @@ jobs:
 
   ComparePerformance:
     runs-on: ${{ inputs.build-platform }}
+    if: needs.Configure.outputs.runperformance
     needs: [Configure, Test]
     steps:
       - name: Checkout Common
@@ -314,7 +315,6 @@ jobs:
           ref: ${{ inputs.common-ci-ref }}
 
       - name: Download Performance Results Artifact
-        if: needs.Configure.outputs.runperformance
         uses: actions/download-artifact@v4
         with:
           pattern: performance_results-publish-*
@@ -322,7 +322,6 @@ jobs:
           merge-multiple: true
 
       - name: Compare Performance
-        if: needs.Configure.outputs.runperformance
         run: |
           ./nightly-publish.compare-performance.ps1 `
           -RepoName '${{ inputs.repo-name }}' `
@@ -337,13 +336,11 @@ jobs:
           -DryRun ([bool]::Parse('${{ inputs.dryrun }}'))
 
       - name: Escape Branch Name
-        if: needs.Configure.outputs.runperformance
         id: escape_branch
         run: |
           "name=" + $env:GITHUB_REF_NAME -replace '[":<>|*?/\\\r\n]', '-' | Out-File $env:GITHUB_OUTPUT -Append
 
       - name: Upload Performance Results Artifact
-        if: needs.Configure.outputs.runperformance
         uses: actions/upload-artifact@v4
         with:
           name: publish_performance_results@${{ steps.escape_branch.outputs.name }} # https://github.com/actions/upload-artifact/issues/22
@@ -353,10 +350,9 @@ jobs:
 
   Package:
     runs-on: ${{ inputs.build-platform }}
-    needs: [Configure, ComparePerformance]
-    if: ${{ success() && needs.configure.outputs.update_required == 'true' }}
+    needs: [Configure, Test, ComparePerformance]
+    if: ${{ !failure() && !cancelled() && needs.configure.outputs.update_required == 'true' }}
     steps:
-
       - name: Checkout Common
         uses: actions/checkout@v4
         with:
