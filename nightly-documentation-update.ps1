@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 ./generate-documentation.ps1 `
     -RepoName $RepoName `
     -OrgName $OrgName `
-    -Branch $Branch, `
+    -Branch $Branch `
     -GitHubUser $GitHubUser `
     -GitHubEmail $GitHubEmail `
     -GitHubToken $GitHubToken `
