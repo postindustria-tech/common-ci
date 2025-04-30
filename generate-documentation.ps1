@@ -39,6 +39,10 @@ if ($RepoName -ne "documentation") {
     Write-Output "::group::Clone Documentation"
     ./steps/clone-repo.ps1 -RepoName "documentation" -OrgName $OrgName -Branch $Branch
     Write-Output "::endgroup::"
+} else {
+    Write-Output "::group::Remote-Update Documentation Submodules"
+    git -C $RepoName submodule update --init --remote
+    Write-Output "::endgroup::"
 }
 
 Write-Output "::group::Generate Documentation"
