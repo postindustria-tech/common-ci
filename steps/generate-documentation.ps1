@@ -50,12 +50,15 @@ try {
     & {
         $PSNativeCommandUseErrorActionPreference = $false
         git show-ref --quiet $branch
-        if ($LASTEXITCODE -ne 0) {
-            Write-Output "Creating new orphan branch"
-        }
     }
-    # checkout's more aggressive (compared to switch) force behavior is required
-    git checkout --force --recurse-submodules ($LASTEXITCODE -ne 0 ? '--orphan' : $null) $branch
+    if ($LASTEXITCODE -ne 0) {
+        Write-Output "Creating new orphan branch"
+        # checkout's more aggressive (compared to switch) force behavior is required
+        git checkout --force --recurse-submodules --orphan $branch
+        git rm -rf .
+    } else {
+        git checkout --force --recurse-submodules $branch
+    }
 
     if (Test-Path $VersionPath) {
         Write-Output "Removing existing docs in $($VersionPath.FullName)"
