@@ -1,8 +1,6 @@
 param (
-    [Parameter(Mandatory=$true)]
-    [string]$RepoName,
-    [Parameter(Mandatory=$true)]
-    [string]$OrgName,
+    [Parameter(Mandatory)][string]$RepoName,
+    [Parameter(Mandatory)][string]$OrgName,
     [string]$Branch = "main",
     [string]$GitHubUser,
     [string]$GitHubEmail,
@@ -24,10 +22,8 @@ if ($PullRequestId -ne 0) {
 }
 
 if ($SeparateExamples){
-    $ExamplesRepo = "$RepoName-examples"
-
-    Write-Output "::group::Clone $ExamplesRepo"
-    ./steps/clone-repo.ps1 -RepoName $ExamplesRepo -OrgName $OrgName -Branch $Branch -DestinationDir $RepoName/$ExamplesRepo
+    Write-Output "::group::Clone $RepoName-examples"
+    ./steps/clone-repo.ps1 -RepoName "$RepoName-examples" -OrgName $OrgName -Branch $Branch -DestinationDir $RepoName
     Write-Output "::endgroup::"
 }
 

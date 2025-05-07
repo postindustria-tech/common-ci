@@ -1,8 +1,6 @@
 param (
-    [Parameter(Mandatory=$true)]
-    [string]$RepoName,
-    [Parameter(Mandatory=$true)]
-    [string]$OrgName,
+    [Parameter(Mandatory)][string]$RepoName,
+    [Parameter(Mandatory)][string]$OrgName,
     [string]$Branch = "main",
     [string]$ForceSwitchTo,
     [string]$DestinationDir = "."
@@ -24,11 +22,3 @@ git -C $tmp log -1
 
 Write-Output "Renaming '$tmp' to '$RepoName'"
 Rename-Item $tmp $RepoName
-
-<#if ($Branch) {
-    & {
-        $PSNativeCommandUseErrorActionPreference = $false
-        git -C $RepoName show-ref --quiet --branches $Branch
-    }
-    git switch ($LASTEXITCODE -ne 0 ? '-c' : $null) $Branch
-}#>
