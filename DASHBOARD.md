@@ -23,6 +23,11 @@
 
 [![Nightly Pipeline](https://github.com/51Degrees/device-detection-cxx/actions/workflows/nightly-pipeline.yml/badge.svg?branch=version/4.5)](https://github.com/51Degrees/device-detection-cxx/actions/workflows/nightly-pipeline.yml)
 
+### [ip-intelligence-cxx](https://github.com/51Degrees/ip-intelligence-cxx)
+[![Nightly Pipeline](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/nightly-pipeline.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/nightly-pipeline.yml)
+[![Nightly Documentation Update](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/nightly-documentation-update.yml)
+[![Monthly Copyright Update](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/monthly-copyright-update.yml)
+
 ## Dotnet
 
 ### [common-dotnet](https://github.com/51Degrees/common-dotnet)
@@ -77,6 +82,15 @@
 [![Nightly Publish Main](https://github.com/51Degrees/caching-dotnet/actions/workflows/nightly-publish-main.yml/badge.svg)](https://github.com/51Degrees/caching-dotnet/actions/workflows/nightly-publish-main.yml)
 [![Nightly Package Update](https://github.com/51Degrees/caching-dotnet/actions/workflows/nightly-package-update.yml/badge.svg)](https://github.com/51Degrees/caching-dotnet/actions/workflows/nightly-package-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/caching-dotnet/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/caching-dotnet/actions/workflows/monthly-copyright-update.yml)
+
+### [ip-intelligence-dotnet](https://github.com/51Degrees/ip-intelligence-dotnet)
+[![Nightly Pipeline](https://github.com/51Degrees/ip-intelligence-dotnet/actions/workflows/nightly-pipeline.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-dotnet/actions/workflows/nightly-pipeline.yml)
+[![Nightly Documentation Update](https://github.com/51Degrees/ip-intelligence-dotnet/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-dotnet/actions/workflows/nightly-documentation-update.yml)
+[![Monthly Copyright Update](https://github.com/51Degrees/ip-intelligence-dotnet/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-dotnet/actions/workflows/monthly-copyright-update.yml)
+
+### [ip-intelligence-dotnet-examples](https://github.com/51Degrees/ip-intelligence-dotnet-examples)
+[![Nightly Pipeline](https://github.com/51Degrees/ip-intelligence-dotnet-examples/actions/workflows/nightly-pipeline.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-dotnet-examples/actions/workflows/nightly-pipeline.yml)
+[![Monthly Copyright Update](https://github.com/51Degrees/ip-intelligence-dotnet-examples/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-dotnet-examples/actions/workflows/monthly-copyright-update.yml)
 
 ## Java
 
