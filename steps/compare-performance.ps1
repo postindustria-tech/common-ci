@@ -74,6 +74,7 @@ function Generate-PerformanceResults {
         $historic.LegendText = "historic"
 
         # Write to the output image
+        $plot.Font.Set([ScottPlot.Fonts]::Monospace)
         $plot.SavePng("$RepoName/perf-graph-$Name-$MetricName-latest.png", 400, 300)
     } else {
         Write-Host "Not publishing graphs, skipping graph generation"
@@ -118,7 +119,7 @@ try {
         Write-Host "Installing ScottPlot..."
         dotnet new classlib -o $plotTmp
         dotnet add $plotTmp package ScottPlot --version 5.0.55
-        dotnet dotnet publish $plotTmp --output $plotTmp/scottplot
+        dotnet publish $plotTmp --output $plotTmp/scottplot
         $arch = [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString().ToLower()
         $skia = `
             $IsLinux   ? "linux-$arch/native/libSkiaSharp.so" :
