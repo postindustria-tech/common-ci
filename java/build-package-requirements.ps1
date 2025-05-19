@@ -9,7 +9,7 @@ Write-Host "Entering '$RepoName'"
 Push-Location $RepoName
 try {
     Write-Host "Building '$Name'"
-    mvn compile --batch-mode --no-transfer-progress -DskipTests
+    mvn package --batch-mode --no-transfer-progress -DskipTests
 }
 finally {
     Write-Host "Leaving '$RepoName'"
