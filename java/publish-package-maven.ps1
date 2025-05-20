@@ -1,27 +1,34 @@
 param (
-    [Parameter(Mandatory)][string]$RepoName,
-    [Parameter(Mandatory)][string]$Version,
-    [Parameter(Mandatory)][string]$MavenSettings
+    [Parameter(Mandatory)][string]$MavenSettings,
+    $RepoName, # accepted for compatibility
+    $Version   # accepted for compatibility
 )
 $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
-$mvnSettings = "$PWD/java/settings.xml"
-
-Write-Host "Entering '$RepoName'"
-Push-Location $RepoName
-try {
-    # We need to set the version here again even though the packages are already built using the next version
-    # as this script will run in a new job and the repo will be cloned again.
-    Write-Host "Setting version to '$Version'"
-    mvn --batch-mode --no-transfer-progress versions:set "-DnewVersion=$Version"
-
-    $env:MVN_CENTRAL_USERNAME, $env:MVN_CENTRAL_PASSWORD = $MavenSettings -split ' ', 2
-    $env:MAVEN_OPTS='--add-opens=java.base/java.util=ALL-UNNAMED'
-
-    Write-Host "Releasing to Maven central"
-    mvn deploy --batch-mode --no-transfer-progress --settings $mvnSettings -DskipTests 
-} finally {
-    Write-Host "Leaving '$RepoName'"
-    Pop-Location
+$args = @{
+    ConnectionTimeoutSeconds = 30
+    OperationTimeoutSeconds = 30
+    Method = 'Post'
+    Headers = @{Authorization = "Bearer $MavenSettings"}
 }
+$api = "https://central.sonatype.com/api/v1/publisher"
+
+Write-Host "Uploading the bundle..."
+$id = Invoke-WebRequest @args -Uri "$api/upload" -Form @{bundle = Get-Item package/central-bundle.zip; publishingType = 'AUTOMATIC'}
+Write-Host "Deployment id: $id"
+
+for ($i = 1; $i -le 60; ++$i) {
+    Start-Sleep -Seconds 10
+
+    Write-Host "Checking status ($i)..."
+    $resp = Invoke-WebRequest @args -Uri "$api/status?id=$id" | ConvertFrom-Json
+
+    switch ($resp.deploymentState) {
+        'VALIDATED' {Write-Error "Deployment has passed validation and is waiting on a user to manually publish via the Central Portal UI"}
+        'FAILED'    {Write-Error "Publishing failed:" $resp.errors}
+        'PUBLISHED' {Write-Host "Deployment successful"; exit 0}
+    }
+    # Retry on other statuses
+}
+Write-Error "Reached maximum number of retries, giving up"

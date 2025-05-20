@@ -74,8 +74,8 @@ try {
     Write-Host "Copying 51degrees packages from local repo"
     Copy-Item -Recurse $mvnLocalRepo/com/51degrees $packagePath
 
-    Write-Host "Copying local maven staging directory"
-    Copy-Item -Recurse target $packagePath
+    Write-Host "Copying publishing bundle"
+    Copy-Item target/central-publishing/central-bundle.zip $packagePath
 } finally {
     Write-Host "Leaving '$RepoName'"
     Pop-Location

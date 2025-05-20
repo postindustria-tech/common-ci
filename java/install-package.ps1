@@ -15,11 +15,8 @@ try {
     Write-Host "Copying packages to the local repository"
     Copy-Item -Recurse "$packagePath/51degrees" "$mvnLocalRepo/com/51degrees"
 
-    Write-Host "Copying packages to the local staging repository"
-    Copy-Item -Recurse "$packagePath/target" .
-
     Write-Host "Local 51d maven repository contents:"
-    Get-ChildItem $MavenLocal51DPath
+    Get-ChildItem "$mvnLocalRepo/com/51degrees"
 } finally {
     Write-Host "Leaving '$RepoName'"
     Pop-Location
