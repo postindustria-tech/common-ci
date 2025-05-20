@@ -24,10 +24,11 @@ for ($i = 1; $i -le 60; ++$i) {
     Write-Host "Checking status ($i)..."
     $resp = Invoke-WebRequest @args -Uri "$api/status?id=$id" | ConvertFrom-Json
 
-    switch ($resp.deploymentState) {
+    switch -Wildcard ($resp.deploymentState) {
+        # shouldn't happen due to publishingType being set above, but just in case
         'VALIDATED' {Write-Error "Deployment has passed validation and is waiting on a user to manually publish via the Central Portal UI"}
         'FAILED'    {Write-Error "Publishing failed:" $resp.errors}
-        'PUBLISHED' {Write-Host "Deployment successful"; exit 0}
+        'PUBLISH*' {Write-Host "Deployment successful: $_"; exit 0}
     }
     # Retry on other statuses
 }
