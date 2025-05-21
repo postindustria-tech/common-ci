@@ -27,7 +27,7 @@ for ($i = 1; $i -le 60; ++$i) {
     switch -Wildcard ($resp.deploymentState) {
         # shouldn't happen due to publishingType being set above, but just in case
         'VALIDATED' {Write-Error "Deployment has passed validation and is waiting on a user to manually publish via the Central Portal UI"}
-        'FAILED'    {Write-Error "Publishing failed:" $resp.errors}
+        'FAILED'    {Write-Error "Publishing failed: $($resp.errors | ConvertTo-Json)"}
         'PUBLISH*' {Write-Host "Deployment successful: $_"; exit 0}
     }
     # Retry on other statuses
