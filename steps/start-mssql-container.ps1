@@ -11,4 +11,5 @@ docker run -d --name sqlcontainer --hostname sqlcontainer `
     -e "MSSQL_AGENT_ENABLED=true" `
     mcr.microsoft.com/mssql/server:2022-latest
 
-Write-Output docker ps --filter "ancestor=mcr.microsoft.com/mssql/server:2022-latest"
+$DockerRunning = docker ps --filter "ancestor=mcr.microsoft.com/mssql/server:2022-latest"
+Write-Output $DockerRunning
