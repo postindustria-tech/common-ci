@@ -2,6 +2,8 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Password
 )
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
 docker run -d --name sqlcontainer --hostname sqlcontainer `
     -p 1433:1433 `
