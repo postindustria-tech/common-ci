@@ -1,0 +1,1 @@
+docker run -d --name sqlcontainer --hostname sqlcontainer -p 1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=admin -e MSSQL_PID=Developer -e MSSQL_AGENT_ENABLED=true mcr.microsoft.com/mssql/server:2022-latest
