@@ -28,6 +28,9 @@
 [![Nightly Documentation Update](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/nightly-documentation-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/nightly-documentation-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-cxx/actions/workflows/monthly-copyright-update.yml)
 
+### [ip-graph-cxx](https://github.com/51Degrees/ip-graph-cxx)
+[![Nightly Pull Requests](https://github.com/51Degrees/ip-graph-cxx/actions/workflows/nightly-prs-to-main.yml/badge.svg)](https://github.com/51Degrees/ip-graph-cxx/actions/workflows/nightly-prs-to-main.yml)
+
 ## Dotnet
 
 ### [common-dotnet](https://github.com/51Degrees/common-dotnet)
