@@ -136,6 +136,14 @@
 [![Nightly Submodule Update](https://github.com/51Degrees/location-java/actions/workflows/nightly-submodule-update.yml/badge.svg)](https://github.com/51Degrees/location-java/actions/workflows/nightly-submodule-update.yml)
 [![Monthly Copyright Update](https://github.com/51Degrees/location-java/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/location-java/actions/workflows/monthly-copyright-update.yml)
 
+### [ip-intelligence-java](https://github.com/51Degrees/ip-intelligence-java)
+[![Nightly Pipeline](https://github.com/51Degrees/ip-intelligence-java/actions/workflows/nightly-pipeline.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-java/actions/workflows/nightly-pipeline.yml)
+[![Monthly Copyright Update](https://github.com/51Degrees/ip-intelligence-java/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-java/actions/workflows/monthly-copyright-update.yml)
+
+### [ip-intelligence-java-examples](https://github.com/51Degrees/ip-intelligence-java-examples)
+[![Nightly Pipeline](https://github.com/51Degrees/ip-intelligence-java-examples/actions/workflows/nightly-pipeline.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-java-examples/actions/workflows/nightly-pipeline.yml)
+[![Monthly Copyright Update](https://github.com/51Degrees/ip-intelligence-java-examples/actions/workflows/monthly-copyright-update.yml/badge.svg)](https://github.com/51Degrees/ip-intelligence-java-examples/actions/workflows/monthly-copyright-update.yml)
+
 ## Nginx
 
 ### [device-detection-nginx](https://github.com/51Degrees/device-detection-nginx)
