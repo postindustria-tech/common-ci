@@ -12,9 +12,9 @@ $PSNativeCommandUseErrorActionPreference = $true
 $summaryDir = New-Item -ItemType directory -Path $RepoName/test-results/performance-summary -Force
 
 Write-Host "Cloning examples..."
-./steps/clone-repo.ps1 -OrgName $OrgName -RepoName $ExamplesRepo -Branch $Branch $DestinationDir $RepoName
+git clone --branch $Branch --depth 1 "https://github.com/$OrgName/$ExamplesRepo.git"
 
-Push-Location $RepoName/$ExamplesRepo
+Push-Location $ExamplesRepo
 try {
     Write-Host "Running performance test..."
     go run $Example
