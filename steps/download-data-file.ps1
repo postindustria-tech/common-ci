@@ -1,15 +1,15 @@
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory)][string]$FullFilePath,
+    [string]$Url,
     [string]$LicenseKey,
-    [Parameter(Mandatory=$true)]
     [string]$DataType,
-    [Parameter(Mandatory=$true)]
-    [string]$Product,
-    [Parameter(Mandatory=$true)]
-    [string]$FullFilePath,
-    [string]$Url
+    [string]$Product
 )
 $ErrorActionPreference = "Stop"
+
+if (!$Url -and (!$LicenseKey -or !$DataType -or !$Product)) {
+    Write-Error "Either full Url or LicenseKey+DataType+Product must be provided"
+}
 
 $Url = $Url ? $Url : "https://distributor.51degrees.com/api/v2/download?LicenseKeys=$LicenseKey&Type=$DataType&Download=True&Product=$Product"
 Write-Host ($Url -replace '^https?://', '')
