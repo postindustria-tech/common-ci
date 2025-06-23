@@ -186,7 +186,7 @@ foreach ($Failure in $Failures) {
     Write-Output "Attempting to restore: $($Failure.Path)"
     dotnet restore $Failure.Path
     if ($LASTEXITCODE -ne 0) {
-        Write-Warning "⚠️ $($Failure.Path) -- Re-restore failed with exit code $LASTEXITCODE"
+        Write-Error "❌ $($Failure.Path) -- Re-restore failed with exit code $LASTEXITCODE"
         exit $LASTEXITCODE
     }
 }
