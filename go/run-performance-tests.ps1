@@ -10,12 +10,16 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
 $summaryDir = New-Item -ItemType directory -Path $RepoName/test-results/performance-summary -Force
+$repoPath = "$PWD/$RepoName"
 
 Write-Host "Cloning examples..."
 git clone --branch $Branch --depth 1 "https://github.com/$OrgName/$ExamplesRepo.git"
 
 Push-Location $ExamplesRepo
 try {
+    Write-Host "Using local ip-intelligence-go version"
+    go mod edit -replace "github.com/51Degrees/ip-intelligence-go=$repoPath"
+
     Write-Host "Running performance test..."
     go run $Example
 
