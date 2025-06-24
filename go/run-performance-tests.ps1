@@ -17,7 +17,7 @@ git clone --branch $Branch --depth 1 "https://github.com/$OrgName/$ExamplesRepo.
 
 Push-Location $ExamplesRepo
 try {
-    Write-Host "Using local ip-intelligence-go version"
+    Write-Host "Using local $RepoName version"
     go mod edit -replace "github.com/51Degrees/ip-intelligence-go=$repoPath"
 
     Write-Host "Running performance test..."
