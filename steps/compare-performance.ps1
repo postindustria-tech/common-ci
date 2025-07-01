@@ -89,7 +89,7 @@ function Generate-PerformanceResults {
         Write-Output "| Date | $MetricName |" >> $env:GITHUB_STEP_SUMMARY
         Write-Output "| --- | --- |" >> $env:GITHUB_STEP_SUMMARY
         for ($i=0; $i -lt $Dates.Length; ++$i) {
-            Write-Output "| $($Dates[$i]) | $($Values[$i]) |" >> $env:GITHUB_STEP_SUMMARY
+            Write-Output "| $([DateTime]::FromOADate($Dates[$i])) | $($Values[$i]) |" >> $env:GITHUB_STEP_SUMMARY
         }
     }
 
