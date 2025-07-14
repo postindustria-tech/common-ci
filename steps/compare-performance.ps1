@@ -75,7 +75,7 @@ function Generate-PerformanceResults {
 
         # Write to the output image
         $plot.Font.Set([ScottPlot.Fonts]::Monospace)
-        Write-Host "Default font:", [ScottPlot.Fonts]::Monospace
+        Write-Host "Default font: $([ScottPlot.Fonts]::Monospace)"
         $plot.SavePng("$RepoName/perf-graph-$Name-$MetricName-latest.png", 400, 300)
     } else {
         Write-Host "Not publishing graphs, skipping graph generation"

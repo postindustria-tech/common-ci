@@ -303,7 +303,7 @@ jobs:
           skip-performance: true
 
   ComparePerformance:
-    runs-on: ${{ inputs.build-platform }}
+    runs-on: ubuntu-latest
     if: needs.Configure.outputs.runperformance
     needs: [Configure, Test]
     steps:
