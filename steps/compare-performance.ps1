@@ -75,6 +75,9 @@ function Generate-PerformanceResults {
 
         # Write to the output image
         $plot.Font.Set(($env:CI && $IsLinux) ? "DejaVu Sans Mono" : [ScottPlot.Fonts]::Monospace)
+        $plot.Axes.Title.Label.Bold = $false
+        $plot.Axes.Bottom.Label.Bold = $false
+        $plot.Axes.Left.Label.Bold = $false
         $plot.SavePng("$RepoName/perf-graph-$Name-$MetricName-latest.png", 400, 300)
     } else {
         Write-Host "Not publishing graphs, skipping graph generation"
