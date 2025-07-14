@@ -48,6 +48,7 @@ try {
                     --configuration $Configuration `
                     @PlatformParams `
                     --results-directory $TestResultPath `
+                    --diag:"$RepoPath/test-log-$($NextFile.Name).txt" `
                     --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
             }
