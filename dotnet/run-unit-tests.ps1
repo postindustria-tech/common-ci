@@ -53,16 +53,20 @@ try {
                     --configuration $Configuration `
                     @DotnetCallParams `
                     --results-directory $TestResultPath `
-                    --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
-                Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
-                if (($LASTEXITCODE -ne 0) -and $DotnetDiag) {
-                    $LogFiles = Get-ChildItem "$RepoPath/test-log-$($NextFile.Name)*txt"
-                    foreach ($NextLogFile in $LogFiles) {
-                        Write-Warning "---- $($NextLogFile.Name) BEGIN ----"
-                        Get-Content $NextLogFile.FullName
-                        Write-Warning "---- $($NextLogFile.Name) END ----"
+                    --blame-crash --blame-hang-timeout 5m -l "trx" $verbose
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Warning "dotnet test LastExitCode=$LASTEXITCODE"
+                    if ($DotnetDiag) {
+                        $LogFiles = Get-ChildItem "$RepoPath/test-log-$($NextFile.Name)*txt"
+                        foreach ($NextLogFile in $LogFiles) {
+                            Write-Warning "---- $($NextLogFile.Name) BEGIN ----"
+                            Get-Content $NextLogFile.FullName
+                            Write-Warning "---- $($NextLogFile.Name) END ----"
+                        }
                     }
+                    $script:ok = $false
                 }
+                Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
             }
         }
     } else {
