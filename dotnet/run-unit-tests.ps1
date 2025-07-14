@@ -7,6 +7,7 @@ param(
     [string]$Configuration = "Release",
     [string]$Arch = "x64",
     [string]$BuildMethod="dotnet",
+    [switch]$DotnetDiag,
     [string]$DirNameFormatForDotnet = "*bin*",
     [string]$DirNameFormatForNotDotnet = "*\bin\*",
     [string]$Filter,
@@ -32,6 +33,10 @@ try {
         Write-Output "[dotnet] => Looking for '$Filter' in directories like '$DirNameFormatForDotnet'"
         $PlatformParams = $SkipPlatformArgs ? @() : @("-p:Platform=$Arch")
         foreach ($NextFile in (Get-ChildItem -Path $RepoPath -Recurse -File)) {
+            $DotnetCallParams = $PlatformParams
+            if ($DotnetDiag) {
+                $DotnetCallParams += "--diag:$RepoPath/test-log-$($NextFile.Name).txt"
+            }
             $NextDirName = $NextFile.DirectoryName
             $NextFileName = $NextFile.Name
             Write-Debug "[$NextDirName]/[$NextFileName]"
@@ -46,9 +51,8 @@ try {
                 dotnet test $NextFile.FullName `
                     --no-build `
                     --configuration $Configuration `
-                    @PlatformParams `
+                    @DotnetCallParams `
                     --results-directory $TestResultPath `
-                    --diag:"$RepoPath/test-log-$($NextFile.Name).txt" `
                     --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
             }
