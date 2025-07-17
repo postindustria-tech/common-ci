@@ -110,7 +110,7 @@ jobs:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
     name: Build and Test - ${{ inputs.pull-request-id }} - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
-    timeout-minutes: 120
+    timeout-minutes: 240
     steps:
       - name: Checkout Common
         uses: actions/checkout@v4
