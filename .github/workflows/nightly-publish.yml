@@ -27,6 +27,9 @@ on:
       common-ci-ref:
         type: string
         default: ''
+      skip-compare-performance:
+        type: boolean
+        default: false
     secrets:
       # PAT that we use to authenticate on behalf of GitHub Actions.
       token:
@@ -301,7 +304,7 @@ jobs:
 
   ComparePerformance:
     runs-on: ubuntu-latest
-    if: needs.Configure.outputs.runperformance
+    if: ${{ !skip-compare-performance && needs.Configure.outputs.runperformance }}
     needs: [Configure, Test]
     steps:
       - name: Checkout Common

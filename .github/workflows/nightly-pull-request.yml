@@ -33,6 +33,9 @@ on:
       build-test-timeout-minutes:
         type: number
         default: 120
+      skip-compare-performance:
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
@@ -191,9 +194,8 @@ jobs:
           overwrite: true
 
   ComparePerformance:
-    # This needs to run on Windows to support ScottPlot
-    runs-on: windows-latest
     needs: [ Configure, BuildAndTest ]
+    if: ${{ !inputs.skip-compare-performance }}
     name: Compare Performance - ${{ inputs.pull-request-id }}
     steps:
       - name: Checkout Common
@@ -231,6 +233,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Complete ${{ inputs.pull-request-id }}
     needs: [ BuildAndTest, ComparePerformance ]
+    if: ${{ !failure() && !cancelled() }}
     steps:
       - name: Checkout Common
         uses: actions/checkout@v4
