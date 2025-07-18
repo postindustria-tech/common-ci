@@ -30,6 +30,9 @@ on:
       branch: # Branch to use if not one calling this
         type: string
         default: ''
+      build-test-timeout-minutes:
+        type: number
+        default: 120
     secrets:
       token:
         required: true
@@ -110,7 +113,7 @@ jobs:
         options: ${{ fromJSON(needs.configure.outputs.options ) }}
     name: Build and Test - ${{ inputs.pull-request-id }} - ${{ matrix.options.name }}
     runs-on: ${{ matrix.options.image }}
-    timeout-minutes: 120
+    timeout-minutes: ${{ inputs.build-test-timeout-minutes }}
     steps:
       - name: Checkout Common
         uses: actions/checkout@v4
