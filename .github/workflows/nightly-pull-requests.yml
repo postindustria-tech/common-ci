@@ -28,6 +28,12 @@ on:
       branch: # Branch to use if not one calling this
         type: string
         default: ''
+      build-test-timeout-minutes:
+        type: number
+        default: 120
+      skip-compare-performance:
+        type: boolean
+        default: false
     secrets:
       token:
         required: true
@@ -110,4 +116,6 @@ jobs:
       cache-assets: ${{ inputs.cache-assets }}
       common-ci-ref: ${{ inputs.common-ci-ref }}
       branch: ${{ inputs.branch }}
+      build-test-timeout-minutes: ${{ inputs.build-test-timeout-minutes }}
+      skip-compare-performance: ${{ inputs.skip-compare-performance }}
     secrets: inherit

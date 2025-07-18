@@ -307,7 +307,7 @@ jobs:
 
   ComparePerformance:
     runs-on: ubuntu-latest
-    if: ${{ !skip-compare-performance && needs.Configure.outputs.runperformance }}
+    if: ${{ !inputs.skip-compare-performance && needs.Configure.outputs.runperformance }}
     needs: [Configure, Test]
     steps:
       - name: Checkout Common

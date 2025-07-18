@@ -194,6 +194,7 @@ jobs:
           overwrite: true
 
   ComparePerformance:
+    runs-on: ubuntu-latest
     needs: [ Configure, BuildAndTest ]
     if: ${{ !inputs.skip-compare-performance }}
     name: Compare Performance - ${{ inputs.pull-request-id }}
