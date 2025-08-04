@@ -23,7 +23,7 @@ Write-Output "Entering '$RepoPath'"
 Push-Location $RepoPath
 
 try {
-    $ok = $true
+    $script:ok = $true
     $verbose = $IsMacOS ? '--verbosity', 'd' : $null # macOS debugging
 
     $skipPattern = "*performance*"
@@ -82,7 +82,8 @@ try {
         }
     }
 
-    if (!$ok) {
+    Write-Output "Final test result: ok = $($script:ok)"
+    if (!$script:ok) {
         Write-Error "Tests failed"
     }
 } finally {
