@@ -28,6 +28,12 @@ try {
 
     $skipPattern = "*performance*"
     Write-Output "Testing '$Name'"
+    Write-Output "BuildMethod: $BuildMethod"
+    Write-Output "Initial ok value: $($script:ok)"
+    Write-Output "Initial LASTEXITCODE: $LASTEXITCODE"
+    
+    # Reset LASTEXITCODE to ensure clean state
+    $LASTEXITCODE = 0
     if ($BuildMethod -eq "dotnet"){
         Write-Output "[dotnet] => Looking for '$Filter' in directories like '$DirNameFormatForDotnet'"
         $PlatformParams = $SkipPlatformArgs ? @() : @("-p:Platform=$Arch")
@@ -51,6 +57,7 @@ try {
                     --blame-crash --blame-hang-timeout 5m -l "trx" $verbose
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
                 if ($LASTEXITCODE -ne 0) {
+                    Write-Output "Setting ok=false due to dotnet test exit code $LASTEXITCODE for $NextFile"
                     $script:ok = $false
                 }
             }
@@ -76,6 +83,7 @@ try {
                     /ResultsDirectory:$TestResultPath
                 Write-Output "vstest.console LastExitCode=$LASTEXITCODE"
                 if ($LASTEXITCODE -ne 0) {
+                    Write-Output "Setting ok=false due to vstest.console exit code $LASTEXITCODE for $NextFile"
                     $script:ok = $false
                 }
             }
