@@ -48,8 +48,11 @@ try {
                     --configuration $Configuration `
                     @PlatformParams `
                     --results-directory $TestResultPath `
-                    --blame-crash --blame-hang-timeout 5m -l "trx" $verbose || $($script:ok = $false)
+                    --blame-crash --blame-hang-timeout 5m -l "trx" $verbose
                 Write-Output "dotnet test LastExitCode=$LASTEXITCODE"
+                if ($LASTEXITCODE -ne 0) {
+                    $script:ok = $false
+                }
             }
         }
     } else {
@@ -70,8 +73,11 @@ try {
                 & vstest.console.exe $NextFile.FullName `
                     @PlatformParams `
                     /Logger:trx `
-                    /ResultsDirectory:$TestResultPath || $($script:ok = $false)
+                    /ResultsDirectory:$TestResultPath
                 Write-Output "vstest.console LastExitCode=$LASTEXITCODE"
+                if ($LASTEXITCODE -ne 0) {
+                    $script:ok = $false
+                }
             }
         }
     }
