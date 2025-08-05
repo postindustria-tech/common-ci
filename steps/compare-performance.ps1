@@ -48,6 +48,8 @@ function Generate-PerformanceResults {
     $higherBound = $stats.Average + $maxDiff
 
     $currentResult = $Values[-1]
+    Write-Host "Average: $($stats.Average)"
+    Write-Host "Standard deviation: $($stats.StandardDeviation) (x2 = $($stats.StandardDeviation*2))"
     Write-Host "Acceptable values: $($HigherIsBetter ? ">$lowerBound" : "<$higherBound")"
     Write-Host "Current result: $currentResult"
 
@@ -165,7 +167,8 @@ try {
         # Get the historic performance results from the artifacts
         [System.Collections.ArrayList]$results = @()
         $artifacts | Sort-Object -Property created_at | ForEach-Object {if ($result = Get-Artifact-Result -Artifact $_ -Name $Options.Name) {$results.Add($result)}}
-        $results.Add($currentResult)
+        [void]$results.Add($currentResult)
+        Write-Host "Number of results: $($results.Count)"
 
         # Generate the performance results for all metrics
         $higherIsBetterResults = $results.Where({$null -ne $_.HigherIsBetter})
