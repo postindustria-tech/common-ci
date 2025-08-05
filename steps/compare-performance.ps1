@@ -178,13 +178,15 @@ try {
             [double[]]$values = foreach ($_ in $higherIsBetterResults) { $_.HigherIsBetter[$metric] }
             Generate-PerformanceResults -Name $Options.Name -MetricName $metric -Dates $dates -Values $values -HigherIsBetter
         }
-        $lowerIsBetterResults = $results.Where({$null -ne $_.LowerIsBetter})
-        foreach ($metric in $CurrentResult.LowerIsBetter.Keys) {
-            Write-Host "Checking '$metric' (LowerIsBetter)"
-            [double[]]$dates = foreach ($_ in $lowerIsBetterResults) { $_.Artifact.created_at.ToOADate() }
-            [double[]]$values = foreach ($_ in $lowerIsBetterResults) { $_.LowerIsBetter[$metric] }
-            Generate-PerformanceResults -Name $Options.Name -MetricName $metric -Dates $dates -Values $values
-        }
+        ### NOTE: currently all LowerIsBetter metrics are derivatives of
+        ### HigherIsBetter metrics, no reason to do the comparison twice
+        # $lowerIsBetterResults = $results.Where({$null -ne $_.LowerIsBetter})
+        # foreach ($metric in $CurrentResult.LowerIsBetter.Keys) {
+        #     Write-Host "Checking '$metric' (LowerIsBetter)"
+        #     [double[]]$dates = foreach ($_ in $lowerIsBetterResults) { $_.Artifact.created_at.ToOADate() }
+        #     [double[]]$values = foreach ($_ in $lowerIsBetterResults) { $_.LowerIsBetter[$metric] }
+        #     Generate-PerformanceResults -Name $Options.Name -MetricName $metric -Dates $dates -Values $values
+        # }
     }
 
     if ($Publish) {
