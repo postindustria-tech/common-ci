@@ -166,7 +166,7 @@ try {
 
         # Get the historic performance results from the artifacts
         [System.Collections.ArrayList]$results = @()
-        $artifacts | Sort-Object -Property created_at | ForEach-Object {if ($result = Get-Artifact-Result -Artifact $_ -Name $Options.Name) {$results.Add($result)}}
+        $artifacts | Sort-Object -Property created_at | ForEach-Object {if ($result = Get-Artifact-Result -Artifact $_ -Name $Options.Name) {[void]$results.Add($result)}}
         [void]$results.Add($currentResult)
         Write-Host "Number of results: $($results.Count)"
 
